@@ -17,7 +17,7 @@ public class TheMainClass
 		cfg.title = "Pojahns Game Engine";
 		cfg.width = 800;
 		cfg.height = 600;
-		cfg.vSyncEnabled = settings.vsync;
+		cfg.vSyncEnabled = settings.vsync; 
 		cfg.resizable = false;
 		cfg.useGL30 = true; 
 		cfg.backgroundFPS = settings.fps;
