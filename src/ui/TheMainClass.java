@@ -8,7 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class TheMainClass 
 {
-	public static void main(String[] args) 
+	public static void main(String... args) 
 	{
 		GameSettings settings = new GameSettings();
 		settings.loadSettings("res/data/game.ini");
@@ -19,7 +19,7 @@ public class TheMainClass
 		cfg.height = 600;
 		cfg.vSyncEnabled = settings.vsync;
 		cfg.resizable = false;
-		cfg.useGL30 = true;
+		cfg.useGL30 = true; 
 		cfg.backgroundFPS = settings.fps;
 		cfg.foregroundFPS = settings.fps;
 		cfg.addIcon("res/data/icon128x128.png", FileType.Internal);

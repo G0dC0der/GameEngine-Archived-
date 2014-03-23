@@ -56,7 +56,7 @@ public class Splash implements Screen
 		batch.draw(splashImage, x, 0);
 		batch.end();
 		
-		if(time > 1f)//3f)
+		if(time > 3f)//3f)
 			manager.nextTask(Task.OPEN_MENU);
 	}
 
