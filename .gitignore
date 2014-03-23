@@ -2,5 +2,8 @@
 /replays
 /res
 /Tutorials
-/bin/
-.classpath/.gitignore/.project/.settings
+/bin
+/.classpath
+/.gitignore
+/.project
+/.settings
