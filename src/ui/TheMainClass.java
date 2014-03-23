@@ -23,7 +23,7 @@ public class TheMainClass
 		cfg.backgroundFPS = settings.fps;
 		cfg.foregroundFPS = settings.fps;
 		cfg.addIcon("res/data/icon128x128.png", FileType.Internal);
-		cfg.addIcon("res/data/icon32x32.png", FileType.Internal); 
+		cfg.addIcon("res/data/icon32x32.png", FileType.Internal);  
 		cfg.addIcon("res/data/icon16x16.png", FileType.Internal);
 		
 		new LwjglApplication(new ScreenManager(), cfg); 
