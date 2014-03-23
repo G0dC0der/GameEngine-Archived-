@@ -2,4 +2,5 @@
 /replays
 /res
 /Tutorials
-/bin
+/bin/
+.classpath/.gitignore/.project/.settings
