@@ -26,6 +26,6 @@ public class TheMainClass
 		cfg.addIcon("res/data/icon32x32.png", FileType.Internal);
 		cfg.addIcon("res/data/icon16x16.png", FileType.Internal);
 		
-		new LwjglApplication(new ScreenManager(), cfg);
+		new LwjglApplication(new ScreenManager(), cfg); 
 	}	
 }
