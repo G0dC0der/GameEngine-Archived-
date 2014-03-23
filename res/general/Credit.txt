@@ -1,0 +1,14 @@
+hearth.png by C.Nilsson and modified by Pojahn Moradi:
+http://opengameart.org/content/simple-small-pixel-hearts
+
+main character/android by creek23 and modified by Pojahn Moradi:
+http://opengameart.org/content/droid-the-android-mascot
+
+jump.wav by soundnimja:
+http://www.freesound.org/people/soundnimja/sounds/173326/
+
+explosion animation(main/death) by Osmic and modified by Pojahn Moradi:
+http://opengameart.org/content/explosion-animated
+
+death.wav by Taira Komori:
+http://www.freesound.org/people/Taira%20Komori/sounds/215600/
