@@ -67,7 +67,7 @@ public class MainMenu implements Screen
 			}
 		});
 		
-		TextButton stats = new TextButton("Stats", skin);
+		TextButton stats = new TextButton("Highscores", skin);
 		stats.setPosition(330, 350);
 		stats.setSize(140, 43);
 		stats.addListener(new ClickListener()

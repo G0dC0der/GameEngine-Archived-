@@ -11,22 +11,19 @@ import game.essentials.Controller.PressedButtons;
 public class HighScore implements java.io.Serializable, Comparable<HighScore>
 {
 	private static final long serialVersionUID = -8294988208058754641L;
-	
-	public static final Comparator<HighScore> RESULT_SORT = new Comparator<HighScore>()
-	{
-		@Override
-		public int compare(HighScore hs1, HighScore hs2) 
-		{
-			return hs1.result.compareTo(hs2.result);
-		}
-	};
 
 	public static final Comparator<HighScore> DATE_SORT = new Comparator<HighScore>()
 	{
 		@Override
 		public int compare(HighScore hs1, HighScore hs2) 
 		{
-			return hs1.date.compareTo(hs2.date);
+			int value = hs1.date.compareTo(hs2.date);
+			if(value > 0)
+				value = -1;
+			else if(value < 0)
+				value = 1;
+			
+			return value;
 		}
 	};
 	
@@ -35,7 +32,24 @@ public class HighScore implements java.io.Serializable, Comparable<HighScore>
 		@Override
 		public int compare(HighScore hs1, HighScore hs2) 
 		{
-			return hs1.name.compareTo(hs2.name);
+			int value = hs1.name.compareTo(hs2.name);
+			if(value > 0)
+				value = -1;
+			else if(value < 0)
+				value = 1;
+			
+			if (value == 0) 
+			{
+				if (hs1.time > hs2.time)
+					return -1;
+				
+				if (hs1.time < hs2.time)
+					return 1;
+				
+				return 0;
+			} 
+			else 
+				return value;
 		}
 	};
 	
@@ -44,7 +58,24 @@ public class HighScore implements java.io.Serializable, Comparable<HighScore>
 		@Override
 		public int compare(HighScore hs1, HighScore hs2) 
 		{
-			return hs1.stageName.compareTo(hs2.stageName);
+			int value =  hs1.stageName.compareTo(hs2.stageName);
+			if(value > 0)
+				value = -1;
+			else if(value < 0)
+				value = 1;
+			
+			if (value == 0) 
+			{
+				if (hs1.time > hs2.time)
+					return -1;
+				
+				if (hs1.time < hs2.time)
+					return 1;
+				
+				return 0;
+			} 
+			else 
+				return value;
 		}
 	};
 	
@@ -56,7 +87,13 @@ public class HighScore implements java.io.Serializable, Comparable<HighScore>
 			Double d1 = hs1.time;
 			Double d2 = hs2.time;
 			
-			return d1.compareTo(d2);
+			int value = d1.compareTo(d2);
+			if(value > 0)
+				value = -1;
+			else if(value < 0)
+				value = 1;
+			
+			return value;
 		}
 	};
 	

@@ -5,8 +5,6 @@ import game.core.GameObject.Event;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.movable.TimedEnemy;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,13 +18,6 @@ import kuusisto.tinysound.Music;
  */
 public abstract class Stage 
 {	
-	/**
-	 * Playable stages need to add this annotation to their class deceleration so it can be recognized by certain methods.
-	 * @author Pojahn Moradi
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Playable{}
-	
 	/**
 	 * This enum is used when setting the background/foreground image the quick way with the predefined functions found in {@code Stage}.
 	 * @author Pojahn Moradi
@@ -94,9 +85,19 @@ public abstract class Stage
 	public Engine game;
 	
 	/**
-	 * The name of the stage. This name is used when generating welcome text and saving replays.
+	 * The name of the stage. This name is used when saving replays among other things.
 	 */
-	protected String name;
+	public String name;
+	
+	/**
+	 * The welcome text. Up to the user interface what to do with this.
+	 */
+	public String welcomText;
+	
+	/**
+	 * The thumpnail of the map. Up to the user interface what to do with this.
+	 */
+	public String thumpnail;
 	
 	/**
 	 * {@code startX} respective {@code startY} are the starting position of the main character.
@@ -324,11 +325,6 @@ public abstract class Stage
 	public abstract void init();
 	
 	/**
-	 * The welcome screen, often just a {@code JOptionPane} window.
-	 */
-	public abstract void welcome();
-	
-	/**
 	 * Called upon start, death and restart. The stage is built from this method.
 	 */
 	public void build()
@@ -351,9 +347,12 @@ public abstract class Stage
 	public abstract void dispose();
 	
 	/**
-	 * This method optional and is called once every frame.
+	 * Optional and is called once every frame.
 	 */
-	public abstract void extra();
+	public void extra()
+	{
+		
+	}
 	
 	/**
 	 * This function return data to the replay file(default=empty string) that needs to be saved.<br>
@@ -412,25 +411,6 @@ public abstract class Stage
 			cloneStageData();
 		
 		return stageClone[y][x];
-	}
-	
-	/**
-	 * A completely optional way of creating the welcome text.
-	 * @param author The author of the stage.
-	 * @param difficulty The difficulty of the stage. Can be in any format.
-	 * @param avTime The average completion time.
-	 * @param proTime The professional completion time.
-	 * @param objective The stages objective.
-	 * @return The generated string.
-	 */
-	public String getWelcomeText(String author, String difficulty, int avTime, int proTime, String objective)
-	{
-		return   "Stage: " + name +
-			   "\nAuthor: " + author +
-			   "\nDifficulty: " + difficulty +
-			   "\nAvarage Time: " + avTime +
-			   "\nProfessional Time: " + proTime +
-			   "\nObjective: " + objective;
 	}
 	
 	private static class SceneImage extends TimedEnemy

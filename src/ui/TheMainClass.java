@@ -8,7 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class TheMainClass 
 {
-	public static void main(String... args) 
+	public static void main(String... args) throws Exception 
 	{
 		GameSettings settings = new GameSettings();
 		settings.loadSettings("res/data/game.ini");

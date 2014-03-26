@@ -6,7 +6,6 @@ import game.core.Engine.GameState;
 import game.core.GameObject.Hitbox;
 import game.core.MovableObject;
 import game.core.MovableObject.TileEvent;
-import game.core.Stage.Playable;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
@@ -20,9 +19,9 @@ import game.movable.SolidPlatform;
 import game.movable.TimedEnemy;
 import game.objects.Particle;
 import java.io.File;
-import javax.swing.JOptionPane;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+import ui.accessories.Playable;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -30,13 +29,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 @Playable
 public class Race extends Stage
-{	
-	{
-		this.name = "Race";
-		visibleWidth = 800;
-		visibleHeight = 600; 
-	}
-	
+{
 	private Pixmap stageImage;
 	private Image2D backgroundImg, foregroundImg;
 	private Image2D[] deathImg, mainImage, blImg, contImg1, contImg2, contImg3, boImg, bo2Img, flagImg;
@@ -44,6 +37,15 @@ public class Race extends Stage
 	private PressedButtons[] replay1, replay2, replay3;
 	private Sound jump, jump1, jump2, jump3, bounceball, bounceblock;
 	private String pos1, pos2, pos3;
+	
+	public Race()
+	{
+		welcomText = "Stage: Race\nAuthor: Pojahn Moradi\nDifficulty: 1\nAverage time: 45 sec\nProfessional time: 35 sec\nObjective: Race to the finish!";
+		name = "Race";
+		
+		visibleWidth = 800;
+		visibleHeight = 600; 
+	}
 	
 	@Override
 	public void init() 
@@ -350,12 +352,6 @@ public class Race extends Stage
 		flag.setImage(new Frequency<>(6, flagImg));
 		flag.moveTo(3912, 514);
 		add(flag);
-	}
-
-	@Override
-	public void welcome() 
-	{
-		JOptionPane.showMessageDialog(null, "Stage: Race\nAuthor: Pojahn Moradi\nDifficulty: 1\nAverage time: 45 sec\nProfessional time: 35 sec\nObjective: Race to the finish!", "Pojahn's Game Engine", JOptionPane.PLAIN_MESSAGE);
 	}
 
 	@Override

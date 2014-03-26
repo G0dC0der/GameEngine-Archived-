@@ -70,7 +70,7 @@ public class GameSettings
 				in.close();
 			}
 			else
-				System.err.println("INI file not found.");
+				System.err.println("INI file not found: " + file.getAbsolutePath());
 		}
 		catch(IOException e)
 		{

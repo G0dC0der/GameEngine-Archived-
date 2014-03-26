@@ -483,14 +483,14 @@ public final class Engine implements ApplicationListener
 		TinySound.init();
 		TinySound.setGlobalVolume(GAME_VOLUME);
 
+		stage.init();
+
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(stage.visibleWidth, stage.visibleHeight);
-		camera.setToOrtho(true);
+		camera.setToOrtho(true,stage.visibleWidth, stage.visibleHeight);
 
 		Gdx.graphics.setDisplayMode(stage.visibleWidth, stage.visibleHeight, false);
 		
-		stage.welcome();
-		stage.init();
 		stage.build();
 		
 		main.currX = stage.startX;
@@ -754,7 +754,7 @@ public final class Engine implements ApplicationListener
 			hs.className = stage.getClass();
 			hs.result = state == GameState.DEAD ? "Death" : "Victorious";
 			
-			Utilities.exportObject(hs, "replays/" + stage.name + " " + playername + " " + hs.result + " " + hs.time + " sec " + hs.date + ".hs");
+			Utilities.exportObject(hs, "replays/" + cleanString(stage.name) + " " + cleanString(playername) + " " + hs.result + " " + hs.time + " sec " + hs.date + ".hs");
 		}
 	}	
 	
@@ -898,6 +898,20 @@ public final class Engine implements ApplicationListener
 		pb.suicide    = isKeyPressed(con.suicide);
 		
 		return pb;
+	}
+	
+	private String cleanString(String source)
+	{
+		StringBuilder filename = new StringBuilder();
+
+		for (char c : source.toCharArray()) 
+		{
+			if (c=='.' || Character.isJavaIdentifierPart(c)) 
+				filename.append(c);
+			else
+				filename.append("x");
+		} 
+		return filename.toString();
 	}
 	
 	private static class GhostContainer

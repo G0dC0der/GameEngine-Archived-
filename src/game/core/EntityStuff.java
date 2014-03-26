@@ -20,7 +20,7 @@ public class EntityStuff
 	 * @param rec2 The second rectangle.
 	 * @return True if the two rectangles are colliding.
 	 */
-	public static boolean rectangleVsRecganlte(GameObject rec1, GameObject rec2)
+	public static final boolean rectangleVsRecganlte(GameObject rec1, GameObject rec2)
 	{
 		if ((rec1.currY + rec1.height < rec2.currY) ||
 	        (rec1.currY > rec2.currY + rec2.height) ||

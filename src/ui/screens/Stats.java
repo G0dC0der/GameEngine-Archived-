@@ -2,24 +2,32 @@ package ui.screens;
 
 import game.essentials.HighScore;
 import game.essentials.Utilities;
+import java.util.Collections;
 import java.util.List;
 import ui.screens.ScreenManager.Task;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
 public class Stats implements Screen
 {
@@ -32,6 +40,8 @@ public class Stats implements Screen
 	private Label view;
 	private SpriteBatch batch;
 	private Texture background;
+	private SelectBox<String> sortBy;
+	private CheckBox viewFailBox, ascendingBox;
 	
 	public Stats(ScreenManager manager)
 	{
@@ -56,6 +66,16 @@ public class Stats implements Screen
 		
 		skin = new Skin(Gdx.files.internal("res/data/uiskin.json"));
 		
+		viewFailBox = new CheckBox(" List Failures ", skin);
+		viewFailBox.setChecked(true);
+		ascendingBox = new CheckBox(" Ascending Order", skin);
+		ascendingBox.setChecked(true);
+		
+		sortBy = new SelectBox<>(skin);
+		sortBy.setItems("Player","Stage","Time","Date");
+		sortBy.setZIndex(100);
+		sortBy.setColor(Color.WHITE);
+		
 		table = new Table(skin);
 		setColumns();
 
@@ -78,14 +98,14 @@ public class Stats implements Screen
 			}
 		});
 		
-		TextButton refresh = new TextButton("Refresh", skin);
+		TextButton refresh = new TextButton("Apply", skin);
 		refresh.addListener(new ClickListener()
 		{
 			@Override
 			public void clicked(InputEvent event, float x, float y) 
 			{
 				super.clicked(event, x, y);
-				highScores = Utilities.readAllHighScores();
+//				highScores = Utilities.readAllHighScores();		//Disable for now.
 				table.clear();
 				setColumns();
 				setTableElements();
@@ -96,18 +116,34 @@ public class Stats implements Screen
 		LabelStyle style = new LabelStyle();
 		style.font = font;
 		
-		Label label = new Label("Highscores", style);
-		
-		container.add(label).padTop(-100);
+		container.add(new Label("Highscores", style));
 		container.row();
-		container.add(scroll).size(650, 400);
+		container.add(scroll).size(650, 400).padTop(40);
 		container.row();
 		
-		Table buttonTable = new Table(skin);
-		buttonTable.add(goBack).width(80);
-		buttonTable.add(" ").width(5);
-		buttonTable.add(refresh).width(80);
-		container.add(buttonTable).padBottom(-100);
+		Pixmap dot = new Pixmap(1, 1, Format.RGBA8888);
+		dot.setColor(0x00000088);
+		dot.fill();
+		
+		Sprite dotImg = new Sprite(new Texture(dot));
+		dot.dispose();
+		
+		SelectBoxStyle dropdownStyle = sortBy.getStyle();
+		dropdownStyle.listStyle.background = new SpriteDrawable(dotImg);
+		
+		Table filterTable = new Table(skin);
+		filterTable.add("Sort By:").width(-10);
+		filterTable.add(sortBy).width(85);
+		filterTable.row();
+		filterTable.add(viewFailBox);
+		filterTable.add(ascendingBox);
+		filterTable.row().padTop(10);
+
+		filterTable.add(refresh).width(80).padRight(-42);
+		filterTable.add(goBack).width(80).padLeft(-16);
+		
+		container.add(filterTable).padTop(12);
+		
 	}
 	
 	@Override
@@ -156,25 +192,51 @@ public class Stats implements Screen
 	
 	private void setTableElements()
 	{
+		String value = sortBy.getSelected();
+		switch (value)
+		{
+			case "Player":
+				Collections.sort(highScores, HighScore.NAME_SORT);
+				break;
+			case "Stage":
+				Collections.sort(highScores, HighScore.STAGE_SORT);
+				break;
+			case "Time":
+				Collections.sort(highScores, HighScore.TIME_SORT);
+				break;
+			case "Date":
+				Collections.sort(highScores, HighScore.DATE_SORT);
+				break;
+			default:
+				break;
+		}
+		
+		if(ascendingBox.isChecked())
+			Collections.reverse(highScores);
+		
+		boolean viewFail = viewFailBox.isChecked();
 		for(final HighScore hs : highScores)
 		{
-			table.add(" " + hs.name).width(120);
-			table.add(" " + hs.stageName).width(125);
-			table.add(" " + hs.time + " sec").width(100);
-			table.add(" " + hs.date).width(100);
-			table.add(" " + hs.result).width(100);
-			TextButton viewButton = new TextButton("Watch",skin);
-			viewButton.addListener(new ClickListener()
+			if(viewFail || (!viewFail && hs.result.equals("Victorious")))
 			{
-				@Override
-				public void clicked(InputEvent event, float x, float y) 
+				table.add(" " + hs.name).width(120);
+				table.add(" " + hs.stageName).width(125);
+				table.add(" " + hs.time + " sec").width(100);
+				table.add(" " + hs.date).width(100);
+				table.add(" " + hs.result).width(100);
+				TextButton viewButton = new TextButton("Watch",skin);
+				viewButton.addListener(new ClickListener()
 				{
-					super.clicked(event, x, y);
-					
-				}
-			});
-			table.add(viewButton).width(50).height(20);
-			table.row();
+					@Override
+					public void clicked(InputEvent event, float x, float y) 
+					{
+						super.clicked(event, x, y);
+						
+					}
+				});
+				table.add(viewButton).width(50).height(20);
+				table.row();
+			}
 		}
 	}
 

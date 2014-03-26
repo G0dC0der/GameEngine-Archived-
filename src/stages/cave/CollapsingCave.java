@@ -7,7 +7,6 @@ import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.GameObject.Hitbox;
-import game.core.Stage.Playable;
 import game.core.MovableObject;
 import game.core.Stage;
 import game.essentials.Controller;
@@ -22,10 +21,10 @@ import game.movable.SolidPlatform;
 import game.objects.Particle;
 import java.io.File;
 import java.util.Random;
-import javax.swing.JOptionPane;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+import ui.accessories.Playable;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -36,14 +35,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 @Playable
 public class CollapsingCave extends Stage
 {
-	{
-		this.name = "Collapsing Cave";
-		visibleWidth = 800;
-		visibleHeight = 600;
-		Engine.TIME_COLOR = Color.WHITE;
-		Engine.DEATH_TEXT_COLOR = Color.WHITE;
-	}
-	
 	private Pixmap stageImage;
 	private Image2D backgroundImg, foregroundImg, deathImg[], mainImage[], crusherImg, drillImg[], bottomImg[], middleImg, collectImg[], flagImg[];
 	private Sound collect, jump, exp1, exp2, exp3, exp4, slam;
@@ -57,6 +48,16 @@ public class CollapsingCave extends Stage
 	private ParticleEffect ps;
 	private Random r = new Random();
 	private int soundCounter;
+	
+	public CollapsingCave()
+	{
+		name = "Collapsing Cave";
+		welcomText = "Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).";
+		visibleWidth = 800;
+		visibleHeight = 600;
+		Engine.TIME_COLOR = Color.WHITE;
+		Engine.DEATH_TEXT_COLOR = Color.WHITE;
+	}
 	
 	@Override
 	public void init() 
@@ -300,12 +301,6 @@ public class CollapsingCave extends Stage
 		camera = new MovableObject();
 		camera.moveTo(560, 60);
 		camera.freeze();
-	}
-
-	@Override
-	public void welcome() 
-	{
-		JOptionPane.showMessageDialog(null, "Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).", "Pojahn's Game Engine", JOptionPane.PLAIN_MESSAGE);
 	}
 
 	@Override
