@@ -2,9 +2,7 @@ package ui.screens;
 
 import game.essentials.Utilities;
 import javax.swing.JOptionPane;
-
 import ui.screens.ScreenManager.Task;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -136,8 +134,8 @@ public class MainMenu implements Screen
 		batch.draw(background, 0, 0);
 		batch.end();
 		
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
 	}
 
 	@Override

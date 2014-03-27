@@ -17,10 +17,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import javax.swing.JOptionPane;
 import stages.demo.DemoStage;
+
 public class StageReader 
 {
+	public static List<Class<Stage>> AVAILABLE_STAGE;
+	
+	static
+	{
+		AVAILABLE_STAGE = new ArrayList<>();
+		try
+		{
+			AVAILABLE_STAGE.addAll(loadStages(new File("stages")));
+			AVAILABLE_STAGE.addAll(readAllStages());
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error reading stages.");
+		}
+	}
+	
 	/**
 	 * Loads and returns all the {@code Playable} stages found in the jars.
 	 * @param folder The folder containing all the jar files.
@@ -48,26 +64,18 @@ public class StageReader
 			            
 			            if (element.getName().endsWith(".class")) 
 			            {
-			                try 
-			                {
-			                	@SuppressWarnings("unchecked")
-			                    Class<Stage> clazz = (Class<Stage>) clazzLoader.loadClass(element.getName().replaceAll(".class", "").replaceAll("/", "."));
-			                    
-			                    if(Stage.class.isAssignableFrom(clazz) && isPlayable(clazz))
-			                    	stageClasses.add(clazz);
-			                } 
-			                catch (Exception e) 
-			                {
-			                	JOptionPane.showMessageDialog(null, "The selected file could not be loaded:\n" + jarPath.getAbsolutePath(), "Runtime error", JOptionPane.ERROR_MESSAGE);
-			                    e.printStackTrace();
-			                }
+		                	@SuppressWarnings("unchecked")
+		                    Class<Stage> clazz = (Class<Stage>) clazzLoader.loadClass(element.getName().replaceAll(".class", "").replaceAll("/", "."));
+		                    
+		                    if(Stage.class.isAssignableFrom(clazz) && isPlayable(clazz))
+		                    	stageClasses.add(clazz);
 			            }
 			        }
 		        }
 	      
 				catch(Exception e)
 				{
-					System.err.println("Invalid file. Should be jar stage.");
+					System.err.println("Invalid jar, skipping: " + jarPath.getAbsolutePath());
 					e.printStackTrace();
 				}
 				finally
@@ -84,7 +92,7 @@ public class StageReader
 	}
 	
 	/**
-	 * Reads all the stages from the {@code stages} package.
+	 * Read and returns all the playable stages from the {@code stages} package.
 	 * @return The classes.
 	 * @throws IOException 
 	 * @throws URISyntaxException 

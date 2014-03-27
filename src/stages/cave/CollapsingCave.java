@@ -1,7 +1,6 @@
 package stages.cave;
 
 import game.core.Enemy;
-import game.core.Engine;
 import game.core.Engine.GameState;
 import game.core.EntityStuff;
 import game.core.GameObject;
@@ -55,13 +54,14 @@ public class CollapsingCave extends Stage
 		welcomText = "Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).";
 		visibleWidth = 800;
 		visibleHeight = 600;
-		Engine.TIME_COLOR = Color.WHITE;
-		Engine.DEATH_TEXT_COLOR = Color.WHITE;
 	}
 	
 	@Override
 	public void init() 
 	{
+		game.timeColor = Color.WHITE;
+		game.deathTextColor = Color.WHITE;
+		
 		try
 		{
 			crusherImg  = new Image2D("res/collapsingcave/crusher.png", false);
@@ -76,7 +76,7 @@ public class CollapsingCave extends Stage
 			foregroundImg = new Image2D("res/collapsingcave/foreground.png", false);
 			deathImg   	  = Image2D.loadImages(new File("res/general/main/death"), false);
 			
-			Engine.LIFE_IMAGE = new Image2D("res/general/hearth.png", false);
+			game.lifeImage   = new Image2D("res/general/hearth.png", false);
 			stageImage        = new Pixmap(new FileHandle("res/collapsingcave/stage.png"));
 			
 			collapsing = Utilities.loadMusic("res/collapsingcave/collapsing.wav");

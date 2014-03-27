@@ -70,7 +70,7 @@ public class Race extends Stage
 			
 			deathImg   		  = Image2D.loadImages(new File("res/general/main/death"), false);
 			stageImage        = new Pixmap(new FileHandle("res/race/map.png"));
-			Engine.TIME_COLOR = Color.GREEN;
+			game.timeColor = Color.GREEN;
 			
 			for(int i = 0; i < mainImage.length; i++)
 			{
@@ -172,8 +172,8 @@ public class Race extends Stage
 							
 							clearTransformation(batch);
 							
-							Engine.TIME_FONT.setColor(Color.WHITE);
-							Engine.TIME_FONT.draw(batch, pos1 + " place goes to Weed Guy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.setColor(Color.WHITE);
+							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
 							restoreTransformation(batch);
 						}
@@ -217,8 +217,8 @@ public class Race extends Stage
 							
 							clearTransformation(batch);
 							
-							Engine.TIME_FONT.setColor(Color.WHITE);
-							Engine.TIME_FONT.draw(batch, pos2 + " place goes to White Boy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.setColor(Color.WHITE);
+							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
 							restoreTransformation(batch);
 						}
@@ -262,8 +262,8 @@ public class Race extends Stage
 							
 							clearTransformation(batch);
 							
-							Engine.TIME_FONT.setColor(Color.WHITE);
-							Engine.TIME_FONT.draw(batch, pos3 + " place goes to Blackie!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.setColor(Color.WHITE);
+							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
 							restoreTransformation(batch);
 						}

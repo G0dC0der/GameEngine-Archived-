@@ -2,9 +2,15 @@ package ui.screens;
 
 import game.essentials.HighScore;
 import game.essentials.Utilities;
+
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import ui.accessories.StageReader;
 import ui.screens.ScreenManager.Task;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -231,7 +237,21 @@ public class Stats implements Screen
 					public void clicked(InputEvent event, float x, float y) 
 					{
 						super.clicked(event, x, y);
-						
+						if(hs.className == null || hs.replay == null)
+							JOptionPane.showMessageDialog(null, "Corrupted or incomplete highscore file.", "Runtime Error", JOptionPane.ERROR_MESSAGE);
+						else if(!StageReader.AVAILABLE_STAGE.contains(hs.className))
+							JOptionPane.showMessageDialog(null, "Stage \"" + hs.stageName + "\" do not exist.", "Runtime Error", JOptionPane.ERROR_MESSAGE);
+						else
+						{
+							try 
+							{
+								manager.startGame((game.core.Stage)hs.className.newInstance(), hs);
+							} 
+							catch (InstantiationException | IllegalAccessException e) 
+							{
+								e.printStackTrace();
+							}
+						}
 					}
 				});
 				table.add(viewButton).width(50).height(20);

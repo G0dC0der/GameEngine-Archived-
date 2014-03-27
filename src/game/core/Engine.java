@@ -1,12 +1,12 @@
 package game.core;
 
+import game.core.GameObject.Event;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
-
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,19 +16,16 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import kuusisto.tinysound.TinySound;
-
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -39,7 +36,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * The Engine class is the core of the game. All calculations and controls and the required function calls are being called from here.
  * @author Pojahn Moradi
  */
-public final class Engine implements ApplicationListener
+public final class Engine implements Screen
 {
 	public enum Direction{N,NE,E,SE,S,SW,W,NW};
 	
@@ -186,49 +183,55 @@ public final class Engine implements ApplicationListener
 	/**
 	 * The font of the timer.
 	 */
-	public static BitmapFont TIME_FONT, FPS_FONT;
+	public BitmapFont timeFont, fpsFont;
 	
 	/**
 	 * The font color of the timer.
 	 */
-	public static Color TIME_COLOR = new Color(0,0,0,255);
+	public Color timeColor = new Color(0,0,0,255);
 	
 	/**
 	 * The color of the text that shows up upon death.
 	 */
-	public static Color DEATH_TEXT_COLOR = new Color(0,0,0,255);
+	public Color deathTextColor = new Color(0,0,0,255);
 	
-	public static Color WIN_TINT = Color.valueOf("ff00ffff");
+	/**
+	 * The tinting color to fade to upon victory. Set it to {@code defaultTint} to disable.
+	 */
+	public Color wintTint = Color.valueOf("ff00ffff");
 	
+	/**
+	 * The default tint color.
+	 */
+	public final Color defaultTint = Color.valueOf("fffffffe");
+
 	/**
 	 * The image to use to indicate the amount of health the main character have.
 	 */
-	public static Image2D LIFE_IMAGE;
+	public Image2D lifeImage;
 	
 	/**
 	 * The volume of the game, where 1.0 is 100%.
 	 */
-	public static double GAME_VOLUME = 1.0;
+	public double gameVolume = 1.0;
 	
 	/**
 	 * Whether or not to streams sounds directly from the file rather than loading it to the memory. Must be changed before launching game in order for it to take effect.
 	 */
-	public static boolean STREAM_SOUNDS = false;
+	public boolean streamSounds = false;
 	
 	/**
 	 * Whether or not to clear the container every frame.
 	 */
-	public static boolean CLEAR_EACH_FRAME = true;
+	public boolean clearEachFrame = true;
 	
 	/**
 	 * Whether or not to save replays upon victory and death.
 	 */
-	public static boolean SAVE_REPLAYS = true;
+	public boolean saveReplays = true;
 	
-	public static final Color DEFAULT_TINT = Color.valueOf("fffffffe");
-	
-	private static final PressedButtons STILL = new PressedButtons();	
 	private static int DELTA_VALUE = 0;
+	private static final PressedButtons STILL = new PressedButtons();	
 	
 	/**
 	 * The state of the game can be manipulated with the help of these enums.
@@ -270,6 +273,7 @@ public final class Engine implements ApplicationListener
 	private OrthographicCamera camera;
 	private HashSet<Integer> pressedKeys;
 	private Color currTint;
+	private Event exitEvent;
 	
 	/**
 	 * Constructs an Engine.
@@ -287,7 +291,7 @@ public final class Engine implements ApplicationListener
 		zoom = 1;
 		ghosts  = new ArrayList<>(); 
 		pressedKeys = new HashSet<>();
-		currTint = new Color(DEFAULT_TINT);
+		currTint = new Color(defaultTint);
 		
 		if(replay == null)
 			this.replay = new LinkedList<>();
@@ -300,7 +304,7 @@ public final class Engine implements ApplicationListener
 	
 	
 	@Override
-	public void render()
+	public void render(float delta)
 	{
 		if((state == GameState.ALIVE || state == GameState.PAUSED) && isKeyPressed(Keys.ESCAPE))
 			state = state == GameState.PAUSED ? GameState.ALIVE : GameState.PAUSED;
@@ -327,7 +331,7 @@ public final class Engine implements ApplicationListener
 
 	private void paint()
 	{
-		if(CLEAR_EACH_FRAME)
+		if(clearEachFrame)
 		{
 			Gdx.gl.glClearColor(1, 1, 1, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -359,7 +363,7 @@ public final class Engine implements ApplicationListener
 		
 		if(state == GameState.FINISH)
 		{
-			Utilities.fadeColor(currTint, WIN_TINT, .005f);
+			Utilities.fadeColor(currTint, wintTint, .005f);
 			batch.setColor(currTint);
 		}
 		
@@ -389,15 +393,15 @@ public final class Engine implements ApplicationListener
 		renderStatusBar();
 
 		if(state == GameState.DEAD)
-			TIME_FONT.draw(batch, "You are dead. Press 'R' to retry or 'E' to quit.", stage.visibleWidth / 2 - 300, stage.visibleHeight / 2);
+			timeFont.draw(batch, "You are dead. Press 'R' to retry or 'E' to quit.", stage.visibleWidth / 2 - 300, stage.visibleHeight / 2);
 		
 		if(showFps)
 		{
 			if(++fpsWriterCounter % 5 == 0)
 				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
 			
-			FPS_FONT.setColor(Color.WHITE);
-			FPS_FONT.draw(batch, fps + " fps", stage.visibleWidth - 60, 5);
+			fpsFont.setColor(Color.WHITE);
+			fpsFont.draw(batch, fps + " fps", stage.visibleWidth - 60, 5);
 		}
 			
 		batch.end();
@@ -410,7 +414,7 @@ public final class Engine implements ApplicationListener
 		PressedButtons pb;
 		
 		if(playReplay)
-			pb = replay.get(frameCounter++);
+			pb = frameCounter < replay.size() ? replay.get(frameCounter++) : STILL;
 		else
 		{
 			pb = getPressedButtons(main.con);
@@ -432,7 +436,7 @@ public final class Engine implements ApplicationListener
 				stage.build();
 			}
 			else if(Gdx.input.isKeyPressed(Keys.E))
-				System.exit(0);
+				exitEvent.eventHandling();
 		}
 		else if(state == GameState.FINISH)
 			winAction();
@@ -475,13 +479,13 @@ public final class Engine implements ApplicationListener
 	}
 	
 	@Override
-	public void create()  
+	public void show()  
 	{
-		TIME_FONT = new BitmapFont(Gdx.files.internal("res/data/sansserif32.fnt"), true);
-		FPS_FONT  = new BitmapFont(Gdx.files.internal("res/data/cambria20.fnt"), true);
+		timeFont = new BitmapFont(Gdx.files.internal("res/data/sansserif32.fnt"), true);
+		fpsFont  = new BitmapFont(Gdx.files.internal("res/data/cambria20.fnt"), true);
 		
 		TinySound.init();
-		TinySound.setGlobalVolume(GAME_VOLUME);
+		TinySound.setGlobalVolume(gameVolume);
 
 		stage.init();
 
@@ -512,8 +516,8 @@ public final class Engine implements ApplicationListener
 	{
 		TinySound.shutdown();
 		stage.dispose();
-		TIME_FONT.dispose();
-		FPS_FONT.dispose();
+		timeFont.dispose();
+		fpsFont.dispose();
 		
 	}
 	
@@ -676,14 +680,15 @@ public final class Engine implements ApplicationListener
 		this.showFps = showFps;
 	}
 	
-	@Override
-	public void pause() {}
+	public void setExitEvent(Event exitEvent)
+	{
+		this.exitEvent = exitEvent;
+	}
 	
-	@Override
-	public void resize(int x, int y) {}
-	
-	@Override
-	public void resume() {}
+	@Override public void hide() {dispose();}
+	@Override public void pause() {}
+	@Override public void resize(int x, int y) {}
+	@Override public void resume() {}
 
 	/**
 	 * The amount of milliseconds since the last frame.
@@ -708,24 +713,24 @@ public final class Engine implements ApplicationListener
 		frameCounter = 0;
 		state = GameState.ALIVE;
 		horValue = vertValue = DELTA_VALUE = 0;
-		batch.setColor(DEFAULT_TINT);
-		currTint = new Color(DEFAULT_TINT);
+		batch.setColor(defaultTint);
+		currTint = new Color(defaultTint);
 	}
 	
 	private void renderStatusBar()
 	{
 		if(state == GameState.PAUSED)
-			TIME_FONT.setColor(Color.WHITE);
+			timeFont.setColor(Color.WHITE);
 		else
-			TIME_FONT.setColor(TIME_COLOR);
-		TIME_FONT.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
+			timeFont.setColor(timeColor);
+		timeFont.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
 		
 		int hp = main.getHP();
-		if(LIFE_IMAGE != null && state != GameState.DEAD)
+		if(lifeImage != null && state != GameState.DEAD)
 		{
-			final int width = (int) (LIFE_IMAGE.getWidth() + 2);
+			final int width = (int) (lifeImage.getWidth() + 2);
 			for(int i = 0, posX = 10; i < hp; i++, posX += width)
-				batch.draw(LIFE_IMAGE, posX, 40);
+				batch.draw(lifeImage, posX, 40);
 		}
 	}
 	
@@ -738,7 +743,7 @@ public final class Engine implements ApplicationListener
 	
 	private void saveReplay(String playername)
 	{
-		if(!playReplay && SAVE_REPLAYS)
+		if(!playReplay && saveReplays)
 		{
 			PressedButtons[] replayData = new PressedButtons[replay.size()];
 			for(int i = 0; i < replayData.length; i++)
@@ -802,7 +807,7 @@ public final class Engine implements ApplicationListener
 				String playerName = (input == null || input.isEmpty()) ? "Player" : input;
 
 				saveReplay(playerName);
-				Gdx.app.exit();
+				exitEvent.eventHandling();
 			}
 		});
 		
@@ -825,8 +830,8 @@ public final class Engine implements ApplicationListener
 		Gdx.gl.glClearColor(0, 0, 0, .4f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		TIME_FONT.setColor(Color.WHITE);
-		TIME_FONT.draw(batch, "Game is paused.", stage.visibleWidth / 2 - 120, stage.visibleHeight / 2);
+		timeFont.setColor(Color.WHITE);
+		timeFont.draw(batch, "Game is paused.", stage.visibleWidth / 2 - 120, stage.visibleHeight / 2);
 		renderStatusBar();
 	}
 	

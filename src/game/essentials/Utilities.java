@@ -1,8 +1,7 @@
 package game.essentials;
 
 import static game.core.Engine.*;
-import game.core.Engine;
-
+import game.core.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,11 +10,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -102,7 +99,7 @@ public class Utilities
 	 */
 	public static Sound loadSound(String path)
 	{
-		return TinySound.loadSound(new File(path),Engine.STREAM_SOUNDS);
+		return TinySound.loadSound(new File(path),Stage.STAGE.game.streamSounds);
 	}
 	
 	/**
@@ -112,7 +109,7 @@ public class Utilities
 	 */
 	public static Music loadMusic(String path)
 	{
-		return TinySound.loadMusic(new File(path),Engine.STREAM_SOUNDS);
+		return TinySound.loadMusic(new File(path),Stage.STAGE.game.streamSounds);
 	}
 	
 	public static void exportObject(Object obj, String path)

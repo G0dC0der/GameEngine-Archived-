@@ -1,5 +1,11 @@
 package ui.screens;
 
+import java.util.Arrays;
+
+import game.core.Engine;
+import game.core.Stage;
+import game.essentials.HighScore;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 
@@ -13,7 +19,7 @@ public class ScreenManager extends Game
 		OPEN_STATS
 	}
 	
-	private Screen splash, menu, controllerCreator, statsScreen;
+	private Screen splash, menu, controllerCreator, statsScreen, selectStage;
 	
 	@Override
 	public void create() 
@@ -22,6 +28,7 @@ public class ScreenManager extends Game
 		menu = new MainMenu(this);
 		controllerCreator = new ControllerCreator(this);
 		statsScreen = new Stats(this);
+		selectStage = new SelectStage(this);
 		
 		setScreen(splash);
 	}
@@ -44,8 +51,13 @@ public class ScreenManager extends Game
 				setScreen(statsScreen);
 				break;
 			case OPEN_STAGE_CHOOSER:
-				
+				setScreen(selectStage);
 				break;
 		}
+	}
+	
+	public void startGame(Stage stage, HighScore replay)
+	{
+		setScreen(new Engine("Pojahns Game Engine", stage, Arrays.asList(replay.replay)));
 	}
 }
