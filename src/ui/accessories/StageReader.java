@@ -67,7 +67,7 @@ public class StageReader
 		                	@SuppressWarnings("unchecked")
 		                    Class<Stage> clazz = (Class<Stage>) clazzLoader.loadClass(element.getName().replaceAll(".class", "").replaceAll("/", "."));
 		                    
-		                    if(Stage.class.isAssignableFrom(clazz) && isPlayable(clazz))
+		                    if(Stage.class.isAssignableFrom(clazz) && getPlayable(clazz) != null)
 		                    	stageClasses.add(clazz);
 			            }
 			        }
@@ -104,27 +104,30 @@ public class StageReader
 			
 		for(String packageName : packages)
 		{
-			List<String> packageClasses = getClassNamesFromPackage("stages." + packageName);
-			for(String className : packageClasses)
+			if(!packageName.contains("."))
 			{
-				@SuppressWarnings("unchecked")
-				Class<Stage> clazz = (Class<Stage>) Class.forName(className);
-				if(Stage.class.isAssignableFrom(clazz) && isPlayable(clazz))
-					clazzez.add(clazz);
+				List<String> packageClasses = getClassNamesFromPackage("stages." + packageName);
+				for(String className : packageClasses)
+				{
+					@SuppressWarnings("unchecked")
+					Class<Stage> clazz = (Class<Stage>) Class.forName(className);
+					if(Stage.class.isAssignableFrom(clazz) && getPlayable(clazz) != null)
+						clazzez.add(clazz);
+				}
 			}
 			
 		}
 		return clazzez;
 	}
 	
-	static boolean isPlayable(Class<?> clazz)
+	public static Playable getPlayable(Class<?> clazz)
 	{
 		Annotation[] ans = clazz.getAnnotations();
 		for(Annotation an : ans)
 			if(an instanceof Playable)
-				return true;
+				return (Playable)an;
 		
-		return false;
+		return null;
 	}
 	
 	private static ArrayList<String> getClassNamesFromPackage(String packageName) throws IOException, URISyntaxException, ClassNotFoundException

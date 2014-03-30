@@ -19,7 +19,6 @@ public abstract class MainCharacter extends MovableObject
 	public Particle deathImg;
 	protected int hp, hurtSkip;
 	protected Controller con;
-	protected boolean moving;
 	private int invincibleCounter, frameSkipCounter;
 	private boolean hurt, useOnce;
 	
@@ -33,7 +32,7 @@ public abstract class MainCharacter extends MovableObject
 		invincibleCounter = frameSkipCounter = 0;
 		hurtSkip = 3;
 		triggerable = true;
-		moving = hurt = false;
+		hurt = false;
 		
 		addTileEvent(new TileEvent()
 		{
@@ -107,16 +106,10 @@ public abstract class MainCharacter extends MovableObject
 		if (hurt && ++invincibleCounter % 100 == 0)
 			hurt = false;
 		
-		if (!visible || (hurt && ++frameSkipCounter % hurtSkip != 0))
+		if (hurt && ++frameSkipCounter % hurtSkip != 0)
 			return null;
 		
-		if(!multiFacings)
-			return super.getFrame();
-		
-		if (moving)
-			currImage.getObject();
-		
-		return getRightFrame();
+		return super.getFrame();
 	}
 	
 	/**

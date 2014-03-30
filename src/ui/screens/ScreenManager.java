@@ -1,11 +1,11 @@
 package ui.screens;
 
-import java.util.Arrays;
-
 import game.core.Engine;
+import game.core.GameObject.Event;
 import game.core.Stage;
 import game.essentials.HighScore;
-
+import java.util.Arrays;
+import ui.accessories.GameSettings;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 
@@ -58,6 +58,31 @@ public class ScreenManager extends Game
 	
 	public void startGame(Stage stage, HighScore replay)
 	{
-		setScreen(new Engine("Pojahns Game Engine", stage, Arrays.asList(replay.replay)));
+		GameSettings settings = new GameSettings();
+		settings.loadSettings("res/data/game.ini");
+		
+		Engine engine = new Engine("Pojahns Game Engine", stage, replay == null ? null : Arrays.asList(replay.replay));
+		engine.clearEachFrame = settings.clearEachFrame;
+		engine.showFps(settings.showFps);
+		engine.streamSounds = settings.streamSounds;
+		engine.saveReplays = settings.saveReplays;
+		engine.gameVolume = settings.volume;
+		engine.setExitEvent(new Event()
+		{
+			@Override
+			public void eventHandling() 
+			{
+				setScreen(menu);
+			}
+		});
+		
+		setScreen(engine);
+	}
+	
+	@Override
+	public void setScreen(Screen screen) 
+	{
+		super.setScreen(screen);
+		System.gc();
 	}
 }

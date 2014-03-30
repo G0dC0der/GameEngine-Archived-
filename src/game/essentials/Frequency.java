@@ -38,7 +38,7 @@ public class Frequency<T>
 	 */
 	public T getCurrentObject()
 	{
-		return objs[index];
+		return objs == null ? null : objs[index];
 	}
 	
 	/**
@@ -241,6 +241,14 @@ public class Frequency<T>
 	public void stop(boolean stop)
 	{
 		this.stop = stop;
+	}
+	
+	/**
+	 * True if this object is stopped.
+	 */
+	public boolean isStopped()
+	{
+		return stop;
 	}
 	
 	/**

@@ -8,4 +8,9 @@ import java.lang.annotation.RetentionPolicy;
  * @author Pojahn Moradi
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Playable{}
+public @interface Playable
+{
+	String name() default "Unnamed Stage";
+	String description() default "";
+	String thumpnail() default "";
+}

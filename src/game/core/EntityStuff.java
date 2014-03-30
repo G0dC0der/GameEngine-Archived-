@@ -4,7 +4,6 @@ import game.core.Engine.Direction;
 import game.essentials.Image2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -244,8 +243,14 @@ public class EntityStuff
 	 */
 	public static boolean pixelPerfect(GameObject obj1, GameObject obj2)
 	{	
-		Image2D image1 = GameObject.getCorrectImage(obj1);
-		Image2D image2 = GameObject.getCorrectImage(obj2);
+		boolean obj1stopped = obj1.currImage.isStopped();
+		boolean obj2stopped = obj2.currImage.isStopped();
+		obj1.currImage.stop(true);
+		obj2.currImage.stop(true);
+		Image2D image1 = obj1.getFrame();
+		Image2D image2 = obj2.getFrame();
+		obj1.currImage.stop(obj1stopped);
+		obj2.currImage.stop(obj2stopped);
 		
 		if(image1 == null ||image2 == null)
 			return false;
@@ -771,6 +776,6 @@ public class EntityStuff
 		else if (x < 0 && y < 0)
 		    return Direction.SE;
 		
-		throw new RuntimeException();
+		return null;
 	}
 }

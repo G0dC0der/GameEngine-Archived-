@@ -172,6 +172,15 @@ public class GameObject
 	}
 	
 	/**
+	 * Returns the object's image.
+	 * @return The image of the {@code GameObject}.
+	 */
+	public Frequency<Image2D> getImage()
+	{
+		return currImage;
+	}
+	
+	/**
 	 * Checks if this object is colliding with the argument, taking the both entities hitbox type into consideration.
 	 * @return True if the two objects are intersecting, otherwise false.
 	 */
@@ -299,7 +308,7 @@ public class GameObject
 	
 	/**
 	 * Checks if this entity is visible.
-	 * @return True if this unit have an image and {@code setVisible} is set to {@code true}.
+	 * @return True if this unit have an image and {@code setVisible} set to {@code true}.
 	 */
 	public boolean isVisible()
 	{
@@ -616,21 +625,5 @@ public class GameObject
 		default:
 			throw new RuntimeException("The specified accuracy is not implemented yet");
 		}
-	}
-
-	/**
-	 * Return the current image of the specified object. Takes multifaced {@code MovableObjects} into account.
-	 * @param go The GameObject we want the current image of.
- 	 * @return The image this GameObject is currently using.
-	 */
-	public static Image2D getCorrectImage(GameObject go)
-	{
-		if(go instanceof MovableObject)
-		{
-			MovableObject mo = (MovableObject) go;
-			if(mo.multiFacings)
-				return mo.getRightFrame();
-		}
-		return go.currImage.getCurrentObject();
 	}
 }

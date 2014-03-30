@@ -6,6 +6,7 @@ import game.core.MainCharacter;
 import game.core.MovableObject;
 import game.core.Stage;
 import game.essentials.Controller.PressedButtons;
+import game.essentials.Image2D;
 import game.essentials.SoundBank;
 
 /*
@@ -23,7 +24,7 @@ import game.essentials.SoundBank;
 public class GravityMan extends MainCharacter
 {
 	public float maxX, maxY, accX, vx, vy, boostX, upSpeed, mass, gravity, damping, wallGravity, wallDamping, maxWallSlideSpeed, breakSpeed;
-	private boolean jumpAllowed, wallSliding, jumpStarted, oldInput, allowWallJump, allowWallSlide, blockInput;
+	private boolean jumpAllowed, wallSliding, jumpStarted, oldInput, allowWallJump, allowWallSlide, blockInput, moving;
 	private int counter;
 	private float prevVX;
 	private byte[][] d;
@@ -285,6 +286,19 @@ public class GravityMan extends MainCharacter
 	    	else if(facing == Direction.NW)
 	    		facing = Direction.W;
 	    }
+	}
+	
+	@Override
+	public Image2D getFrame() 
+	{
+		boolean stopped = currImage.isStopped();
+		if(!moving)
+			currImage.stop(true);
+			
+		Image2D img =  super.getFrame();
+		currImage.stop(stopped);
+		
+		return img;
 	}
 	
 	/**

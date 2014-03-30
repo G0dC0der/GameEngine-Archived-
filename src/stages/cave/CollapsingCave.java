@@ -31,7 +31,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-@Playable
+@Playable(name="Collapsing Cave",
+		  description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
 public class CollapsingCave extends Stage
 {
 	private Pixmap stageImage;
@@ -48,19 +49,13 @@ public class CollapsingCave extends Stage
 	private Random r = new Random();
 	private int soundCounter;
 	
-	public CollapsingCave()
-	{
-		name = "Collapsing Cave";
-		welcomText = "Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).";
-		visibleWidth = 800;
-		visibleHeight = 600;
-	}
-	
 	@Override
 	public void init() 
 	{
 		game.timeColor = Color.WHITE;
 		game.deathTextColor = Color.WHITE;
+		visibleWidth = 800;
+		visibleHeight = 600;
 		
 		try
 		{
@@ -117,8 +112,8 @@ public class CollapsingCave extends Stage
 		stageData = Utilities.createStageData(stageImage);
 		basicInits();
 		
-		background(RenderType.FULL, backgroundImg);
-		foreground(RenderType.FULL, foregroundImg);
+		background(RenderOption.FULL, backgroundImg);
+		foreground(RenderOption.FULL, foregroundImg);
 		game.drugVertical(0, 0);
 		game.drugHorizontal(0, 0);
 		coll1 = coll2 = coll3 = coll4 = done = false;

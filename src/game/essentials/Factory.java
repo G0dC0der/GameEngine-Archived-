@@ -253,7 +253,11 @@ public class Factory
 				if(target.getPrevX() != target.currX || target.getPrevY() != target.currY)
 				{
 					byte[][] data  = Stage.STAGE.stageData;
-					Image2D image  = GameObject.getCorrectImage(target);
+					Frequency<Image2D> img = target.getImage();
+					boolean stopped = img.isStopped();
+					img.stop(true);
+					Image2D image = target.getFrame();
+					img.stop(stopped);
 					
 					int prevX = (int) target.getPrevX(),
 						prevY = (int) target.getPrevY(),

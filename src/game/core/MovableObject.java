@@ -3,6 +3,7 @@ package game.core;
 import static game.core.Engine.*;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +34,7 @@ public class MovableObject extends GameObject
 	 */
 	public Direction facing;
 	protected float moveSpeed;
-	protected boolean canMove, triggerable, multiFacings, manualFacings;
+	protected boolean canMove, triggerable, doubleFaced, multiFacings, flipImage, manualFacings;
 	protected ArrayList<TileEvent> tileEvents;
 	protected Set<GameObject> solidObjects;
 	protected Set<Byte> occupyingCells;
@@ -72,9 +73,25 @@ public class MovableObject extends GameObject
 	 */
 	public void setMultiFaced(boolean multiFacings)
 	{
+		if(doubleFaced && multiFacings)
+			throw new IllegalStateException("Cannot enable multi facing while double facing is enabled.");
+		
 		if((this.multiFacings = multiFacings))
 			currImage.setLimit(currImage.getArray().length / 8);
 	}
+	
+	public void setDoubleFaced(boolean doubleFaced, boolean flipImage)
+	{
+		if(multiFacings && doubleFaced)
+			throw new IllegalStateException("Cannot enable double facing while multi facing is enabled.");
+		
+		this.doubleFaced = doubleFaced;
+		this.flipImage = flipImage;
+		
+		if(doubleFaced && !flipImage)
+			currImage.setLimit(currImage.getArray().length / 2);
+	}
+	
 	
 	/**
 	 * The facing of a {@code GameObject} is by default set automatically by the engine. It can be switched off here.
@@ -100,11 +117,80 @@ public class MovableObject extends GameObject
 		if (!visible || currImage == null)
 			return null;
 		
-		if(!multiFacings)
-			return super.getFrame();
+		currImage.getObject();
+		
+		if(multiFacings)
+		{
+			Image2D[] objImage = currImage.getArray();
+			int animationCounter = currImage.getIndex(),
+				framesPerAngle = objImage.length / 8;
 
-		currImage.getObject();		
-		return getRightFrame();
+			switch (facing)
+			{
+				case N:
+					return objImage[animationCounter];
+				case NE:
+					return objImage[animationCounter + framesPerAngle];
+				case E:
+					return objImage[animationCounter + (framesPerAngle * 2)];
+				case SE:
+					return objImage[animationCounter + (framesPerAngle * 3)];
+				case S:
+					return objImage[animationCounter + (framesPerAngle * 4)];
+				case SW:
+					return objImage[animationCounter + (framesPerAngle * 5)];
+				case W:
+					return objImage[animationCounter + (framesPerAngle * 6)];
+				case NW:
+					return objImage[animationCounter + (framesPerAngle * 7)];
+			}
+		}
+			
+		if(doubleFaced)
+		{
+			if(flipImage)
+			{
+				Image2D img = currImage.getCurrentObject();
+				switch (facing)
+				{
+					case NE:
+					case E:
+					case SE:
+						img.setFlip(false, false);
+						break;
+					case SW:
+					case W:
+					case NW:
+						img.setFlip(true, false);
+						break;
+					default:
+						break;
+				}
+				return img;
+			}
+			else
+			{
+				Image2D[] objImage = currImage.getArray();
+				int animationCounter = currImage.getIndex(),
+					framesPerAngle = objImage.length / 2;
+
+				switch (facing)
+				{
+					case NE:
+					case E:
+					case SE:
+						return objImage[animationCounter];
+					case SW:
+					case W:
+					case NW:
+						return objImage[animationCounter + framesPerAngle];
+					default:
+						throw new RuntimeException();
+				}
+			}
+		}
+		
+		return currImage.getCurrentObject();
 	}
 	
 	@Override
@@ -800,38 +886,5 @@ public class MovableObject extends GameObject
 		}
 		else
 			tileEvents.remove(tileEvent);
-	}
-	
-	/**
-	 * Returns the correct image for a multifaced unit.
-	 * @return The image.
-	 */
-	Image2D getRightFrame()
-	{
-		Image2D[] objImage = currImage.getArray();
-		int animationCounter = currImage.getIndex(),
-			framesPerAngle = objImage.length / 8;
-
-		switch (facing)
-		{
-		case N:
-			return objImage[animationCounter];
-		case NE:
-			return objImage[animationCounter + framesPerAngle];
-		case E:
-			return objImage[animationCounter + (framesPerAngle * 2)];
-		case SE:
-			return objImage[animationCounter + (framesPerAngle * 3)];
-		case S:
-			return objImage[animationCounter + (framesPerAngle * 4)];
-		case SW:
-			return objImage[animationCounter + (framesPerAngle * 5)];
-		case W:
-			return objImage[animationCounter + (framesPerAngle * 6)];
-		case NW:
-			return objImage[animationCounter + (framesPerAngle * 7)];
-		default:
-			return objImage[0];
-		}
 	}
 }

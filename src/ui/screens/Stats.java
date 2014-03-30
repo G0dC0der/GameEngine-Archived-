@@ -61,7 +61,6 @@ public class Stats implements Screen
 		
 		stage = new Stage(800, 600, false);
 		Gdx.input.setInputProcessor(stage);
-		Gdx.graphics.setVSync(false);
 		
 		batch = new SpriteBatch(1);
 		background = new Texture("res/data/scores.png");

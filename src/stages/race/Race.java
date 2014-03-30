@@ -27,7 +27,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-@Playable
+@Playable(name="Race", description="Stage: Race\nAuthor: Pojahn Moradi\nDifficulty: 1\nAverage time: 45 sec\nProfessional time: 35 sec\nObjective: Race to the finish!")
 public class Race extends Stage
 {
 	private Pixmap stageImage;
@@ -38,18 +38,12 @@ public class Race extends Stage
 	private Sound jump, jump1, jump2, jump3, bounceball, bounceblock;
 	private String pos1, pos2, pos3;
 	
-	public Race()
-	{
-		welcomText = "Stage: Race\nAuthor: Pojahn Moradi\nDifficulty: 1\nAverage time: 45 sec\nProfessional time: 35 sec\nObjective: Race to the finish!";
-		name = "Race";
-		
-		visibleWidth = 800;
-		visibleHeight = 600; 
-	}
-	
 	@Override
 	public void init() 
 	{
+		visibleWidth = 800;
+		visibleHeight = 600; 
+		
 		try
 		{
 			mainImage   = Image2D.loadImages(new File("res/general/main"), true);
@@ -70,7 +64,7 @@ public class Race extends Stage
 			
 			deathImg   		  = Image2D.loadImages(new File("res/general/main/death"), false);
 			stageImage        = new Pixmap(new FileHandle("res/race/map.png"));
-			game.timeColor = Color.GREEN;
+			game.timeColor = Color.WHITE;
 			
 			for(int i = 0; i < mainImage.length; i++)
 			{
@@ -99,6 +93,7 @@ public class Race extends Stage
 	@Override
 	public void build()
 	{
+		
 		/*
 		 * Standard stuff
 		 *******************************************
@@ -107,8 +102,8 @@ public class Race extends Stage
 
 		stageData = Utilities.createStageData(stageImage);
 		
-		background(RenderType.PORTION, backgroundImg);
-		foreground(RenderType.PORTION, foregroundImg);
+		background(RenderOption.PORTION, backgroundImg);
+		foreground(RenderOption.PORTION, foregroundImg);
 		
 		basicInits();
 		pos1 = pos2 = pos3 = null;	
@@ -131,7 +126,7 @@ public class Race extends Stage
 		gm.deathImg.zIndex(101);
 		game.setFocusObject(gm);
 		game.setMainCharacter(gm);
-		
+
 		/*
 		 * Contestants
 		 *******************************************

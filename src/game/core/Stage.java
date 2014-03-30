@@ -22,7 +22,7 @@ public abstract class Stage
 	 * This enum is used when setting the background/foreground image the quick way with the predefined functions found in {@code Stage}.
 	 * @author Pojahn Moradi
 	 */
-	public enum RenderType
+	public enum RenderOption
 	{
 		/**
 		 * Renders the entire background/foreground.
@@ -83,21 +83,6 @@ public abstract class Stage
 	 * A reference to the engine.
 	 */
 	public Engine game;
-	
-	/**
-	 * The name of the stage. This name is used when saving replays among other things.
-	 */
-	public String name;
-	
-	/**
-	 * The welcome text. Up to the user interface what to do with this.
-	 */
-	public String welcomText;
-	
-	/**
-	 * The thumpnail of the map. Up to the user interface what to do with this.
-	 */
-	public String thumpnail;
 	
 	/**
 	 * {@code startX} respective {@code startY} are the starting position of the main character.
@@ -243,11 +228,19 @@ public abstract class Stage
 					enemy.inspectIntersections();
 				}
 				
-				if(enemy.multiFacings && !enemy.manualFacings)
+				if((enemy.multiFacings || enemy.doubleFaced) && !enemy.manualFacings)
 				{
 					Direction dir = EntityStuff.getDirection(EntityStuff.normalize(enemy.prevX + enemy.width / 2, enemy.prevY + enemy.height / 2, enemy.currX + enemy.width / 2, enemy.currY + enemy.height / 2));
 					if(dir != null)
-						enemy.facing = dir;
+					{
+						if(enemy.doubleFaced)
+						{
+							if(dir != Direction.N && dir != Direction.S)
+								enemy.facing = dir;
+						}
+						else
+							enemy.facing = dir;
+					}
 				}
 				enemy.prevX = enemy.currX;
 				enemy.prevY = enemy.currY;
@@ -299,7 +292,7 @@ public abstract class Stage
 	 * An optional way of setting the background. Wraps the given image in a {@code GameObject} with {@code z-index} set to -100.
 	 * @param img The image to use as background.
 	 */
-	public void background(RenderType type, Image2D... img)
+	public void background(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
 		wrapper.setImage(img);
@@ -311,7 +304,7 @@ public abstract class Stage
 	 * An optional way of setting the foreground. Wraps the given image in a {@code GameObject} with {@code z-index} set to 100.
 	 * @param img The image to use as foreground.
 	 */
-	public void foreground(RenderType type, Image2D... img)
+	public void foreground(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
 		wrapper.setImage(img);
@@ -415,9 +408,9 @@ public abstract class Stage
 	
 	private static class SceneImage extends TimedEnemy
 	{
-		RenderType type;
+		RenderOption type;
 		
-		SceneImage(RenderType type)
+		SceneImage(RenderOption type)
 		{
 			this.type = type;
 			setVisible(true);

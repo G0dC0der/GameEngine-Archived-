@@ -264,7 +264,7 @@ public final class Engine implements Screen
 	MainCharacter main;
 	Stage stage;
 	private GameState state;
-	private boolean showFps, justRestarted, autoTranslate, playReplay, increasingVert, increasingHor, showingDialog, increasingScale = true;
+	private boolean showFps, justRestarted, autoTranslate, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, disposed, increasingScale = true;
 	private List<PressedButtons> replay;
 	private List<GhostContainer> ghosts;
 	private int frameCounter, fpsWriterCounter, fps;
@@ -306,10 +306,17 @@ public final class Engine implements Screen
 	@Override
 	public void render(float delta)
 	{
-		if((state == GameState.ALIVE || state == GameState.PAUSED) && isKeyPressed(Keys.ESCAPE))
+		if(disposed)
+			return;
+		
+		boolean escDown = isKeyPressed(Keys.ESCAPE);
+		if((state == GameState.ALIVE || state == GameState.PAUSED) && !playReplay && escDown)
 			state = state == GameState.PAUSED ? GameState.ALIVE : GameState.PAUSED;
 		
-		if(state == GameState.PAUSED)
+		if(escDown && playReplay)
+			replayHelp = !replayHelp;
+		
+		if(state == GameState.PAUSED && !playReplay)
 		{
 			pressedKeys.clear();
 			if(stage.music != null  && stage.music.getVolume() != .1f)
@@ -393,11 +400,14 @@ public final class Engine implements Screen
 		renderStatusBar();
 
 		if(state == GameState.DEAD)
-			timeFont.draw(batch, "You are dead. Press 'R' to retry or 'E' to quit.", stage.visibleWidth / 2 - 300, stage.visibleHeight / 2);
+			timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", stage.visibleWidth / 2 - 320, stage.visibleHeight / 2);
+		
+		if(replayHelp)
+			timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.visibleWidth / 2 - 230, stage.visibleHeight / 2);
 		
 		if(showFps)
 		{
-			if(++fpsWriterCounter % 5 == 0)
+			if(++fpsWriterCounter % 10 == 0)
 				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
 			
 			fpsFont.setColor(Color.WHITE);
@@ -409,17 +419,22 @@ public final class Engine implements Screen
 	
 	public void update()
 	{
-		DELTA_VALUE = (int) (Gdx.graphics.getDeltaTime() * 1000f);
-
-		PressedButtons pb;
+		if(replayHelp && Gdx.input.isKeyPressed(Keys.B))
+		{
+			runExitEvent();
+			return;
+		}
 		
+		DELTA_VALUE = (int) (Gdx.graphics.getDeltaTime() * 1000f);
+		
+		PressedButtons pb;
 		if(playReplay)
 			pb = frameCounter < replay.size() ? replay.get(frameCounter++) : STILL;
 		else
 		{
 			pb = getPressedButtons(main.con);
 			
-			if(!Gdx.input.isKeyPressed(Keys.ESCAPE))
+			if(state == GameState.ALIVE)
 				replay.add(pb);
 		}
 		
@@ -435,8 +450,8 @@ public final class Engine implements Screen
 				restart();
 				stage.build();
 			}
-			else if(Gdx.input.isKeyPressed(Keys.E))
-				exitEvent.eventHandling();
+			else if(Gdx.input.isKeyPressed(Keys.B))
+				runExitEvent();
 		}
 		else if(state == GameState.FINISH)
 			winAction();
@@ -514,11 +529,11 @@ public final class Engine implements Screen
 	@Override
 	public void dispose()
 	{
+		disposed = true;
 		TinySound.shutdown();
 		stage.dispose();
 		timeFont.dispose();
 		fpsFont.dispose();
-		
 	}
 	
 	public OrthographicCamera getCamera()
@@ -753,13 +768,13 @@ public final class Engine implements Screen
 			hs.replay = replayData;
 			hs.meta = stage.getMeta();
 			hs.name = playername;
-			hs.stageName = stage.name;
+			hs.stageName = Utilities.prettify(stage.getClass().getSimpleName());
 			hs.time = (double)elapsedTime/1000;
 			hs.date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 			hs.className = stage.getClass();
 			hs.result = state == GameState.DEAD ? "Death" : "Victorious";
 			
-			Utilities.exportObject(hs, "replays/" + cleanString(stage.name) + " " + cleanString(playername) + " " + hs.result + " " + hs.time + " sec " + hs.date + ".hs");
+			Utilities.exportObject(hs, "replays/" + cleanString(stage.getClass().getSimpleName()) + " " + cleanString(playername) + " " + hs.result + " " + hs.time + " sec " + hs.date + ".hs");
 		}
 	}	
 	
@@ -807,7 +822,7 @@ public final class Engine implements Screen
 				String playerName = (input == null || input.isEmpty()) ? "Player" : input;
 
 				saveReplay(playerName);
-				exitEvent.eventHandling();
+				runExitEvent();
 			}
 		});
 		
@@ -917,6 +932,26 @@ public final class Engine implements Screen
 				filename.append("x");
 		} 
 		return filename.toString();
+	}
+	
+	private void runExitEvent()
+	{
+		new Thread(new Runnable() 
+		{
+			@Override
+			public void run() 
+			{
+				Gdx.app.postRunnable(new Runnable() 
+				{
+					@Override
+					public void run() 
+					{
+						exitEvent.eventHandling();
+
+					}
+				});
+			}
+		}).start();
 	}
 	
 	private static class GhostContainer

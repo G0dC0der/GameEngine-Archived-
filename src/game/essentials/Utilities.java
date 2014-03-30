@@ -253,4 +253,20 @@ public class Utilities
 		
 		return highscores;
 	}
+	
+	public static String prettify(String str)
+	{
+		StringBuilder bu = new StringBuilder(str.length() + 5);
+		
+		for(int i = 0; i < str.length(); i++)
+		{
+			char c = str.charAt(i);
+			
+			if(i > 0 && Character.isUpperCase(c))
+				bu.append(" ");
+			
+			bu.append(c);
+		}
+		return bu.toString();
+	}
 }
