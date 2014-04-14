@@ -3,14 +3,14 @@ package game.movable;
 import game.core.Engine;
 import game.core.EntityStuff;
 import game.core.GameObject;
+import game.essentials.Factory;
+import game.essentials.LaserBeam;
 import game.essentials.SoundBank;
 import game.objects.Particle;
 import java.awt.geom.Point2D;
-
+import kuusisto.tinysound.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-import kuusisto.tinysound.Sound;
 
 /**
  * This unit fire laser at the closest seeable(customizable) target. Any target intersecting with the laser beam will have its {@code HitEvent} fired with the laser drone as argument.<br>
@@ -19,17 +19,14 @@ import kuusisto.tinysound.Sound;
  */
 public class LaserDrone extends PathDrone
 {
-	/**
-	 * This is the colors used when drawing the laser. The first index is the color that will appear at the edges of the laser,
-	 * and the last color is the inner color. The more elements this one have, the wider laser.
-	 */
-	public Color[] laserColors, startupColors;
 	protected float targetX, targetY;
 	private int laserStartup, laserDuration, reload, sucounter, ducounter, reloadCounter;
 	private byte stopTile;
 	private boolean scan, firing;
 	private Particle exp;
+	private Color laserTint;
 	private final GameObject[] targets;
+	private LaserBeam firingBeam, chargeBeam;
 	
 	/**
 	 * Creates a laser drone.
@@ -38,37 +35,31 @@ public class LaserDrone extends PathDrone
 	 * @param laserStartup The amount of frames before the laser comes out when a target has been detected.
 	 * @param laserDuration The amount of frames the laser stays active(and deadly).
 	 * @param reload The amount of frames to wait before scanning for a new target after this unit have finished its current firing mission.
-	 * @param scan Set to true to fire at seeable targets or false to fire the laser at the closest target even if there is a wall between them.
 	 * @param targets The units capable of being hit and targeted by this unit.
 	 */
-	public LaserDrone(float x, float y, int laserStartup, int laserDuration, int reload, boolean scan, GameObject... targets)
+	public LaserDrone(float x, float y, int laserStartup, int laserDuration, int reload, GameObject... targets)
 	{
 		super(x, y);
 		this.laserStartup = laserStartup;
 		this.laserDuration = laserDuration;
-		this.scan = scan;
 		this.targets = targets;
 		this.reload = reload;
+		this.scan = true;
 		targetX = targetY = -1;
 		sucounter = ducounter = reloadCounter = 0;
 		sounds = new SoundBank(2);	//0 = startup, 1 = firing
 		stopTile = Engine.SOLID;
+		laserTint = Color.valueOf("CC0000FF");
+		firingBeam = Factory.defaultLaser();
+		chargeBeam = Factory.defaultChargeLaser();
+	}
+	
+	public LaserDrone(float x, float y, int laserStartup, int laserDuration, int reload, LaserBeam firingBeam, LaserBeam chargeBeam, GameObject... targets)
+	{
+		this(x,y,laserStartup,laserDuration,reload,targets);
+		this.firingBeam = firingBeam;
+		this.chargeBeam = chargeBeam;
 		
-		laserColors = new Color[4];
-		int red = 255;
-		for (int i = 0; i < laserColors.length; i++)
-		{
-			laserColors[i] = new Color(red,0,0,200);
-			red -= 20;
-		}
-		
-		startupColors = new Color[2];
-		red = 255;
-		for (int i = 0; i < startupColors.length; i++)
-		{
-			startupColors[i] = new Color(red,0,0,25);
-			red -= 20;
-		}
 	}
 	
 	/**
@@ -116,6 +107,60 @@ public class LaserDrone extends PathDrone
 		this.stopTile = stopTile;
 	}
 	
+	/**
+	 * Whether or not to fire at visible target.
+	 * @param fireAtVisible Set to true to fire at seeable targets or false to fire the laser at the closest target even if there is a wall between them.
+	 */
+	public void fireAtVisible(boolean fireAtVisible)
+	{
+		scan = fireAtVisible;
+	}
+	
+	/**
+	 * Allows you to customize the laser tinting.
+	 * @param tint The tint the lasers should use.
+	 */
+	public void setLaserTint(Color tint)
+	{
+		this.laserTint = tint;
+	}
+	
+	/**
+	 * Returns the firing beam of the {@code LaserDrone}.
+	 * @return The beam.
+	 */
+	public LaserBeam getFiringBeam() 
+	{
+		return firingBeam;
+	}
+
+	/**
+	 * The laser beam to use when firing.
+	 * @param firingBeam The beam to use.
+	 */
+	public void setFiringBeam(LaserBeam firingBeam) 
+	{
+		this.firingBeam = firingBeam;
+	}
+	
+	/**
+	 * Returns the charge beam of the {@code LaserDrone}.
+	 * @return
+	 */
+	public LaserBeam getChargeBeam() 
+	{
+		return chargeBeam;
+	}
+	
+	/**
+	 * The laser beam to use when charging.
+	 * @param chargeBeam The beam to use.
+	 */
+	public void setChargeBeam(LaserBeam chargeBeam) 
+	{
+		this.chargeBeam = chargeBeam;
+	}
+
 	@Override
 	public void moveEnemy()
 	{
@@ -167,6 +212,8 @@ public class LaserDrone extends PathDrone
 			}
 			if(firing)
 			{
+				firingBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
+				
 				for(GameObject go : targets)
 					if(EntityStuff.checkLine((int)currX, (int) currY, (int)targetX, (int)targetY, go))
 						go.runHitEvent(this);
@@ -178,42 +225,22 @@ public class LaserDrone extends PathDrone
 					firing = false;
 				}
 			}
+			else
+				chargeBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
 		}
 	}
 
 	@Override
-	public void drawSpecial(SpriteBatch g)	//TODO:
+	public void drawSpecial(SpriteBatch b)
 	{
-//		int colorCounter = 0;
-//		float x = currX + width / 2,
-//			  y = currY + height / 2,
-//			  lineWidth;
-//		
-//		if(!firing && haveTarget())
-//		{
-//			lineWidth = startupColors.length;
-//			sounds.trySound(0, false);
-//			
-//			while(lineWidth > 0)
-//			{
-//				g.setColor(startupColors[colorCounter++]);
-//				g.setLineWidth(lineWidth--);
-//	
-//				g.drawLine(x,y,targetX, targetY);
-//			}
-//		}
-//		if(firing)
-//		{
-//			lineWidth = laserColors.length;
-//			sounds.trySound(1, false);
-//			
-//			while(lineWidth > 0)
-//			{
-//				g.setColor(laserColors[colorCounter++]);
-//				g.setLineWidth(lineWidth--);
-//	
-//				g.drawLine(x,y,targetX, targetY);
-//			}
-//		}
+		Color defaultColor = b.getColor();
+		
+		if(laserTint != null)
+			b.setColor(laserTint);
+		
+		chargeBeam.renderLasers(b);
+		firingBeam.renderLasers(b);
+		
+		b.setColor(defaultColor);
 	}
 }

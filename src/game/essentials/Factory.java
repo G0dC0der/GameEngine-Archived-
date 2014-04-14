@@ -2,6 +2,7 @@ package game.essentials;
 
 import static game.core.Engine.*;
 import game.core.Engine;
+import game.core.Engine.Direction;
 import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.GameObject.Event;
@@ -13,17 +14,17 @@ import game.mains.GravityMan;
 import game.movable.PathDrone;
 import game.movable.PathDrone.PathData;
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
+import kuusisto.tinysound.Music;
+import kuusisto.tinysound.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-import kuusisto.tinysound.Music;
-import kuusisto.tinysound.Sound;
 
 /**
  * A collection of static method that mostly returns different type of events.
@@ -32,6 +33,24 @@ import kuusisto.tinysound.Sound;
  */
 public class Factory 
 {
+	private static Image2D[] LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE;
+	
+	static
+	{
+		try
+		{
+			LASER_BEAM = Image2D.loadImages(new File("res/data/laser"),false);
+			LASER_BEGIN = Image2D.loadImages(new File("res/data/laser/rear"),false);
+			LASER_IMPACT = Image2D.loadImages(new File("res/data/laser/end"),false);
+			LASER_CHARGE = Image2D.loadImages(new File("res/data/charge"),false);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Failed to load laser resources.");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Chains the given set of sounds, playing them after each other.
 	 * @param indexes Indexes to the sound array.
@@ -739,6 +758,117 @@ public class Factory
 				}
 			}
 		};
+	}
+	
+	/**
+	 * Returns a laser beam with customized look.<br>
+	 * Each of the parameters accept null, which means "skip rendering this part".
+	 * @param laserBegin The "gunfire" animation, which will be rendered at the source coordinate.
+	 * @param laserBeam The actual laser beam. This should be a rectangular image and is stretched and rotated to target the destination coordinate.
+	 * @param laserImpact The animation to render at the destination point.
+	 * @return The beam.
+	 */
+	public static LaserBeam threeStageLaser(final Frequency<Image2D> laserBegin, final Frequency<Image2D> laserBeam, final Frequency<Image2D> laserImpact)
+	{
+		return new LaserBeam()
+		{
+			class Task
+			{
+				float srcX, srcY, destX, destY;
+				int active;
+				
+				public Task(float srcX, float srcY, float destX, float destY, int active) 
+				{
+					this.srcX = srcX;
+					this.srcY = srcY;
+					this.destX = destX;
+					this.destY = destY;
+					this.active = active;
+				}
+			}
+			
+			LinkedList<Task> tasks = new LinkedList<>();
+			
+			@Override
+			public void fireAt(float srcX, float srcY, float destX, float destY, int active) 
+			{
+				tasks.add(new Task(srcX,srcY,destX,destY,active));
+			}
+			
+			@Override
+			public void renderLasers(SpriteBatch b) 
+			{
+				int size = tasks.size();
+				for(int i = 0; i < size; i++)
+				{
+					final Task t = tasks.get(i);
+					final float angle = (float)EntityStuff.getAngle(t.srcX, t.srcY, t.destX, t.destY);
+					
+					if(laserBeam != null)
+					{
+						Image2D beam = laserBeam.getObject();
+						float dx = (float) (beam.getHeight() / 2 * Math.cos(Math.toRadians(angle - 90)));
+						float dy = (float) (beam.getHeight() / 2 * Math.sin(Math.toRadians(angle - 90)));
+						b.draw(beam, t.srcX + dx, t.srcY + dy, 0, 0, (float)EntityStuff.distance(t.srcX + dx, t.srcY + dy, t.destX, t.destY), beam.getHeight(), 1, 1, angle);
+					}
+					
+					if(laserImpact != null)
+					{
+						Image2D exp = laserImpact.getObject();
+						float halfWidth = exp.getWidth() / 2;
+						float halfHeight = exp.getHeight() / 2;
+						b.draw(exp, t.destX - halfWidth, t.destY - halfHeight, halfWidth, halfHeight, exp.getWidth(), exp.getHeight(), 1, 1, angle);
+					}
+					
+					if(laserBegin != null)
+					{
+						Image2D begin = laserBegin.getObject();
+						float halfWidth = begin.getWidth() / 2;
+						float halfHeight = begin.getHeight() / 2;
+						b.draw(begin, t.srcX - halfWidth, t.srcY - halfHeight, halfHeight, halfHeight, begin.getWidth(), begin.getHeight(), 1, 1, angle);
+					}
+					
+					if(0 >= --t.active)
+					{
+						tasks.remove(t);
+						size--;
+					}
+				}
+			}
+		};
+	}
+	
+	/**
+	 * Returns a {@code LaserBeam} with default images.
+	 * @return The beam.
+	 */
+	public static LaserBeam defaultLaser()
+	{
+		if(LASER_BEGIN == null || LASER_BEAM == null || LASER_IMPACT == null)
+			throw new NullPointerException("The laser resources is null. Check if they still exist.");
+		
+		Frequency<Image2D> laserBegin = new Frequency<>(3, LASER_BEGIN);
+		Frequency<Image2D> laserImage = new Frequency<>(3, LASER_BEAM);
+		Frequency<Image2D> laserImpact = new Frequency<>(3, LASER_IMPACT);
+		laserImage.pingPong(true);
+		laserImpact.pingPong(true);
+		
+		return threeStageLaser(laserBegin, laserImage, laserImpact);
+	}
+
+	/**
+	 * Returns a charge {@code LaserBeam} with default images.
+	 * @return The beam.
+	 */
+	public static LaserBeam defaultChargeLaser()
+	{
+		if(LASER_CHARGE == null)
+			throw new NullPointerException("The laser resources is null. Check if they still exist.");
+		
+		Frequency<Image2D> charge = new Frequency<>(2, LASER_CHARGE);
+		charge.pingPong(true);
+		
+		return threeStageLaser(null, charge, null);
 	}
 	
 	/**

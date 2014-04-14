@@ -165,12 +165,12 @@ public class Race extends Stage
 							if(pos1 == null)
 								pos1 = game.getState() == GameState.FINISH ? "4th" : "3rd";
 							
-							clearTransformation(batch);
+							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
-							restoreTransformation(batch);
+							game.restoreTransformation();
 						}
 					});
 				}
@@ -210,12 +210,12 @@ public class Race extends Stage
 							if(pos2 == null)
 								pos2 = game.getState() == GameState.FINISH ? "3rd" : "2nd";
 							
-							clearTransformation(batch);
+							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
-							restoreTransformation(batch);
+							game.restoreTransformation();
 						}
 					});
 				}
@@ -255,12 +255,12 @@ public class Race extends Stage
 							if(pos3 == null)
 								pos3 = game.getState() == GameState.FINISH ? "2nd" : "1st";
 							
-							clearTransformation(batch);
+							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
 							
-							restoreTransformation(batch);
+							game.restoreTransformation();
 						}
 					});
 				}
@@ -350,7 +350,8 @@ public class Race extends Stage
 	}
 
 	@Override
-	public void extra() {}
+	public void extra() 
+	{}
 
 	@Override
 	public void dispose() 

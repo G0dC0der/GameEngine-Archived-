@@ -343,9 +343,7 @@ public abstract class Stage
 	 * Optional and is called once every frame.
 	 */
 	public void extra()
-	{
-		
-	}
+	{}
 	
 	/**
 	 * This function return data to the replay file(default=empty string) that needs to be saved.<br>
@@ -432,9 +430,9 @@ public abstract class Stage
 					batch.draw(super.getFrame(), 0, 0);
 					break;
 				case FIXED:
-					clearTransformation(batch);
+					STAGE.game.clearTransformation();
 					batch.draw(super.getFrame(), 0, 0);
-					restoreTransformation(batch);
+					STAGE.game.restoreTransformation();
 					break;
 				case PORTION:
 					OrthographicCamera camera = STAGE.game.getCamera();

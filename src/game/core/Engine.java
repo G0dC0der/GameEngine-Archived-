@@ -7,21 +7,16 @@ import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+
 import kuusisto.tinysound.TinySound;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
@@ -31,6 +26,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
 /**
  * The Engine class is the core of the game. All calculations and controls and the required function calls are being called from here.
@@ -264,7 +263,7 @@ public final class Engine implements Screen
 	MainCharacter main;
 	Stage stage;
 	private GameState state;
-	private boolean showFps, justRestarted, autoTranslate, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, disposed, increasingScale = true;
+	private boolean showFps, justRestarted, autoTranslate, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, increasingScale = true;
 	private List<PressedButtons> replay;
 	private List<GhostContainer> ghosts;
 	private int frameCounter, fpsWriterCounter, fps;
@@ -274,6 +273,8 @@ public final class Engine implements Screen
 	private HashSet<Integer> pressedKeys;
 	private Color currTint;
 	private Event exitEvent;
+	private com.badlogic.gdx.scenes.scene2d.Stage gui;
+	private Skin skin;
 	
 	/**
 	 * Constructs an Engine.
@@ -294,7 +295,11 @@ public final class Engine implements Screen
 		currTint = new Color(defaultTint);
 		
 		if(replay == null)
+		{
 			this.replay = new LinkedList<>();
+			gui = new com.badlogic.gdx.scenes.scene2d.Stage();
+			skin = new Skin(Gdx.files.internal("res/data/uiskin.json"));
+		}
 		else
 		{
 			this.replay = replay;
@@ -306,33 +311,39 @@ public final class Engine implements Screen
 	@Override
 	public void render(float delta)
 	{
-		if(disposed)
-			return;
-		
-		boolean escDown = isKeyPressed(Keys.ESCAPE);
-		if((state == GameState.ALIVE || state == GameState.PAUSED) && !playReplay && escDown)
-			state = state == GameState.PAUSED ? GameState.ALIVE : GameState.PAUSED;
-		
-		if(escDown && playReplay)
-			replayHelp = !replayHelp;
-		
-		if(state == GameState.PAUSED && !playReplay)
+		try
 		{
-			pressedKeys.clear();
-			if(stage.music != null  && stage.music.getVolume() != .1f)
-				stage.music.setVolume(.1f);
+			boolean escDown = isKeyPressed(Keys.ESCAPE);
+			if((state == GameState.ALIVE || state == GameState.PAUSED) && !playReplay && escDown)
+				state = state == GameState.PAUSED ? GameState.ALIVE : GameState.PAUSED;
 			
-			batch.begin();
-			renderPause();
-			batch.end();
+			if(escDown && playReplay)
+				replayHelp = !replayHelp;
+			
+			if(state == GameState.PAUSED && !playReplay)
+			{
+				pressedKeys.clear();
+				if(stage.music != null  && stage.music.getVolume() != .1f)
+					stage.music.setVolume(.1f);
+				
+				batch.begin();
+				renderPause();
+				batch.end();
+			}
+			else
+			{
+				if(stage.music != null  && stage.music.getVolume() != Stage.MUSIC_VOLUME)
+					stage.music.setVolume(Stage.MUSIC_VOLUME);
+				
+				update();
+				paint();
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			if(stage.music != null  && stage.music.getVolume() != Stage.MUSIC_VOLUME)
-				stage.music.setVolume(Stage.MUSIC_VOLUME);
-			
-			update();
-			paint();
+			System.err.println("Ops, game crashed.");
+			e.printStackTrace();
+			Gdx.app.exit();
 		}
 	}
 
@@ -340,7 +351,7 @@ public final class Engine implements Screen
 	{
 		if(clearEachFrame)
 		{
-			Gdx.gl.glClearColor(1, 1, 1, 1);
+			Gdx.gl.glClearColor(0, 0, 0, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		}
 		
@@ -415,6 +426,12 @@ public final class Engine implements Screen
 		}
 			
 		batch.end();
+		
+		if(showingDialog)
+		{
+			gui.act(Gdx.graphics.getDeltaTime());
+			gui.draw();
+		}
 	}
 	
 	public void update()
@@ -509,6 +526,7 @@ public final class Engine implements Screen
 		camera.setToOrtho(true,stage.visibleWidth, stage.visibleHeight);
 
 		Gdx.graphics.setDisplayMode(stage.visibleWidth, stage.visibleHeight, false);
+		ShaderProgram.pedantic = false;
 		
 		stage.build();
 		
@@ -529,11 +547,16 @@ public final class Engine implements Screen
 	@Override
 	public void dispose()
 	{
-		disposed = true;
 		TinySound.shutdown();
 		stage.dispose();
 		timeFont.dispose();
 		fpsFont.dispose();
+		if(!playReplay)
+		{
+			skin.dispose();
+			gui.dispose();
+		}
+		stage = null;
 	}
 	
 	public OrthographicCamera getCamera()
@@ -690,6 +713,34 @@ public final class Engine implements Screen
 		scaleSpeed = speed;
 	}
 	
+	/**
+	 * Clears the transformation matrix.
+	 * @param g The rendering context.
+	 */
+	public void clearTransformation()
+	{
+		OrthographicCamera camera = stage.game.getCamera();
+		camera.position.set(stage.visibleWidth / 2, stage.visibleHeight / 2, 0);
+		camera.zoom = 1;
+		camera.rotate(-angle);
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+	}
+	
+	/**
+	 * Restores the transformation matrix.
+	 * @param g The rendering context.
+	 */
+	public void restoreTransformation()
+	{
+		OrthographicCamera camera = stage.game.getCamera();
+		camera.position.set(tx, ty, 0);
+		camera.zoom = zoom;
+		camera.rotate(angle);
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+	}
+	
 	public void showFps(boolean showFps)
 	{
 		this.showFps = showFps;
@@ -730,6 +781,19 @@ public final class Engine implements Screen
 		horValue = vertValue = DELTA_VALUE = 0;
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
+		
+		if(!playReplay)
+		{
+			Gdx.input.setInputProcessor(new InputAdapter()
+			{			
+				@Override
+				public boolean keyDown(int key) 
+				{
+					pressedKeys.add(key);
+					return true;
+				}
+			});
+		}
 	}
 	
 	private void renderStatusBar()
@@ -784,60 +848,41 @@ public final class Engine implements Screen
 			return;
 
 		showingDialog = true;
+		Gdx.input.setInputProcessor(gui);
 		
-		final JDialog d = new JDialog();
-		d.setTitle("Success!");
-
-		final JTextField textField = new JTextField(10);
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(4, 1));
-		panel.add(new JLabel("Congratulations!"));
-		panel.add(new JLabel("It took you " + (double)elapsedTime/1000 + " seconds to finish the stage."));
-		panel.add(new JLabel("Enter your name to save your stats."));			
-		panel.add(textField);
-		
-		JButton retryButton = new JButton("Retry");
-		retryButton.addActionListener(new ActionListener()
+		new Dialog("Stage Complete!", skin)
 		{
-			@Override
-			public void actionPerformed(ActionEvent ae) 
+			TextField field;
+			
 			{
-				d.dispose();
-				String input = textField.getText();
-				String playerName = (input == null || input.isEmpty()) ? "Player" : input;
+				field = new TextField("", skin);
+				text("Congratulations!\nIt took you " + (double)elapsedTime/1000 + " seconds to finish the stage.\nEnter your name to save your replay.");
+				getContentTable().row();
+				getContentTable().add(field);
+				button("Retry", "retry");
+				button("Return To Menu", "menu");
+				setModal(false);
+			}
+			
+			protected void result(Object object) 
+			{
+				String name = field.getText();
+				if(name == null || name.isEmpty())
+					name = "Player";
 				
-				saveReplay(playerName);
-				stage.build();
-				restart();
+				if(object.equals("retry"))
+				{
+					saveReplay(name);
+					stage.build();
+					restart();
+				}
+				else if(object.equals("menu"))
+				{
+					saveReplay(name);
+					runExitEvent();
+				}
 			}
-		});
-		JButton menuButton = new JButton("Return To Menu");
-		menuButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent ae) 
-			{
-				d.dispose();
-				String input = textField.getText();
-				String playerName = (input == null || input.isEmpty()) ? "Player" : input;
-
-				saveReplay(playerName);
-				runExitEvent();
-			}
-		});
-		
-		JPanel panel2 = new JPanel();
-		panel2.setLayout(new GridLayout(1, 2));
-		panel2.add(retryButton);
-		panel2.add(menuButton);
-
-		d.add(panel, "Center");
-		d.add(panel2, "South");
-		d.pack();
-		d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		d.setLocationRelativeTo(null);
-		d.setModal(false);
-		d.setVisible(true);		
+		}.show(gui);
 	}
 
 	private void renderPause()

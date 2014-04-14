@@ -1,7 +1,6 @@
 package ui.screens;
 
 import game.essentials.Utilities;
-import javax.swing.JOptionPane;
 import ui.screens.ScreenManager.Task;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -100,7 +100,14 @@ public class MainMenu implements Screen
 			public void clicked(InputEvent event, float x, float y) 
 			{
 				super.clicked(event, x, y);
-				JOptionPane.showMessageDialog(null, "Pojahn's Game Engine\nVersion: 2.0\nDeveloped by Pojahn Moradi 2012-2014.", "Pojahn's Game Engine", JOptionPane.INFORMATION_MESSAGE);
+				new Dialog("Pojahn's Game Engine", skin)
+				{
+					{
+						text("Pojahn's Game Engine\nVersion: 2.0\nDeveloped by Pojahn Moradi 2012-2014.");
+						button("Ok");
+						
+					}
+				}.show(stage);
 			}
 		});
 		

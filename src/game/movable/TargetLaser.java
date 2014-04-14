@@ -4,7 +4,10 @@ import game.core.Engine;
 import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.MovableObject;
+import game.essentials.Factory;
+import game.essentials.LaserBeam;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
 
 import com.badlogic.gdx.graphics.Color;
@@ -19,7 +22,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public class TargetLaser extends PathDrone
 {		
-	public Color[] laserColors;
 	private boolean stop, specEffect, eye;
 	private int delay, delayCounter;
 	private byte stopTile;
@@ -27,6 +29,8 @@ public class TargetLaser extends PathDrone
 	private MovableObject dummy;
 	private Particle impact;
 	private Point2D.Float wallTarget;
+	private LaserBeam beam;
+	private Color laserTint;
 	
 	/**
 	 * Constructs a {@code TargetLaser} instance.
@@ -44,19 +48,19 @@ public class TargetLaser extends PathDrone
 		stop = eye = false;
 		delay = 1;
 		stopTile = Engine.SOLID;
+		setBeam(Factory.defaultLaser());
+		laserTint = Color.valueOf("CC0000FF");
 		
 		dummy = new MovableObject();
 		dummy.setMoveSpeed(17.2f);
-		
-		laserColors = new Color[4];
-		int red = 255;
-		for (int i = 0; i < laserColors.length; i++)
-		{
-			laserColors[i] = new Color(red,0,0,230);
-			red -= 40;
-		}
 	}
-
+	
+	public TargetLaser(float x, float y, LaserBeam beam, GameObject laserTarget, GameObject... targets) 
+	{
+		this(x,y,laserTarget,targets);
+		this.beam = beam;
+	}
+	
 	@Override
 	public void moveEnemy()
 	{
@@ -67,19 +71,21 @@ public class TargetLaser extends PathDrone
 		
 		float centerX = currX + width / 2;
 		float centerY = currY + height / 2;
+		float tcx = laserTarget.currX + laserTarget.width / 2;  // Target Center X
+		float tcy = laserTarget.currY + laserTarget.height / 2; // Target Center Y
 		
 		if(eye)
 		{
-			dummy.specialMoveToward(laserTarget.currX, laserTarget.currY, 100, 3, Engine.DELTA);
+			dummy.specialMoveToward(laserTarget.currX, tcx, 100, 3, Engine.DELTA);
 			wallTarget = EntityStuff.searchTile(centerX, centerY, dummy.currX, dummy.currY, stopTile);
 			if(wallTarget == null)
 				wallTarget = EntityStuff.searchTile(centerY, centerY, dummy.currX, dummy.currY, stopTile);
 		}
 		else
 		{
-			wallTarget = EntityStuff.searchTile(centerX, centerY, laserTarget.currX, laserTarget.currY, stopTile);
+			wallTarget = EntityStuff.searchTile(centerX, centerY, tcx, tcy, stopTile);
 			if(wallTarget == null)
-				wallTarget = EntityStuff.findEdgePoint(centerY, centerY, laserTarget.currX, laserTarget.currY);
+				wallTarget = EntityStuff.findEdgePoint(centerY, centerY, tcx, tcy);
 		}
 		
 		if(impact != null && ++delayCounter % delay == 0)
@@ -90,6 +96,16 @@ public class TargetLaser extends PathDrone
 			if(go.haveHitEvent() && EntityStuff.checkLine((int)centerX, (int)centerY, (int)wallTarget.x, (int)wallTarget.y, go))
 				go.runHitEvent(this);
 		}
+		
+		if(specEffect)
+		{
+			if(!eye) 
+				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, tcx, tcy);
+			else
+				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, wallTarget.x, wallTarget.y);
+		}
+		
+		beam.fireAt(centerX, centerY, wallTarget.x, wallTarget.y, 1);
 	}
 	
 	/**
@@ -131,33 +147,6 @@ public class TargetLaser extends PathDrone
 		this.delay = delay;
 	}
 	
-	@Override
-	public void drawSpecial(SpriteBatch batch)	//TODO:
-	{
-//		if(stop || wallTarget == null)
-//			return;
-//
-//		float lineWidth = laserColors.length;
-//		int colorCounter = 0;
-//		float x = currX + width / 2,
-//			  y = currY + height / 2;
-//		
-//		while(lineWidth > 0)
-//		{
-//			g.setColor(laserColors[colorCounter++]);
-//			g.setLineWidth(lineWidth--);
-//
-//			g.drawLine(x,y,wallTarget.x, wallTarget.y);
-//		}
-//		if(specEffect)
-//		{
-//			if(!eye) 
-//				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, laserTarget.currX, laserTarget.currY);
-//			else
-//				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, wallTarget.x, wallTarget.y);
-//		}
-	}
-	
 	/**
 	 * Whether or not to rotate the objects image so it is always facing the lasers target.
 	 * @param specEffet True to enable rotating.
@@ -174,5 +163,45 @@ public class TargetLaser extends PathDrone
 	public void stop(boolean stop)
 	{
 		this.stop = stop;
+	}
+	
+	/**
+	 * Allows you to customize the laser tinting.
+	 * @param tint The tint the lasers should use.
+	 */
+	public void setLaserTint(Color tint)
+	{
+		this.laserTint = tint;
+	}
+	
+	/**
+	 * Returns the laser beam of the unit.
+	 * @return The beam.
+	 */
+	public LaserBeam getBeam() 
+	{
+		return beam;
+	}
+
+	/**
+	 * Sets the beam.
+	 * @param beam The beam to use.
+	 */
+	public void setBeam(LaserBeam beam) 
+	{
+		this.beam = beam;
+	}
+
+	@Override
+	public void drawSpecial(SpriteBatch b)
+	{
+		Color defaultColor = b.getColor();
+		
+		if(laserTint != null)
+			b.setColor(laserTint);
+		
+		beam.renderLasers(b);
+		
+		b.setColor(defaultColor);
 	}
 }
