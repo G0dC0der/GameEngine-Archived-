@@ -108,6 +108,11 @@ public class GameObject
 	 */
 	public float offsetY;
 	
+	/**
+	 * Used for debugging purposes.
+	 */
+	public String name;
+	
 	protected ArrayList<Event> events;
 	protected Frequency<Image2D> currImage;
 	protected boolean visible, fast;

@@ -17,6 +17,14 @@ public abstract class TimedEnemy extends Enemy
 	public void moveEnemy()
 	{
 		if(counter++ > time)
+		{
 			Stage.STAGE.discard(this);
+			endEvent();
+		}
 	}
+	
+	/**
+	 * Called before disposing.
+	 */
+	public void endEvent(){}
 }

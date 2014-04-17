@@ -125,7 +125,7 @@ public class Race extends Stage
 		gm.deathImg.setImage(4,deathImg);
 		gm.deathImg.zIndex(101);
 		game.setFocusObject(gm);
-		game.setMainCharacter(gm);
+		add(gm);
 
 		/*
 		 * Contestants
@@ -142,6 +142,7 @@ public class Race extends Stage
 		cont1.useSoundFallOff(true);
 		cont1.emitterProps(700, 1, 80);
 		cont1.removeTileEvent(null);
+		cont1.ghostify(replay1);
 		cont1.addTileEvent(new TileEvent()
 		{	
 			boolean used = false;
@@ -176,6 +177,7 @@ public class Race extends Stage
 				}
 			}
 		});
+		add(cont1);
 		
 		cont2 = new GravityMan();
 		cont2.setImage(new Frequency<>(3, contImg2));
@@ -187,6 +189,7 @@ public class Race extends Stage
 		cont2.useSoundFallOff(true);
 		cont2.emitterProps(700, 1, 80);
 		cont2.removeTileEvent(null);
+		cont2.ghostify(replay2);
 		cont2.addTileEvent(new TileEvent()
 		{	
 			boolean used = false;
@@ -221,6 +224,7 @@ public class Race extends Stage
 				}
 			}
 		});
+		add(cont2);
 		
 		cont3 = new GravityMan();
 		cont3.setImage(new Frequency<>(3, contImg3));
@@ -232,6 +236,7 @@ public class Race extends Stage
 		cont3.emitterProps(700, 1, 80);
 		cont3.useSoundFallOff(true);
 		cont3.removeTileEvent(null);
+		cont3.ghostify(replay3);
 		cont3.addTileEvent(new TileEvent()
 		{	
 			boolean used = false;
@@ -266,11 +271,7 @@ public class Race extends Stage
 				}
 			}
 		});
-
-		game.addGhost(cont1, replay1);
-		game.addGhost(cont2, replay2);
-		game.addGhost(cont3, replay3);
-		add(gm);
+		add(cont3);
 		
 		/*
 		 * Hindrances

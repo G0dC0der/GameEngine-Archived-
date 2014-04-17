@@ -1,11 +1,11 @@
 package stages.cave;
 
 import game.core.Enemy;
-import game.core.Engine.GameState;
 import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.GameObject.Hitbox;
+import game.core.MainCharacter.CharacterState;
 import game.core.MovableObject;
 import game.core.Stage;
 import game.essentials.Controller;
@@ -31,8 +31,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-@Playable(name="Collapsing Cave",
-		  description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
+@Playable(name="Collapsing Cave", description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
 public class CollapsingCave extends Stage
 {
 	private Pixmap stageImage;
@@ -69,10 +68,10 @@ public class CollapsingCave extends Stage
 			
 			backgroundImg = new Image2D("res/collapsingcave/background.png", false);
 			foregroundImg = new Image2D("res/collapsingcave/foreground.png", false);
-			deathImg   	  = Image2D.loadImages(new File("res/general/main/death"), false);
+			deathImg      = Image2D.loadImages(new File("res/general/main/death"), false);
 			
 			game.lifeImage   = new Image2D("res/general/hearth.png", false);
-			stageImage        = new Pixmap(new FileHandle("res/collapsingcave/stage.png"));
+			stageImage       = new Pixmap(new FileHandle("res/collapsingcave/stage.png"));
 			
 			collapsing = Utilities.loadMusic("res/collapsingcave/collapsing.wav");
 			drilling   = Utilities.loadMusic("res/collapsingcave/drilling.wav");
@@ -135,9 +134,8 @@ public class CollapsingCave extends Stage
 		gm.deathImg.setImage(4, deathImg);
 		gm.zIndex(10);
 		gm.freeze();
-		game.setMainCharacter(gm);
-
 		add(gm);
+		
 		add(Factory.soundFalloff(drilling, gm, 580, 215, 1200, 0, 10, 1));
 		
 		/*
@@ -328,7 +326,7 @@ public class CollapsingCave extends Stage
 		}
 		
 		if(coll1 && coll2 && coll3 && coll4 && flag.collidesWithMultiple(gm))
-			game.setState(GameState.FINISH);
+			gm.setState(CharacterState.FINISH);
 	
 		if(!done)
 		{

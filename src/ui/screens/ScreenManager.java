@@ -61,6 +61,9 @@ public class ScreenManager extends Game
 		GameSettings settings = new GameSettings();
 		settings.loadSettings("res/data/game.ini");
 		
+		if(replay != null)
+			stage.setMeta(replay.meta);
+		
 		Engine engine = new Engine("Pojahns Game Engine", stage, replay == null ? null : Arrays.asList(replay.replay));
 		engine.clearEachFrame = settings.clearEachFrame;
 		engine.showFps(settings.showFps);

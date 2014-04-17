@@ -7,16 +7,12 @@ import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import kuusisto.tinysound.TinySound;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
@@ -230,13 +226,12 @@ public final class Engine implements Screen
 	public boolean saveReplays = true;
 	
 	private static int DELTA_VALUE = 0;
-	private static final PressedButtons STILL = new PressedButtons();	
 	
 	/**
 	 * The state of the game can be manipulated with the help of these enums.
 	 * @author Pojahn Moradi
 	 */
-	public enum GameState {ALIVE, DEAD, FINISH, PAUSED};
+	public enum GameState {ONGOING, ENDED, FINISH, PAUSED};
 	
 	/**
 	 * The translation X of the world.
@@ -260,13 +255,11 @@ public final class Engine implements Screen
 	
 	public int elapsedTime;
 	GameObject focus;
-	MainCharacter main;
 	Stage stage;
-	private GameState state;
+	private GameState globalState;
 	private boolean showFps, justRestarted, autoTranslate, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, increasingScale = true;
 	private List<PressedButtons> replay;
-	private List<GhostContainer> ghosts;
-	private int frameCounter, fpsWriterCounter, fps;
+	private int fpsWriterCounter, fps;
 	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
@@ -282,15 +275,14 @@ public final class Engine implements Screen
 	 * @param stage The stage to play.
 	 * @param replay The replay to watch. If null is set, you will play the stage rather than watching a replay.
 	 */
-	public Engine(String title, Stage stage, List<PressedButtons> replay)
+	public Engine(String title, Stage stage, List<PressedButtons> replay)	//TODO: Should be able to pass more lists, in case you have more characters.
 	{
 		stage.game = this;
 		this.stage = stage;
 		elapsedTime = 0;
-		state = GameState.ALIVE;
+		globalState = GameState.ONGOING;
 		autoTranslate = true;
 		zoom = 1;
-		ghosts  = new ArrayList<>(); 
 		pressedKeys = new HashSet<>();
 		currTint = new Color(defaultTint);
 		
@@ -314,13 +306,13 @@ public final class Engine implements Screen
 		try
 		{
 			boolean escDown = isKeyPressed(Keys.ESCAPE);
-			if((state == GameState.ALIVE || state == GameState.PAUSED) && !playReplay && escDown)
-				state = state == GameState.PAUSED ? GameState.ALIVE : GameState.PAUSED;
+			if((globalState == GameState.ONGOING || globalState == GameState.PAUSED) && !playReplay && escDown)
+				globalState = globalState == GameState.PAUSED ? GameState.ONGOING : GameState.PAUSED;
 			
 			if(escDown && playReplay)
 				replayHelp = !replayHelp;
 			
-			if(state == GameState.PAUSED && !playReplay)
+			if(globalState == GameState.PAUSED && !playReplay)
 			{
 				pressedKeys.clear();
 				if(stage.music != null  && stage.music.getVolume() != .1f)
@@ -358,7 +350,7 @@ public final class Engine implements Screen
 		if(autoTranslate)
 		{
 			float focusX = focus.currX + focus.width  / 2,
-				  focusY = focus.currY + focus.height / 2;
+			      focusY = focus.currY + focus.height / 2;
 			
 			tx = Math.min(stage.width  - stage.visibleWidth,   Math.max(0, focusX - stage.visibleWidth  / 2)) + stage.visibleWidth  / 2; 
 			ty = Math.min(stage.height - stage.visibleHeight,  Math.max(0, focusY - stage.visibleHeight / 2)) + stage.visibleHeight / 2;
@@ -379,7 +371,7 @@ public final class Engine implements Screen
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		
-		if(state == GameState.FINISH)
+		if(globalState == GameState.FINISH)
 		{
 			Utilities.fadeColor(currTint, wintTint, .005f);
 			batch.setColor(currTint);
@@ -407,10 +399,10 @@ public final class Engine implements Screen
 		camera.rotate(-angle);
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
-		
+
 		renderStatusBar();
 
-		if(state == GameState.DEAD)
+		if(globalState == GameState.ENDED)
 			timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", stage.visibleWidth / 2 - 320, stage.visibleHeight / 2);
 		
 		if(replayHelp)
@@ -444,24 +436,8 @@ public final class Engine implements Screen
 		
 		DELTA_VALUE = (int) (Gdx.graphics.getDeltaTime() * 1000f);
 		
-		PressedButtons pb;
-		if(playReplay)
-			pb = frameCounter < replay.size() ? replay.get(frameCounter++) : STILL;
-		else
+		if(globalState == GameState.ENDED)
 		{
-			pb = getPressedButtons(main.con);
-			
-			if(state == GameState.ALIVE)
-				replay.add(pb);
-		}
-		
-		if(pb.suicide)
-			setState(GameState.DEAD);
-
-		if (state == GameState.DEAD)
-		{
-			main.deathAction();
-			
 			if(Gdx.input.isKeyPressed(Keys.R))
 			{
 				restart();
@@ -470,41 +446,19 @@ public final class Engine implements Screen
 			else if(Gdx.input.isKeyPressed(Keys.B))
 				runExitEvent();
 		}
-		else if(state == GameState.FINISH)
+		else if(globalState == GameState.FINISH)
 			winAction();
 		
-		main.prevX = main.currX;
-		main.prevY = main.currY;
-		if(state == GameState.ALIVE)
+		if(globalState == GameState.ONGOING)
 		{
-			main.handleInput(pb);
-
 			if(!justRestarted)
 				elapsedTime += DELTA_VALUE;
 			else
 				justRestarted = false;
 		}
-		else if(state == GameState.FINISH)
-			main.handleInput(STILL);
-		
-		for(GhostContainer ghost : ghosts)
-		{
-			ghost.character.prevX = ghost.character.currX;
-			ghost.character.prevY = ghost.character.currY;
-			ghost.character.handleInput((ghost.replay.length > ghost.counter + 1) ? ghost.replay[ghost.counter++] : STILL);
-			
-			ghost.character.runEvents();
-			ghost.character.occupyingCells.clear();
-			ghost.character.tileCheck();
-			ghost.character.inspectIntersections();
-		}
 		
 		stage.moveEnemies();
 		stage.extra();
-
-		main.occupyingCells.clear();
-		main.tileCheck();
-		main.inspectIntersections();
 
 		SoundBank.FRAME_COUNTER++;
 		pressedKeys.clear();
@@ -520,6 +474,7 @@ public final class Engine implements Screen
 		TinySound.setGlobalVolume(gameVolume);
 
 		stage.init();
+		stage.build();
 
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(stage.visibleWidth, stage.visibleHeight);
@@ -527,11 +482,6 @@ public final class Engine implements Screen
 
 		Gdx.graphics.setDisplayMode(stage.visibleWidth, stage.visibleHeight, false);
 		ShaderProgram.pedantic = false;
-		
-		stage.build();
-		
-		main.currX = stage.startX;
-		main.currY = stage.startY;
 		
 		Gdx.input.setInputProcessor(new InputAdapter()
 		{			
@@ -565,44 +515,26 @@ public final class Engine implements Screen
 	}
 	
 	/**
-	 * Returns the main character.
-	 * @return The main character.
-	 */
-	public MainCharacter getMain()
-	{
-		return main;
-	}
-	
-	/**
-	 * Sets the main character.
-	 * @param main The unit to use as the main character.
-	 */
-	public void setMainCharacter(MainCharacter main)
-	{
-		this.main = main;
-	}
-	
-	/**
 	 * Returns the current state of the game.
 	 * @return The current state of the game.
 	 */
 	public GameState getState()
 	{
-		return state;
+		return globalState;
 	}
 	
 	/**
 	 * In this function can you manipulate the state of the game. You can for example pause the game, end it etc.
 	 * Function is ignored if you are dead or have have finished the stage.
-	 * @param state The state the game should be changed to.
+	 * @param globalState The state the game should be changed to.
 	 */
-	public void setState(GameState state)
+	void setGlobalState(GameState globalState)
 	{
-		if(this.state != GameState.FINISH && this.state != GameState.DEAD)
+		if(this.globalState != GameState.FINISH && this.globalState != GameState.ENDED)
 		{
-			this.state = state;
+			this.globalState = globalState;
 
-			if(this.state == GameState.DEAD)
+			if(this.globalState == GameState.ENDED)
 				saveReplay("Loser");
 		}
 	}
@@ -636,21 +568,6 @@ public final class Engine implements Screen
 	public void autoTranslate(boolean genVars)
 	{
 		this.autoTranslate = genVars;
-	}
-
-	/**
-	 * Appends the specified ghost to the game.
-	 * @param character The {@code GameObject} to be used as a ghost.
-	 * @param replay The replay data this ghost should use for its movement.
-	 */
-	public void addGhost(MainCharacter character, PressedButtons[] replay)
-	{
-		GhostContainer rd = new GhostContainer();
-		rd.character = character;
-		rd.replay = replay;
-		
-		ghosts.add(rd);
-		stage.add(character);
 	}
 	
 	public boolean isKeyPressed(int key)
@@ -719,7 +636,6 @@ public final class Engine implements Screen
 	 */
 	public void clearTransformation()
 	{
-		OrthographicCamera camera = stage.game.getCamera();
 		camera.position.set(stage.visibleWidth / 2, stage.visibleHeight / 2, 0);
 		camera.zoom = 1;
 		camera.rotate(-angle);
@@ -733,7 +649,6 @@ public final class Engine implements Screen
 	 */
 	public void restoreTransformation()
 	{
-		OrthographicCamera camera = stage.game.getCamera();
 		camera.position.set(tx, ty, 0);
 		camera.zoom = zoom;
 		camera.rotate(angle);
@@ -751,6 +666,11 @@ public final class Engine implements Screen
 		this.exitEvent = exitEvent;
 	}
 	
+	public boolean playingReplay()
+	{
+		return playReplay;
+	}
+	
 	@Override public void hide() {dispose();}
 	@Override public void pause() {}
 	@Override public void resize(int x, int y) {}
@@ -765,19 +685,13 @@ public final class Engine implements Screen
 		return DELTA_VALUE;
 	}
 	
-	void clearGhosts()
-	{
-		ghosts.clear();
-	}
-	
 	private void restart()
 	{
 		justRestarted =  increasingScale = true;
 		showingDialog = false;
 		if(!playReplay)
 			replay.clear();
-		frameCounter = 0;
-		state = GameState.ALIVE;
+		globalState = GameState.ONGOING;
 		horValue = vertValue = DELTA_VALUE = 0;
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
@@ -798,19 +712,19 @@ public final class Engine implements Screen
 	
 	private void renderStatusBar()
 	{
-		if(state == GameState.PAUSED)
-			timeFont.setColor(Color.WHITE);
-		else
-			timeFont.setColor(timeColor);
-		timeFont.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
-		
-		int hp = main.getHP();
-		if(lifeImage != null && state != GameState.DEAD)
-		{
-			final int width = (int) (lifeImage.getWidth() + 2);
-			for(int i = 0, posX = 10; i < hp; i++, posX += width)
-				batch.draw(lifeImage, posX, 40);
-		}
+//		if(state == GameState.PAUSED)
+//			timeFont.setColor(Color.WHITE);
+//		else
+//			timeFont.setColor(timeColor);
+//		timeFont.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
+//		
+//		int hp = main.getHP();
+//		if(lifeImage != null && state != GameState.DEAD)
+//		{
+//			final int width = (int) (lifeImage.getWidth() + 2);
+//			for(int i = 0, posX = 10; i < hp; i++, posX += width)
+//				batch.draw(lifeImage, posX, 40);
+//		}
 	}
 	
 	private void drawObject(GameObject go)
@@ -836,7 +750,7 @@ public final class Engine implements Screen
 			hs.time = (double)elapsedTime/1000;
 			hs.date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 			hs.className = stage.getClass();
-			hs.result = state == GameState.DEAD ? "Death" : "Victorious";
+			hs.result = globalState == GameState.ENDED ? "Death" : "Victorious";
 			
 			Utilities.exportObject(hs, "replays/" + cleanString(stage.getClass().getSimpleName()) + " " + cleanString(playername) + " " + hs.result + " " + hs.time + " sec " + hs.date + ".hs");
 		}
@@ -949,7 +863,7 @@ public final class Engine implements Screen
 		zoom = scaleValue;
 	}
 	
-	private PressedButtons getPressedButtons(Controller con)
+	PressedButtons getPressedButtons(Controller con)
 	{
 		PressedButtons pb = new PressedButtons();
 		pb.down 	  = Gdx.input.isKeyPressed(con.down);
@@ -998,12 +912,4 @@ public final class Engine implements Screen
 			}
 		}).start();
 	}
-	
-	private static class GhostContainer
-	{
-		MainCharacter character;
-		PressedButtons[] replay;
-		int counter;
-	}
-
 }

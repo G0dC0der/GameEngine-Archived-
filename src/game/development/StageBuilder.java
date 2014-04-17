@@ -183,7 +183,6 @@ public abstract class StageBuilder extends Stage
 			gm.deathImg = new Particle();
 			gm.deathImg.setImage(4,deathImg);
 			gm.deathImg.zIndex(101);
-			game.setMainCharacter(gm);
 			game.setFocusObject(gm);
 			add(gm);
 		}

@@ -1,15 +1,20 @@
 package game.core;
 
 import game.core.Engine.Direction;
+import game.core.Engine.GameState;
 import game.core.GameObject.Event;
+import game.core.MainCharacter.CharacterState;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
-import game.movable.TimedEnemy;
+import game.essentials.Controller.PressedButtons;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import kuusisto.tinysound.Music;
 
 /**
@@ -99,6 +104,7 @@ public abstract class Stage
 	private boolean pending;
 	boolean sort;
 	List<GameObject> stageObjects;
+	List<MainCharacter> mains;
 	List<Event> events;
 	
 	public Stage()
@@ -107,6 +113,7 @@ public abstract class Stage
 		discardList    = new LinkedList<>();
 		appendList     = new LinkedList<>();
 		stageObjects   = new LinkedList<>();
+		mains          = new LinkedList<>();
 		trash		   = new LinkedList<>();
 		events 		   = new LinkedList<>();
 		visibleWidth = visibleHeight = startX = startY = -1;
@@ -214,6 +221,8 @@ public abstract class Stage
 		if(trash.size() > 200)
 			trash.clear();
 		
+		List<MainCharacter> mains = new LinkedList<>();
+		
 		for(GameObject go : stageObjects)
 		{
 			if(go instanceof Enemy)
@@ -228,27 +237,60 @@ public abstract class Stage
 					enemy.inspectIntersections();
 				}
 				
-				if((enemy.multiFacings || enemy.doubleFaced) && !enemy.manualFacings)
-				{
-					Direction dir = EntityStuff.getDirection(EntityStuff.normalize(enemy.prevX + enemy.width / 2, enemy.prevY + enemy.height / 2, enemy.currX + enemy.width / 2, enemy.currY + enemy.height / 2));
-					if(dir != null)
-					{
-						if(enemy.doubleFaced)
-						{
-							if(dir != Direction.N && dir != Direction.S)
-								enemy.facing = dir;
-						}
-						else
-							enemy.facing = dir;
-					}
-				}
+				updateFacing(enemy);
 				enemy.prevX = enemy.currX;
 				enemy.prevY = enemy.currY;
 			}
-			
+			else if(go instanceof MainCharacter)
+				mains.add((MainCharacter)go);
+				
 			go.removeQueuedEvents();
 			go.runEvents();
 		}
+		
+		int aliveMains = mains.size();
+		for(MainCharacter main : mains)	//TODO: Replays are currently not saved. We need to extend this feature to support multiple main characters
+		{
+			if(main.isGhost())
+				aliveMains--;
+			
+			updateFacing(main);
+			main.prevX = main.currX;
+			main.prevY = main.currY;
+			
+			if(game.playingReplay() || main.isGhost())
+				main.handleInput(main.getNext());
+			else if(game.getState() != GameState.ONGOING || main.getState() != CharacterState.ALIVE)
+				main.handleInput(MainCharacter.STILL);
+			else//Register a replay frame here
+			{
+				PressedButtons pbs = game.getPressedButtons(main.con);
+				if(!pbs.suicide)
+					main.handleInput(pbs);
+				else
+				{
+					main.setState(CharacterState.DEAD);
+					main.deathAction();
+				}
+			}
+			if(main.triggerable)
+			{
+				main.occupyingCells.clear();
+				main.tileCheck();
+				main.inspectIntersections();
+			}
+			
+			main.removeQueuedEvents();
+			main.runEvents();
+			
+			if(!main.isGhost() && main.getState() == CharacterState.DEAD)
+				aliveMains--;
+			else if(!main.isGhost() && main.getState() == CharacterState.FINISH)
+				game.setGlobalState(GameState.FINISH);
+		}   
+		
+		if(0 >= aliveMains)
+			game.setGlobalState(GameState.ENDED);
 		
 		if(!events.isEmpty())
 			for(Event event : events)
@@ -327,10 +369,10 @@ public abstract class Stage
 		
 		trash.clear();
 		stageObjects.clear();
+		mains.clear();
 		events.clear();
 		appendList.clear();
 		discardList.clear();
-		game.clearGhosts();
 		game.elapsedTime = 0;
 	}
 	
@@ -379,18 +421,6 @@ public abstract class Stage
 	}
 	
 	/**
-	 * Creates a full clone of the stage data.
-	 */
-	private void cloneStageData()
-	{
-		stageClone = new byte[stageData.length][stageData[0].length];
-		
-		for(int x = 0; x < width; x++)
-			for(int y = 0; y < height; y++)
-				stageClone[y][x] = stageData[y][x];
-	}
-	
-	/**
 	 * Returns the tile type from the stage data clone.
 	 * @param x The X position.
 	 * @param y The Y position.
@@ -404,7 +434,34 @@ public abstract class Stage
 		return stageClone[y][x];
 	}
 	
-	private static class SceneImage extends TimedEnemy
+	void updateFacing(MovableObject mo)
+	{
+		if((mo.multiFacings || mo.doubleFaced) && !mo.manualFacings)
+		{
+			Direction dir = EntityStuff.getDirection(EntityStuff.normalize(mo.prevX + mo.width / 2, mo.prevY + mo.height / 2, mo.currX + mo.width / 2, mo.currY + mo.height / 2));
+			if(dir != null)
+			{
+				if(mo.doubleFaced)
+				{
+					if(dir != Direction.N && dir != Direction.S)
+						mo.facing = dir;
+				}
+				else
+					mo.facing = dir;
+			}
+		}
+	}
+
+	private void cloneStageData()
+	{
+		stageClone = new byte[stageData.length][stageData[0].length];
+		
+		for(int x = 0; x < width; x++)
+			for(int y = 0; y < height; y++)
+				stageClone[y][x] = stageData[y][x];
+	}
+	
+	private static class SceneImage extends GameObject
 	{
 		RenderOption type;
 		
@@ -412,7 +469,6 @@ public abstract class Stage
 		{
 			this.type = type;
 			setVisible(true);
-			time = Integer.MAX_VALUE;
 		}
 		
 		@Override
