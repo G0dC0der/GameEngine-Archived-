@@ -7,14 +7,12 @@ import game.core.MainCharacter.CharacterState;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.essentials.Controller.PressedButtons;
-
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import kuusisto.tinysound.Music;
 
 /**
@@ -225,63 +223,91 @@ public abstract class Stage
 		
 		for(GameObject go : stageObjects)
 		{
-			if(go instanceof Enemy)
+			boolean isEnemy = go instanceof Enemy,
+					isMain = go instanceof MainCharacter;
+			
+			if(isEnemy)
 			{
 				Enemy enemy = (Enemy) go;
-				enemy.moveEnemy();
 				
-				if(enemy.triggerable)
+				if(!enemy.halted)
 				{
-					enemy.occupyingCells.clear();
-					enemy.tileCheck();
-					enemy.inspectIntersections();
+					enemy.moveEnemy();
+					
+					if(enemy.triggerable)
+					{
+						enemy.occupyingCells.clear();
+						enemy.tileCheck();
+						enemy.inspectIntersections();
+					}
+					
+					updateFacing(enemy);
+					
+					enemy.prevX = enemy.currX;
+					enemy.prevY = enemy.currY;
 				}
-				
-				updateFacing(enemy);
-				enemy.prevX = enemy.currX;
-				enemy.prevY = enemy.currY;
+				else
+					enemy.goBack();
 			}
-			else if(go instanceof MainCharacter)
+			else if(isMain)
 				mains.add((MainCharacter)go);
-				
-			go.removeQueuedEvents();
-			go.runEvents();
+			
+			if(!isMain)
+			{
+				go.removeQueuedEvents();
+				go.runEvents();
+			}
 		}
 		
 		int aliveMains = mains.size();
-		for(MainCharacter main : mains)	//TODO: Replays are currently not saved. We need to extend this feature to support multiple main characters
+		for(int i = 0; i < mains.size(); i++)
 		{
+			MainCharacter main = mains.get(i);
+			
 			if(main.isGhost())
 				aliveMains--;
 			
-			updateFacing(main);
-			main.prevX = main.currX;
-			main.prevY = main.currY;
-			
-			if(game.playingReplay() || main.isGhost())
-				main.handleInput(main.getNext());
-			else if(game.getState() != GameState.ONGOING || main.getState() != CharacterState.ALIVE)
-				main.handleInput(MainCharacter.STILL);
-			else//Register a replay frame here
+			if(!main.halted)
 			{
-				PressedButtons pbs = game.getPressedButtons(main.con);
-				if(!pbs.suicide)
-					main.handleInput(pbs);
+				updateFacing(main);
+				main.prevX = main.currX;
+				main.prevY = main.currY;
+				
+				if(main.isGhost())
+					main.handleInput(main.getNext());
+				else if(game.getGlobalState() != GameState.ONGOING || main.getState() != CharacterState.ALIVE)
+					main.handleInput(MainCharacter.STILL);
 				else
 				{
-					main.setState(CharacterState.DEAD);
-					main.deathAction();
+					PressedButtons pbs;
+					if(game.playingReplay())
+						pbs = game.getReplayFrame(i);
+					else
+						pbs = game.getPressedButtons(main.con);
+					
+					if(!pbs.suicide)
+						main.handleInput(pbs);
+					else
+					{
+						main.setState(CharacterState.DEAD);
+						main.deathAction();
+					}
+					
+					if(!game.playingReplay())
+						game.registerReplayFrame(i, pbs);
 				}
+				if(main.triggerable)
+				{
+					main.occupyingCells.clear();
+					main.tileCheck();
+					main.inspectIntersections();
+				}
+				
+				main.removeQueuedEvents();
+				main.runEvents();
 			}
-			if(main.triggerable)
-			{
-				main.occupyingCells.clear();
-				main.tileCheck();
-				main.inspectIntersections();
-			}
-			
-			main.removeQueuedEvents();
-			main.runEvents();
+			else
+				main.goBack();
 			
 			if(!main.isGhost() && main.getState() == CharacterState.DEAD)
 				aliveMains--;
@@ -388,11 +414,12 @@ public abstract class Stage
 	{}
 	
 	/**
-	 * This function return data to the replay file(default=empty string) that needs to be saved.<br>
-	 * Called automatically by the server.
+	 * This function sends data to the replay file(default=empty string) that needs to be saved.<br>
+	 * The meta need to be serializable. 
+	 * Called automatically by the engine.
 	 * @return The meta data to save in the replay file.
 	 */
-	protected String getMeta()
+	protected Serializable getMeta()
 	{
 		return "";
 	}
@@ -402,7 +429,7 @@ public abstract class Stage
 	 * By default, a stage does not contain any meta data.
 	 * @param meta The meta data, sent by the engine.
 	 */
-	public void setMeta(String meta) {}
+	public void setMeta(Serializable meta) {}
 	
 	/**
 	 * Converts this map to a string. Note that the string can become very large(height * width + height).

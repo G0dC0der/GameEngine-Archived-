@@ -39,6 +39,7 @@ public class MovableObject extends GameObject
 	protected Set<GameObject> solidObjects;
 	protected Set<Byte> occupyingCells;
 	float prevX, prevY;
+	boolean halted;
 	private float tempX, tempY;
 	
 	/**
@@ -833,6 +834,11 @@ public class MovableObject extends GameObject
 	public boolean isFrozen()
 	{
 		return !canMove;
+	}
+	
+	public void halt(boolean halt)
+	{
+		this.halted = halt;
 	}
 	
 	/**

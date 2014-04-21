@@ -4,7 +4,6 @@ import game.core.Engine;
 import game.core.GameObject.Event;
 import game.core.Stage;
 import game.essentials.HighScore;
-import java.util.Arrays;
 import ui.accessories.GameSettings;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
@@ -64,7 +63,7 @@ public class ScreenManager extends Game
 		if(replay != null)
 			stage.setMeta(replay.meta);
 		
-		Engine engine = new Engine("Pojahns Game Engine", stage, replay == null ? null : Arrays.asList(replay.replay));
+		Engine engine = new Engine(stage, replay == null ? null : replay.replays);
 		engine.clearEachFrame = settings.clearEachFrame;
 		engine.showFps(settings.showFps);
 		engine.streamSounds = settings.streamSounds;

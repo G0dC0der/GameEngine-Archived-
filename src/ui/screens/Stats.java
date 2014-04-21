@@ -236,7 +236,7 @@ public class Stats implements Screen
 					public void clicked(InputEvent event, float x, float y) 
 					{
 						super.clicked(event, x, y);
-						if(hs.className == null || hs.replay == null)
+						if(hs.className == null || hs.replays == null)
 							JOptionPane.showMessageDialog(null, "Corrupted or incomplete highscore file.", "Runtime Error", JOptionPane.ERROR_MESSAGE);
 						else if(!StageReader.AVAILABLE_STAGE.contains(hs.className))
 							JOptionPane.showMessageDialog(null, "Stage \"" + hs.stageName + "\" do not exist.", "Runtime Error", JOptionPane.ERROR_MESSAGE);

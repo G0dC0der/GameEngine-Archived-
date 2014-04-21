@@ -164,7 +164,7 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos1 == null)
-								pos1 = game.getState() == GameState.FINISH ? "4th" : "3rd";
+								pos1 = game.getGlobalState() == GameState.FINISH ? "4th" : "3rd";
 							
 							game.clearTransformation();
 							
@@ -211,7 +211,7 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos2 == null)
-								pos2 = game.getState() == GameState.FINISH ? "3rd" : "2nd";
+								pos2 = game.getGlobalState() == GameState.FINISH ? "3rd" : "2nd";
 							
 							game.clearTransformation();
 							
@@ -258,7 +258,7 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos3 == null)
-								pos3 = game.getState() == GameState.FINISH ? "2nd" : "1st";
+								pos3 = game.getGlobalState() == GameState.FINISH ? "2nd" : "1st";
 							
 							game.clearTransformation();
 							

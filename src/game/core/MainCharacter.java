@@ -6,7 +6,6 @@ import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.objects.Particle;
-
 import java.util.List;
 
 /**
@@ -25,8 +24,8 @@ public abstract class MainCharacter extends MovableObject
 	public Particle deathImg;
 	protected Controller con;
 	private CharacterState state;
-	private int hp, hurtSkip, invincibleCounter, frameSkipCounter, replayCounter;
-	private boolean hurt, useOnce;
+	private int hp, invincibleCounter, frameSkipCounter, replayCounter;
+	private boolean hurt;
 	private PressedButtons[] ghostData;
 	
 	/**
@@ -37,7 +36,6 @@ public abstract class MainCharacter extends MovableObject
 		super();
 		hp = 0;
 		invincibleCounter = frameSkipCounter = 0;
-		hurtSkip = 3;
 		triggerable = true;
 		hurt = false;
 		state = CharacterState.ALIVE;
@@ -52,12 +50,7 @@ public abstract class MainCharacter extends MovableObject
 				if(tileType == SOLID)
 					deathAction();
 				else if(tileType == LETHAL)
-				{
 					hit(Stage.LETHAL_DAMAGE);
-					
-					if(hp <= 0)
-						deathAction();
-				}
 				else if(tileType == GOAL)
 					stage.game.setGlobalState(GameState.FINISH);
 			}
@@ -86,7 +79,8 @@ public abstract class MainCharacter extends MovableObject
 
 	/**
 	 * You can alter the characters health with this function. Use positive values to add lives or negative values to subtract.<br>
-	 * When health has been subtracted, the character becomes invincible for 100 frames.
+	 * When health has been subtracted, the character becomes invincible for 100 frames.<br>
+	 * If the health after the subtraction is equal or less than zero, {@code deathAction} is called.
 	 * @param strength
 	 */
 	public void hit(int strength)
@@ -98,6 +92,9 @@ public abstract class MainCharacter extends MovableObject
 			hp += strength;
 			hurt = true;			
 		}
+		
+		if(0 >= hp)
+			deathAction();
 	}
 	
 	/**
@@ -124,7 +121,7 @@ public abstract class MainCharacter extends MovableObject
 		if (hurt && ++invincibleCounter % 100 == 0)
 			hurt = false;
 		
-		if (hurt && ++frameSkipCounter % hurtSkip != 0)
+		if (hurt && ++frameSkipCounter % 3 != 0)
 			return null;
 		
 		return super.getFrame();
@@ -142,11 +139,7 @@ public abstract class MainCharacter extends MovableObject
 	
 	public void ghostify(List<PressedButtons> ghostData)
 	{
-		PressedButtons[] pbs = new PressedButtons[ghostData.size()];
-		for(int i = 0; i < pbs.length; i++)
-			pbs[i] = ghostData.get(i);
-		
-		this.ghostData = pbs;
+		this.ghostData = ghostData.toArray(new PressedButtons[ghostData.size()]);
 	}
 	
 	public void ghostify(PressedButtons[] ghostData)
@@ -177,19 +170,18 @@ public abstract class MainCharacter extends MovableObject
 	public abstract void handleInput(PressedButtons pb);
 	
 	/**
-	 * Called by the engine every frame when dead.
+	 * Called upon death. Can be called manually if engine fail to call it.<br>
+	 * Usually, you in this method hides or discard your character, sets its hitbox to INVINCIBLE, state to DEAD and finally adding a death particle.
 	 */
-	protected void deathAction()
+	final void deathAction()
 	{
-		if(!useOnce)
-		{
-			useOnce = true;
-			visible = false;
-			hitbox = Hitbox.INVINCIBLE;
-			state = CharacterState.DEAD;
-			
-			if(deathImg != null)
-				Stage.STAGE.add(deathImg.getClone(currX + (width / 2) - (deathImg.width / 2), currY + (height / 2) - (deathImg.height / 2)));
-		}
+		System.out.println("Running death action");	//TODO:
+		visible = false;
+		hitbox = Hitbox.INVINCIBLE;
+		state = CharacterState.DEAD;
+		halted = true;
+		
+		if(deathImg != null)
+			Stage.STAGE.add(deathImg.getClone(currX + (width / 2) - (deathImg.width / 2), currY + (height / 2) - (deathImg.height / 2)));
 	}
 }

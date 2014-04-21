@@ -269,4 +269,17 @@ public class Utilities
 		}
 		return bu.toString();
 	}
+	
+//	public static PressedButtons[][] convert(List<List<PressedButtons>> replays)
+//	{
+//		PressedButtons[][] pbs = new PressedButtons[replays.size()][];
+//		
+//		for(int i = 0; i < pbs.length; i++)
+//		{
+//			pbs[i] = new PressedButtons[replays.get(i).size()];
+//			for(int j = 0; j < pbs[i].length; j++)
+//				pbs[i][j] = replays.get(i).get(j);
+//		}
+//		return pbs;
+//	}
 }

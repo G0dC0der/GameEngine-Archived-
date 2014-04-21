@@ -1,6 +1,8 @@
 package game.essentials;
 
+import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
 import game.essentials.Controller.PressedButtons;
 
 /**
@@ -96,31 +98,15 @@ public class HighScore implements java.io.Serializable, Comparable<HighScore>
 			return value;
 		}
 	};
-	
-	public static final Comparator<HighScore> INPUT_SORT = new Comparator<HighScore>()
-	{
-		@Override
-		public int compare(HighScore hs1, HighScore hs2) 
-		{
-			return hs1.replay.length - hs2.replay.length;
-		}
-	};
 
-	public String name, stageName, meta, date, result;
 	public double time;
+	public String name, stageName, date, result;
+	public Serializable meta;
 	public Class<?> className;
-	public PressedButtons[] replay;
+	public List<List<PressedButtons>> replays;
 	
 	public HighScore()
 	{}
-	
-	public HighScore(String name, String stageName, String meta, double time)
-	{
-		this.name = name;
-		this.stageName = stageName;
-		this.time = time;
-		this.meta = meta;
-	}
 	
 	@Override
 	public int compareTo(HighScore hs) 
