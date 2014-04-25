@@ -23,7 +23,7 @@ public class StageReader
 {
 	public static List<Class<Stage>> loadAll()
 	{
-		List<Class<Stage>> stages = new LinkedList<>();
+		List<Class<Stage>> stages = new LinkedList<>(); 
 		
 		try
 		{
