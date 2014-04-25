@@ -4,16 +4,26 @@ import game.core.Engine.Direction;
 import game.core.Engine.GameState;
 import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
+import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
-import game.essentials.Controller.PressedButtons;
+
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import kuusisto.tinysound.Music;
+import kuusisto.tinysound.Sound;
+
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Disposable;
 
 /**
  * Create your own stage by extending this class and adding your unique appearance.
@@ -88,12 +98,12 @@ public abstract class Stage
 	public Engine game;
 	
 	/**
-	 * {@code startX} respective {@code startY} are the starting position of the main character.
+	 * {@code startX} and {@code startY} are the starting position of the main character.
 	 */
 	protected int startX, startY;
 	
 	/**
-	 * The music that will play in the background. Can be either wav or ogg.
+	 * The music that will play in the background.
 	 */
 	protected Music music;
 	
@@ -219,7 +229,7 @@ public abstract class Stage
 		if(trash.size() > 200)
 			trash.clear();
 		
-		List<MainCharacter> mains = new LinkedList<>();
+		mains = new LinkedList<>();
 		
 		for(GameObject go : stageObjects)
 		{
@@ -432,22 +442,6 @@ public abstract class Stage
 	public void setMeta(Serializable meta) {}
 	
 	/**
-	 * Converts this map to a string. Note that the string can become very large(height * width + height).
-	 */
-	public String toString()
-	{
-		StringBuilder bu = new StringBuilder ((height * width) + height);
-		for (int i = 0; i < height; i++)
-		{
-			for (int j = 0; j < width; j++)
-				bu.append(stageData[i][j]);
-			
-			bu.append('\n');
-		}
-		return bu.toString();
-	}
-	
-	/**
 	 * Returns the tile type from the stage data clone.
 	 * @param x The X position.
 	 * @param y The Y position.
@@ -459,6 +453,68 @@ public abstract class Stage
 			cloneStageData();
 		
 		return stageClone[y][x];
+	}
+	
+	public static void disposeBatch(Object... objs)
+	{
+		for(Object obj : objs)
+		{
+			try
+			{
+				if(obj instanceof TextureRegion)
+					((TextureRegion)obj).getTexture().dispose();
+				else if(obj instanceof TextureRegion[])
+				{
+					TextureRegion[] arr = (TextureRegion[]) obj;
+					for(TextureRegion img : arr)
+						img.getTexture().dispose();
+				}
+				else if(obj instanceof Pixmap)
+					((Pixmap)obj).dispose();
+				else if(obj instanceof Texture)
+					((Texture)obj).dispose();
+				else if(obj instanceof Texture[])
+				{
+					Texture[] arr = (Texture[]) obj;
+					for(Texture img : arr)
+						img.dispose();
+				}
+				else if(obj instanceof ParticleEffect)
+					((ParticleEffect)obj).dispose();
+				else if(obj instanceof Disposable)
+					((Disposable)obj).dispose();
+				else if(obj instanceof Sound)
+					((Sound)obj).unload();
+				else if(obj instanceof Music)
+					((Music)obj).unload();
+			}
+			catch(Exception e)
+			{
+				System.err.println("Failed to dispose a resource: " + obj);
+			}
+		}
+	}
+	
+	public void nullBatch()
+	{
+		List<Field> fields = new LinkedList<>();
+		Utilities.getAllFields(fields, getClass());
+		
+		for(Field f : fields)
+		{
+			if(f.getType().isPrimitive())
+				continue;
+			
+			f.setAccessible(true);
+			try 
+			{
+				f.set(this, null);
+			} 
+			catch (IllegalArgumentException | IllegalAccessException e) 
+			{
+				e.printStackTrace();
+			} 
+		}
 	}
 	
 	void updateFacing(MovableObject mo)
@@ -543,5 +599,11 @@ public abstract class Stage
 					break;
 			}
 		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable 
+	{
+		System.out.println("Deleting stage");
 	}
 }

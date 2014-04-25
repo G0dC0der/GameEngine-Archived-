@@ -17,11 +17,13 @@ public abstract class MainCharacter extends MovableObject
 	public enum CharacterState { ALIVE, DEAD, FINISH };
 	
 	public static final PressedButtons STILL = new PressedButtons();
+	public static final Image2D DEFAULT_HEALTH_IMAGE = new Image2D("res/general/hearth.png", false);
 	
 	/**
 	 * This is the animation to play when the character have died. 
 	 */
 	public Particle deathImg;
+	public Image2D healthImg = DEFAULT_HEALTH_IMAGE;
 	protected Controller con;
 	private CharacterState state;
 	private int hp, invincibleCounter, frameSkipCounter, replayCounter;
@@ -157,7 +159,7 @@ public abstract class MainCharacter extends MovableObject
 		if(ghostData == null)
 			throw new IllegalStateException("This method can only be called if the MainCharacter is a ghost.");
 		
-		if(replayCounter > ghostData.length - 1)
+		if(replayCounter > ghostData.length - 1 || isFrozen())
 			return STILL;
 		
 		return ghostData[replayCounter++];

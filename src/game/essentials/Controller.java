@@ -75,6 +75,7 @@ public class Controller implements java.io.Serializable
 		 * @param pbs The pressed buttons.
 		 * @param path The path to save the file in.
 		 */
+		@Deprecated
 		public static void encode(String meta, PressedButtons[] pbs, String path)
 		{
 			path = checkAvailability(path);
@@ -115,6 +116,7 @@ public class Controller implements java.io.Serializable
 		 * @param path The path to read from.
 		 * @return The results.
 		 */
+		@Deprecated
 		public static Object[] decode(String path)
 		{
 			Object[] replayData = new Object[2];

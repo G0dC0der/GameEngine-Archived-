@@ -70,7 +70,6 @@ public class CollapsingCave extends Stage
 			foregroundImg = new Image2D("res/collapsingcave/foreground.png", false);
 			deathImg      = Image2D.loadImages(new File("res/general/main/death"), false);
 			
-			game.lifeImage   = new Image2D("res/general/hearth.png", false);
 			stageImage       = new Pixmap(new FileHandle("res/collapsingcave/stage.png"));
 			
 			collapsing = Utilities.loadMusic("res/collapsingcave/collapsing.wav");

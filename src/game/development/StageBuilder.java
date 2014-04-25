@@ -49,6 +49,7 @@ public abstract class StageBuilder extends Stage
 						AutoLoad al = (AutoLoad) an;
 						VisualType type = al.type();
 						String path = fixPath(al.path());
+						field.setAccessible(true);
 						
 						switch(type)
 						{
@@ -125,7 +126,6 @@ public abstract class StageBuilder extends Stage
 					extraHp     = Image2D.loadImages(new File(mainPath + "health"), true);
 					deathImg   	= Image2D.loadImages(new File(mainPath + "main/death"), false);
 					jump        = Utilities.loadSound			   (mainPath + "jump.wav");
-					game.lifeImage = new Image2D(mainPath + "hearth.png", false);
 					
 					try{backgroundImg = Image2D.loadImages(stagePath + "background.png");} catch(Exception e){System.err.println("Background image not found");}
 					try{foregroundImg = Image2D.loadImages(stagePath + "foreground.png");} catch(Exception e){System.err.println("Foreground image not found");}

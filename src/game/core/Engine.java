@@ -1,6 +1,7 @@
 package game.core;
 
 import game.core.GameObject.Event;
+import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.HighScore;
@@ -199,11 +200,6 @@ public final class Engine implements Screen
 	 * The default tint color.
 	 */
 	public final Color defaultTint = Color.valueOf("fffffffe");
-
-	/**
-	 * The image to use to indicate the amount of health the main character have.
-	 */
-	public Image2D lifeImage;
 	
 	/**
 	 * The volume of the game, where 1.0 is 100%.
@@ -684,11 +680,6 @@ public final class Engine implements Screen
 		
 		return pb;
 	}
-	
-	@Override public void hide() {dispose();}
-	@Override public void pause() {}
-	@Override public void resize(int x, int y) {}
-	@Override public void resume() {}
 
 	/**
 	 * The amount of milliseconds since the last frame.
@@ -751,21 +742,31 @@ public final class Engine implements Screen
 		}
 	}
 	
-	private void renderStatusBar()	//TODO:
+	private void renderStatusBar()
 	{
 		if(globalState == GameState.PAUSED)
 			timeFont.setColor(Color.WHITE);
 		else
 			timeFont.setColor(timeColor);
 		timeFont.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
-//		
-//		int hp = main.getHP();
-//		if(lifeImage != null && state != GameState.DEAD)
-//		{
-//			final int width = (int) (lifeImage.getWidth() + 2);
-//			for(int i = 0, posX = 10; i < hp; i++, posX += width)
-//				batch.draw(lifeImage, posX, 40);
-//		}
+
+		int y = 40;
+		
+		for(int index = 0; index < stage.mains.size(); index++)
+		{
+			MainCharacter main = stage.mains.get(index);
+			int hp = main.getHP();
+			
+			if(main.healthImg != null && main.getState() != CharacterState.DEAD && hp > 0)
+			{
+				final float width = main.healthImg.getWidth() + 3;
+				
+				for(int i = 0, posX = 10; i < hp; i++, posX += width)
+					batch.draw(main.healthImg, posX, y);
+				
+				y += main.healthImg.getHeight() + 3;
+			}
+		}
 	}
 	
 	private void drawObject(GameObject go)
@@ -928,10 +929,20 @@ public final class Engine implements Screen
 					public void run() 
 					{
 						exitEvent.eventHandling();
-
 					}
 				});
 			}
 		}).start();
+	}
+	
+	@Override public void hide() {dispose();}
+	@Override public void pause() {}
+	@Override public void resize(int x, int y) {}
+	@Override public void resume() {}
+	
+	@Override
+	protected void finalize() throws Throwable 
+	{
+		System.out.println("Deleting engine");
 	}
 }

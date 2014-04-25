@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import kuusisto.tinysound.Music;
@@ -110,6 +111,12 @@ public class Utilities
 	public static Music loadMusic(String path)
 	{
 		return TinySound.loadMusic(new File(path),Stage.STAGE.game.streamSounds);
+	}
+	
+	public static void unloadBatch(Sound... sounds)
+	{
+		for(Sound sound : sounds)
+			sound.unload();
 	}
 	
 	public static void exportObject(Object obj, String path)
@@ -219,15 +226,18 @@ public class Utilities
 		}
 	}
 	
-	public static void dispose(Disposable obj)
+	public static void dispose(Disposable... arr)
 	{
-		try
+		for(Disposable obj : arr)
 		{
-			obj.dispose();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Could not dispose object: " + obj);
+			try
+			{
+				obj.dispose();
+			}
+			catch(Exception e)
+			{
+				System.err.println("Could not dispose object: " + obj);
+			}
 		}
 	}
 	
@@ -270,16 +280,14 @@ public class Utilities
 		return bu.toString();
 	}
 	
-//	public static PressedButtons[][] convert(List<List<PressedButtons>> replays)
-//	{
-//		PressedButtons[][] pbs = new PressedButtons[replays.size()][];
-//		
-//		for(int i = 0; i < pbs.length; i++)
-//		{
-//			pbs[i] = new PressedButtons[replays.get(i).size()];
-//			for(int j = 0; j < pbs[i].length; j++)
-//				pbs[i][j] = replays.get(i).get(j);
-//		}
-//		return pbs;
-//	}
+	public static List<Field> getAllFields(List<Field> fields, Class<?> type) 
+	{
+	    for (Field field: type.getDeclaredFields()) 
+	        fields.add(field);
+
+	    if (type.getSuperclass() != null)
+	        fields = getAllFields(fields, type.getSuperclass());
+	    
+	    return fields;
+	}
 }

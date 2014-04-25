@@ -2,15 +2,9 @@ package ui.screens;
 
 import game.essentials.HighScore;
 import game.essentials.Utilities;
-
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JOptionPane;
-
-import ui.accessories.StageReader;
 import ui.screens.ScreenManager.Task;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -24,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -237,9 +232,7 @@ public class Stats implements Screen
 					{
 						super.clicked(event, x, y);
 						if(hs.className == null || hs.replays == null)
-							JOptionPane.showMessageDialog(null, "Corrupted or incomplete highscore file.", "Runtime Error", JOptionPane.ERROR_MESSAGE);
-						else if(!StageReader.AVAILABLE_STAGE.contains(hs.className))
-							JOptionPane.showMessageDialog(null, "Stage \"" + hs.stageName + "\" do not exist.", "Runtime Error", JOptionPane.ERROR_MESSAGE);
+							showSimpleDialog("Corrupted or incomplete highscore file.");
 						else
 						{
 							try 
@@ -249,6 +242,7 @@ public class Stats implements Screen
 							catch (InstantiationException | IllegalAccessException e) 
 							{
 								e.printStackTrace();
+								showSimpleDialog("Error loading the stage.\nMake sure it exists.");
 							}
 						}
 					}
@@ -257,6 +251,19 @@ public class Stats implements Screen
 				table.row();
 			}
 		}
+	}
+	
+	void showSimpleDialog(final String text)
+	{
+		new Dialog("Pojahn's Game Engine", skin)
+		{
+			{
+				text(text);
+				setModal(true);
+				button("Ok");
+				
+			}
+		}.show(stage);
 	}
 
 	@Override

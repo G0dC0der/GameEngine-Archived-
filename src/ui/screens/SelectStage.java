@@ -39,7 +39,6 @@ public class SelectStage implements Screen
 	private java.util.List<HighScore> highscores;
 	private List<ReplayHolder> replayList;
 	private TextButton play;
-	
 	private SpriteBatch batch;
 	private Texture background;
 	
@@ -58,8 +57,9 @@ public class SelectStage implements Screen
 		Collections.sort(highscores, HighScore.TIME_SORT);
 		Collections.reverse(highscores);
 		
-		stages = new ArrayList<>(StageReader.AVAILABLE_STAGE.size());
-		for(Class<?> clazz : StageReader.AVAILABLE_STAGE)
+		java.util.List<Class<game.core.Stage>> stgs = StageReader.loadAll();
+		stages = new ArrayList<>(stgs.size());
+		for(Class<?> clazz : stgs)
 		{
 			StageHolder ch = new StageHolder();
 			ch.clazz = clazz;
@@ -215,6 +215,7 @@ public class SelectStage implements Screen
 		stage = null;
 		skin = null;
 		stages = null;
+		replayList = null;
 	}
 
 	@Override

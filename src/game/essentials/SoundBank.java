@@ -1,6 +1,5 @@
 package game.essentials;
 
-import game.core.Engine;
 import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.Stage;
@@ -36,7 +35,6 @@ public class SoundBank
 	
 	private Unit[] units;
 	private GameObject emitter;
-	private Engine game;
 	private boolean falloff;
 	public float maxDistance, maxVolume, power;
 	
@@ -47,7 +45,6 @@ public class SoundBank
 	public SoundBank(int size)
 	{
 		units = new Unit[size];
-		game = Stage.STAGE.game;
 		maxDistance = 400;
 		maxVolume = 1.0f;
 		power = 40;
@@ -97,7 +94,7 @@ public class SoundBank
 			
 			if(falloff && emitter != null)
 			{
-				double distance = EntityStuff.distance(emitter, game.getFocusObject());
+				double distance = EntityStuff.distance(emitter, Stage.STAGE.game.getFocusObject());
 				double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 				
 				units[index].sound.setVolume(Math.min(candidate, maxVolume));

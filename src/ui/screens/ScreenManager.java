@@ -75,16 +75,11 @@ public class ScreenManager extends Game
 			public void eventHandling() 
 			{
 				setScreen(menu);
+				Stage.STAGE = null;
+				System.gc();
 			}
 		});
 		
 		setScreen(engine);
-	}
-	
-	@Override
-	public void setScreen(Screen screen) 
-	{
-		super.setScreen(screen);
-		System.gc();
 	}
 }

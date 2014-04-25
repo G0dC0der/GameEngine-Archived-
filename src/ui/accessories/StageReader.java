@@ -21,20 +21,21 @@ import stages.demo.DemoStage;
 
 public class StageReader 
 {
-	public static List<Class<Stage>> AVAILABLE_STAGE;
-	
-	static
+	public static List<Class<Stage>> loadAll()
 	{
-		AVAILABLE_STAGE = new ArrayList<>();
+		List<Class<Stage>> stages = new LinkedList<>();
+		
 		try
 		{
-			AVAILABLE_STAGE.addAll(loadStages(new File("stages")));
-			AVAILABLE_STAGE.addAll(readAllStages());
+			stages.addAll(loadStages(new File("stages")));
+			stages.addAll(readAllStages());
 		}
 		catch(Exception e)
 		{
 			System.err.println("Error reading stages.");
+			e.printStackTrace();
 		}
+		return stages;
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class StageReader
 	 * @param folder The folder containing all the jar files.
 	 * @return The {@code Class} objects of the classes.
 	 */
-	public static List<Class<Stage>> loadStages(File folder) throws Exception
+	private static List<Class<Stage>> loadStages(File folder) throws Exception
 	{
 		List<Class<Stage>> stageClasses = new LinkedList<>();
 		
@@ -94,14 +95,13 @@ public class StageReader
 	/**
 	 * Read and returns all the playable stages from the {@code stages} package.
 	 * @return The classes.
-	 * @throws IOException 
-	 * @throws URISyntaxException 
+	 * @throws IOException
 	 */
-	public static List<Class<Stage>> readAllStages() throws Exception
+	private static List<Class<Stage>> readAllStages() throws Exception
 	{
 		List<Class<Stage>> clazzez = new ArrayList<>();
 		String[] packages = getResourceListing(DemoStage.class, "stages/");
-			
+		
 		for(String packageName : packages)
 		{
 			if(!packageName.contains("."))
@@ -110,8 +110,8 @@ public class StageReader
 				for(String className : packageClasses)
 				{
 					@SuppressWarnings("unchecked")
-					Class<Stage> clazz = (Class<Stage>) Class.forName(className);
-					if(Stage.class.isAssignableFrom(clazz) && getPlayable(clazz) != null)
+					Class<Stage> clazz = (Class<Stage>) Class.forName(correctName(className));
+					if(Stage.class.isAssignableFrom(clazz) && getPlayable(clazz) != null && !clazzez.contains(clazz))
 						clazzez.add(clazz);
 				}
 			}
@@ -185,61 +185,79 @@ public class StageReader
 	}
 	
 	/**
-	   * List directory contents for a resource folder. Not recursive.
-	   * This is basically a brute-force implementation.
-	   * Works for regular files and also JARs.
-	   * 
-	   * Example usage: getResourceListing(Race.class, "stages"), this would return all the files and folders in the "stages" package.
-	   * 
-	   * @author Greg Briggs
-	   * @param clazz Any java class that lives in the same place as the resources you want.
-	   * @param path Should end with "/", but not start with one.
-	   * @return Just the name of each member item, not the full paths.
-	   */
-	  private static String[] getResourceListing(Class<?> clazz, String path) throws URISyntaxException, IOException 
-	  {
-		  URL dirURL = clazz.getClassLoader().getResource(path);
-	      if (dirURL != null && dirURL.getProtocol().equals("file")) 
-	    	  return new File(dirURL.toURI()).list();
-	      
-	      if (dirURL == null) 
-	      {
-	    	  String me = clazz.getName().replace(".", "/")+".class";
-	    	  dirURL = clazz.getClassLoader().getResource(me);
-	      }
-	      
-	      if (dirURL.getProtocol().equals("jar")) 
-	      {
-	    	  String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
+   * List directory contents for a resource folder. Not recursive.
+   * This is basically a brute-force implementation.
+   * Works for regular files and also JARs.
+   * 
+   * Example usage: getResourceListing(Race.class, "stages"), this would return all the files and folders in the "stages" package.
+   * 
+   * @author Greg Briggs
+   * @param clazz Any java class that lives in the same place as the resources you want.
+   * @param path Should end with "/", but not start with one.
+   * @return Just the name of each member item, not the full paths.
+   */
+	private static String[] getResourceListing(Class<?> clazz, String path) throws URISyntaxException, IOException 
+	{
+		URL dirURL = clazz.getClassLoader().getResource(path);
+		if (dirURL != null && dirURL.getProtocol().equals("file"))
+			return new File(dirURL.toURI()).list();
 
-	    	  JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-	    	  Enumeration<JarEntry> entries = jar.entries();
-														
-	    	  Set<String> result = new HashSet<String>(); 
-														
-	    	  while (entries.hasMoreElements()) 
-	    	  {
-	    		  String name = entries.nextElement().getName();
-	    		  if (name.startsWith(path)) 
-	    		  {
-	    			  String entry = name.substring(path.length());
-	    			  int checkSubdir = entry.indexOf("/");
-	    			  if(checkSubdir >= 0) 
-	    			  {
-	    				  entry = entry.substring(0, checkSubdir);
-	    			  }
-	    			  result.add(entry);
-	    		  }
-	    	  }
-	    	  
-	    	  try
-	    	  {
-	    		  jar.close();
-	    	  }
-	    	  catch(Exception e){}
-	    	  
-	    	  return result.toArray(new String[result.size()]);
+		if (dirURL == null) 
+		{
+			String me = clazz.getName().replace(".", "/") + ".class";
+			dirURL = clazz.getClassLoader().getResource(me);
 		}
-		throw new UnsupportedOperationException("Cannot list files for URL " + dirURL);
+
+		if (dirURL.getProtocol().equals("jar")) 
+		{
+			String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
+
+			JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+			Enumeration<JarEntry> entries = jar.entries();
+
+			Set<String> result = new HashSet<String>();
+
+			while (entries.hasMoreElements()) 
+			{
+				String name = entries.nextElement().getName();
+				if (name.startsWith(path)) 
+				{
+					String entry = name.substring(path.length());
+					int checkSubdir = entry.indexOf("/");
+					if (checkSubdir >= 0) 
+						entry = entry.substring(0, checkSubdir);
+					result.add(entry);
+				}
+			}
+
+			try 
+			{
+				jar.close();
+			} 
+			catch (Exception e) {}
+
+			return result.toArray(new String[result.size()]);
+		}
+		throw new UnsupportedOperationException("Cannot list files for URL "+ dirURL);
+	}
+	  
+	private static String correctName(String name) 
+	{
+		if (name.contains(".."))
+			name = name.replace("..", ".");
+
+		if (name.contains("./"))
+			name = name.replace("./", ".");
+
+		if (name.contains(".\\"))
+			name = name.replace(".\\", ".");
+
+		if (name.contains("/"))
+			name = name.replace("/", ".");
+
+		if (name.contains("\\"))
+			name = name.replace("\\", ".");
+
+		return name;
 	}
 }
