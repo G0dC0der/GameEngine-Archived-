@@ -7,16 +7,13 @@ import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,6 +28,25 @@ import com.badlogic.gdx.utils.Disposable;
  */
 public abstract class Stage 
 {	
+	public enum Difficulty
+	{
+		EASY("Easy"),
+		NORMAL("Normal"),
+		HARD("Hard");
+		
+		private String name;
+		
+		private Difficulty(String name)
+		{
+			this.name = name;
+		}
+		
+		public String toString() 
+		{
+	       return name;
+		}
+	}
+	
 	/**
 	 * This enum is used when setting the background/foreground image the quick way with the predefined functions found in {@code Stage}.
 	 * @author Pojahn Moradi
@@ -107,6 +123,7 @@ public abstract class Stage
 	 */
 	protected Music music;
 	
+	private Difficulty difficulty;
 	private LinkedList<Object> discardList, appendList, trash;
 	private byte[][] stageClone;
 	private boolean pending;
@@ -441,6 +458,16 @@ public abstract class Stage
 	 */
 	public void setMeta(Serializable meta) {}
 	
+	public Difficulty getDifficulty() 
+	{
+		return difficulty;
+	}
+
+	public void setDifficulty(Difficulty difficulty) 
+	{
+		this.difficulty = difficulty;
+	}
+
 	/**
 	 * Returns the tile type from the stage data clone.
 	 * @param x The X position.
@@ -461,7 +488,15 @@ public abstract class Stage
 		{
 			try
 			{
-				if(obj instanceof TextureRegion)
+				if(obj instanceof Image2D)
+					((Image2D)obj).dispose();
+				else if(obj instanceof Image2D[])
+				{
+					Image2D[] arr = (Image2D[]) obj;
+					for(Image2D img : arr)
+						img.dispose();
+				}
+				else if(obj instanceof TextureRegion)
 					((TextureRegion)obj).getTexture().dispose();
 				else if(obj instanceof TextureRegion[])
 				{
@@ -495,6 +530,7 @@ public abstract class Stage
 		}
 	}
 	
+	@Deprecated
 	public void nullBatch()
 	{
 		List<Field> fields = new LinkedList<>();
@@ -599,11 +635,5 @@ public abstract class Stage
 					break;
 			}
 		}
-	}
-	
-	@Override
-	protected void finalize() throws Throwable 
-	{
-		System.out.println("Deleting stage");
 	}
 }

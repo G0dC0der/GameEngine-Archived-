@@ -3,6 +3,7 @@ package game.essentials;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
+import game.core.Stage.Difficulty;
 import game.essentials.Controller.PressedButtons;
 
 /**
@@ -12,7 +13,7 @@ import game.essentials.Controller.PressedButtons;
  */
 public class HighScore implements java.io.Serializable, Comparable<HighScore>
 {
-	private static final long serialVersionUID = -8294988208058754641L;
+	private static final long serialVersionUID = 5351204326933665516L;
 
 	public static final Comparator<HighScore> DATE_SORT = new Comparator<HighScore>()
 	{
@@ -101,6 +102,7 @@ public class HighScore implements java.io.Serializable, Comparable<HighScore>
 
 	public double time;
 	public String name, stageName, date, result;
+	public Difficulty difficulty;
 	public Serializable meta;
 	public Class<?> className;
 	public List<List<PressedButtons>> replays;

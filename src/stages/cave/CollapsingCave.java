@@ -34,6 +34,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 @Playable(name="Collapsing Cave", description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
 public class CollapsingCave extends Stage
 {
+	{
+		setDifficulty(Difficulty.NORMAL);
+	}
+	
 	private Pixmap stageImage;
 	private Image2D backgroundImg, foregroundImg, deathImg[], mainImage[], crusherImg, drillImg[], bottomImg[], middleImg, collectImg[], flagImg[];
 	private Sound collect, jump, exp1, exp2, exp3, exp4, slam;
@@ -182,7 +186,12 @@ public class CollapsingCave extends Stage
 			@Override
 			public void eventHandling() 
 			{
-				crusher.setMoveSpeed(1.7f);
+				if(getDifficulty() == Difficulty.EASY)
+					crusher.setMoveSpeed(1f);
+				else if(getDifficulty() == Difficulty.NORMAL)
+					crusher.setMoveSpeed(2f);
+				else if(getDifficulty() == Difficulty.HARD)
+					crusher.setMoveSpeed(3.4f);
 				discard(dust);
 				collapsing.play(true);
 				drilling.stop();

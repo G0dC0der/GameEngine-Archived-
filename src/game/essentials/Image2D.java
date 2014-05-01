@@ -11,6 +11,11 @@ public final class Image2D extends Sprite
 {
 	private int[][] pixelData;
 	
+	public Image2D(String path)
+	{
+		this(path,false);
+	}
+	
 	public Image2D(String path, boolean createPixelData)
 	{
 		super(new Texture(path));
@@ -29,6 +34,12 @@ public final class Image2D extends Sprite
 			return pixelData[x][y];
 	}
 	
+	public void dispose()
+	{
+		getTexture().dispose();
+		pixelData = null;
+	}
+	
 	public void transferPixelData(Image2D target)
 	{
 		this.pixelData = target.pixelData;
@@ -43,7 +54,7 @@ public final class Image2D extends Sprite
 	{
 		return loadImages(getFiles(folder),createPixelData);
 	}
-
+	
 	public static Image2D[] loadImages(String[] files, boolean createPixelData)
 	{
 		Image2D[] imgs = new Image2D[files.length];

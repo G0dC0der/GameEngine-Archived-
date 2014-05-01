@@ -159,10 +159,7 @@ public abstract class MainCharacter extends MovableObject
 		if(ghostData == null)
 			throw new IllegalStateException("This method can only be called if the MainCharacter is a ghost.");
 		
-		if(replayCounter > ghostData.length - 1 || isFrozen())
-			return STILL;
-		
-		return ghostData[replayCounter++];
+		return replayCounter > ghostData.length - 1 ? STILL : ghostData[replayCounter++];
 	}
 	
 	/**

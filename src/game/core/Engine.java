@@ -784,6 +784,7 @@ public final class Engine implements Screen
 			hs.replays = replays;
 			hs.meta = stage.getMeta();
 			hs.name = playername;
+			hs.difficulty = stage.getDifficulty();
 			hs.stageName = Utilities.prettify(stage.getClass().getSimpleName());
 			hs.time = (double)elapsedTime/1000;
 			hs.date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
@@ -939,10 +940,4 @@ public final class Engine implements Screen
 	@Override public void pause() {}
 	@Override public void resize(int x, int y) {}
 	@Override public void resume() {}
-	
-	@Override
-	protected void finalize() throws Throwable 
-	{
-		System.out.println("Deleting engine");
-	}
 }

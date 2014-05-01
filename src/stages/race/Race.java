@@ -18,13 +18,10 @@ import game.movable.Bouncer;
 import game.movable.SolidPlatform;
 import game.movable.TimedEnemy;
 import game.objects.Particle;
-
 import java.io.File;
-
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -355,13 +352,8 @@ public class Race extends Stage
 	}
 
 	@Override
-	public void extra() 
-	{}
-
-	@Override
 	public void dispose() 
 	{
 		disposeBatch(stageImage, backgroundImg, foregroundImg, deathImg, mainImage, blImg, contImg1, contImg2, contImg3, boImg, bo2Img, flagImg, jump, jump1, jump2, jump3, bounceball, bounceblock, music);
-		nullBatch();
 	}
 }

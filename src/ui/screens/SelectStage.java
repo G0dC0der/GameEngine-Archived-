@@ -1,19 +1,16 @@
 package ui.screens;
 
+import game.core.Stage.Difficulty;
 import game.essentials.HighScore;
 import game.essentials.Utilities;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
-import javax.swing.JOptionPane;
-
 import ui.accessories.Playable;
 import ui.accessories.StageReader;
 import ui.screens.ScreenManager.Task;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,8 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
@@ -144,15 +143,56 @@ public class SelectStage implements Screen
 			public void clicked(InputEvent event, float x, float y) 
 			{
 				super.clicked(event, x, y);
+				final game.core.Stage theStage = initStage(stageList);
+				final HighScore hs = replayList.getSelected().hs;
 				
-				try 
+				if(hs == null)
 				{
-					manager.startGame((game.core.Stage)stageList.getSelected().clazz.newInstance(), replayList.getSelected().hs);
-				} 
-				catch (InstantiationException | IllegalAccessException e) 
+					if(theStage.getDifficulty() != null)
+					{
+						new Dialog("Level Options", skin)
+						{
+							SelectBox<String>  sortBy;
+							
+							{
+								sortBy = new SelectBox<>(skin);
+								sortBy.setItems("Easy","Normal","Hard");
+								sortBy.setZIndex(100);
+								sortBy.setColor(Color.WHITE);
+								
+								text("Please choose the difficulty of the stage.");
+								getContentTable().row();
+								getContentTable().add(sortBy);
+								button("Ok", "ok");
+								setModal(true);
+							}
+							
+							protected void result(Object object) 
+							{
+								if(object.equals("ok"))
+								{
+									Difficulty d = null;
+									String sel = sortBy.getSelected();
+									if(sel.equals("Easy"))
+										d = Difficulty.EASY;
+									else if(sel.equals("Normal"))
+										d = Difficulty.NORMAL;
+									else if(sel.equals("Hard"))
+										d = Difficulty.HARD;
+									
+									theStage.setDifficulty(d);
+									manager.startGame(theStage, null);
+								}
+							}
+						}.show(stage);
+					}
+					else
+						manager.startGame(theStage, hs);
+				}
+				else
 				{
-					JOptionPane.showMessageDialog(null, "Something went wrong.", "Runtime Exception", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
+					theStage.setDifficulty(hs.difficulty);
+					manager.startGame(theStage, hs);
 				}
 			}
 		});
@@ -222,6 +262,19 @@ public class SelectStage implements Screen
 	public void hide() 
 	{
 		dispose();
+	}
+	
+	private game.core.Stage initStage(List<StageHolder> stageList)
+	{
+		try 
+		{
+			return (game.core.Stage)stageList.getSelected().clazz.newInstance();
+		} 
+		catch (InstantiationException | IllegalAccessException e) 
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private void initReplays(Class<?> stage)

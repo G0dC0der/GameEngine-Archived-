@@ -1,6 +1,7 @@
 package game.essentials;
 
 import game.core.GameObject.Event;
+
 import java.lang.reflect.Array;
 import java.util.HashMap;
 
@@ -23,7 +24,8 @@ public class Frequency<T>
 	 * @param speed The speed.
 	 * @param objs The objects array to use.
 	 */
-	public Frequency(int speed, T[] objs)
+	@SafeVarargs
+	public Frequency(int speed, T... objs)
 	{
 		this.speed = speed;
 		this.objs = objs;

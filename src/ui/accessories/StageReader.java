@@ -154,12 +154,16 @@ public class StageReader
 			
 			while (jarEntries.hasMoreElements()) 
 			{
-				entryName = jarEntries.nextElement().getName();
-				if (entryName.startsWith(packageName) && entryName.length() > packageName.length() + 5) 
+				try
 				{
-					entryName = entryName.substring(packageName.length(), entryName.lastIndexOf('.'));
-					names.add(pakkage + entryName);
+					entryName = jarEntries.nextElement().getName();
+					if (entryName.startsWith(packageName) && entryName.length() > packageName.length() + 5) 
+					{
+						entryName = entryName.substring(packageName.length(), entryName.lastIndexOf('.'));
+						names.add(pakkage + entryName);
+					}
 				}
+				catch(StringIndexOutOfBoundsException e){}
 			}
 			try
 			{

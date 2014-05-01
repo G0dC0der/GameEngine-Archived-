@@ -1,8 +1,8 @@
 package ui;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+//import java.io.File;
+//import java.io.FileOutputStream;
+//import java.io.PrintStream;
 import ui.accessories.GameSettings;
 import ui.screens.ScreenManager;
 import com.badlogic.gdx.Files.FileType;
@@ -13,18 +13,17 @@ public class TheMainClass
 {
 	public static void main(String... args) throws Exception 
 	{
-		try
-		{
-			File file = new File("logs/error log.txt");
-			FileOutputStream fos = new FileOutputStream(file);
-			PrintStream ps = new PrintStream(fos);
-			System.setErr(ps);
-		}
-		catch(Exception e)
-		{
-			System.err.println("Could not redirect the error stream.");
-		}
-//		Debugging.startDumpThread();
+//		try
+//		{
+//			File file = new File("logs/error log.txt");
+//			FileOutputStream fos = new FileOutputStream(file);
+//			PrintStream ps = new PrintStream(fos);
+//			System.setErr(ps);
+//		}
+//		catch(Exception e)
+//		{
+//			System.err.println("Could not redirect the error stream.");
+//		}
 		
 		GameSettings settings = new GameSettings();
 		settings.loadSettings("res/data/game.ini");

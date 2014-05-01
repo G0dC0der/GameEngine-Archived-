@@ -131,7 +131,7 @@ public class GameObject
 		visible = true;
 		hitbox = Hitbox.RECTANGLE;
 		width = height = scale = 1;
-		currImage = new Frequency<>(1,null);
+		currImage = new Frequency<>(1,null, null);
 		events 	  = new ArrayList<>();
 		removeQueue = new LinkedList<>();
 		sounds = new SoundBank(0);

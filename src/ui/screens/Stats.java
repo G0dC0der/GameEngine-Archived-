@@ -118,7 +118,7 @@ public class Stats implements Screen
 		
 		container.add(new Label("Highscores", style));
 		container.row();
-		container.add(scroll).size(650, 400).padTop(40);
+		container.add(scroll).size(750, 400).padTop(40);
 		container.row();
 		
 		Pixmap dot = new Pixmap(1, 1, Format.RGBA8888);
@@ -183,6 +183,7 @@ public class Stats implements Screen
 		table.add(" Stage").width(125);
 		table.add(" Time").width(100);
 		table.add(" Date").width(100);
+		table.add(" Difficulty").width(100);
 		table.add(" Result").width(100);
 		table.add(" Replay").width(50);
 		table.row();
@@ -223,6 +224,7 @@ public class Stats implements Screen
 				table.add(" " + hs.stageName).width(125);
 				table.add(" " + hs.time + " sec").width(100);
 				table.add(" " + hs.date).width(100);
+				table.add(" " + (hs.difficulty != null ? hs.difficulty : "-")).width(100);
 				table.add(" " + hs.result).width(100);
 				TextButton viewButton = new TextButton("Watch",skin);
 				viewButton.addListener(new ClickListener()
