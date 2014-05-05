@@ -1,6 +1,7 @@
 package game.core;
 
 import static game.core.Engine.*;
+import game.core.Engine.Direction;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
 

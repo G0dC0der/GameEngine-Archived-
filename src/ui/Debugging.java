@@ -2,6 +2,7 @@ package ui;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+
 import javax.swing.JOptionPane;
 
 public class Debugging

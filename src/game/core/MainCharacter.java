@@ -6,6 +6,7 @@ import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.objects.Particle;
+
 import java.util.List;
 
 /**
@@ -42,30 +43,22 @@ public abstract class MainCharacter extends MovableObject
 		hurt = false;
 		state = CharacterState.ALIVE;
 		
-		addTileEvent(new TileEvent()
+		addTileEvent(tileType ->
 		{
-			@Override
-			public void eventHandling(byte tileType) 
-			{
-				Stage stage = Stage.STAGE;
-				
-				if(tileType == SOLID)
-					deathAction();
-				else if(tileType == LETHAL)
-					hit(Stage.LETHAL_DAMAGE);
-				else if(tileType == GOAL)
-					stage.game.setGlobalState(GameState.FINISH);
-			}
+			Stage stage = Stage.STAGE;
+			
+			if(tileType == SOLID)
+				deathAction();
+			else if(tileType == LETHAL)
+				hit(Stage.LETHAL_DAMAGE);
+			else if(tileType == GOAL)
+				stage.game.setGlobalState(GameState.FINISH);
 		});
-		
-		setHitEvent(new HitEvent()
+
+		setHitEvent(subject -> 
 		{
-			@Override
-			public void eventHandling(GameObject subject) 
-			{
-				if (0 >= hp)
-					deathAction();
-			}
+			if(0 >= hp)
+				deathAction();
 		});
 	}
 	
@@ -174,7 +167,6 @@ public abstract class MainCharacter extends MovableObject
 	 */
 	final void deathAction()
 	{
-		System.out.println("Running death action");	//TODO:
 		visible = false;
 		hitbox = Hitbox.INVINCIBLE;
 		state = CharacterState.DEAD;

@@ -7,8 +7,11 @@ import game.essentials.Factory;
 import game.essentials.LaserBeam;
 import game.essentials.SoundBank;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
+
 import kuusisto.tinysound.Sound;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 

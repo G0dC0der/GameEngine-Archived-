@@ -1,6 +1,7 @@
 package game.movable;
 
 import game.core.Enemy;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**

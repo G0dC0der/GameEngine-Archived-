@@ -18,10 +18,13 @@ import game.movable.Bouncer;
 import game.movable.SolidPlatform;
 import game.movable.TimedEnemy;
 import game.objects.Particle;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -94,7 +97,6 @@ public class Race extends Stage
 	@Override
 	public void build()
 	{
-		
 		/*
 		 * Standard stuff
 		 *******************************************

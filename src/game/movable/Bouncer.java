@@ -1,6 +1,6 @@
 package game.movable;
 
-import static game.core.Engine.*;
+import game.core.Engine.Direction;
 import game.core.EntityStuff;
 import game.core.MovableObject;
 import game.essentials.SoundBank;

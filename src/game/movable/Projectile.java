@@ -6,12 +6,13 @@ import game.core.GameObject;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import kuusisto.tinysound.Sound;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * The {@code Projectile} is scanning for a set of targets, firing at the closest visible one.<br>

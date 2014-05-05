@@ -1,6 +1,6 @@
 package game.objects;
 
-import static game.core.Engine.*;
+import game.core.Engine.Direction;
 import game.core.GameObject;
 import game.mains.GravityMan;
 

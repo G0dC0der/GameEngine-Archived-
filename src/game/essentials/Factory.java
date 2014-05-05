@@ -13,6 +13,7 @@ import game.core.Stage;
 import game.mains.GravityMan;
 import game.movable.PathDrone;
 import game.movable.PathDrone.PathData;
+
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -366,23 +369,6 @@ public class Factory
 	}
 	
 	/**
-	 * Plays the given sound.
-	 * @param sound The sound to be played.
-	 * @return The event.
-	 */
-	public static Event soundEvent(final Sound sound)
-	{
-		return new Event()
-		{
-			@Override
-			public void eventHandling() 
-			{
-				sound.play();		
-			}
-		};
-	}
-	
-	/**
 	 * Forces the {@code tail} to follow the {@code target}. Note that the following functionality is instant.
 	 * @param target The object to follow.
 	 * @param tail The object that will follow someone.
@@ -689,42 +675,6 @@ public class Factory
 					man.enableWallJump(true);
 					man.enableWallSlide(true);					
 				}
-			}
-		};
-	}
-	
-	/**
-	 * Adds the given speed to the specified units rotation value.
-	 * @param go The unit to rotate.
-	 * @param speed The amount to add every frame.
-	 * @return The event.
-	 */
-	public static Event rotation(final GameObject go, final float speed)
-	{
-		return new Event()
-		{
-			@Override
-			public void eventHandling() 
-			{
-				go.rotation += speed;
-			}
-		};
-	}
-	
-	/**
-	 * Simply calls {@code mo.setMoveSpeed(speed)}.
-	 * @param mo The unit that will receive the speed change.
-	 * @param speed The speed to set.
-	 * @return The event.
-	 */
-	public static Event moveSpeed(final MovableObject mo, final float speed)
-	{
-		return new Event() 
-		{
-			@Override
-			public void eventHandling() 
-			{
-				mo.setMoveSpeed(speed);
 			}
 		};
 	}

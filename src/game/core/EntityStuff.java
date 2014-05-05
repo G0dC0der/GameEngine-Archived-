@@ -2,8 +2,10 @@ package game.core;
 
 import game.core.Engine.Direction;
 import game.essentials.Image2D;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
 import com.badlogic.gdx.math.Vector2;
 
 /**

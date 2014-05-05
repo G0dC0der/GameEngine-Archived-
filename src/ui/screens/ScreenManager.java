@@ -5,6 +5,7 @@ import game.core.GameObject.Event;
 import game.core.Stage;
 import game.essentials.HighScore;
 import ui.accessories.GameSettings;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 

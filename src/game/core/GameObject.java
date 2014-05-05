@@ -5,11 +5,13 @@ import game.core.Engine.Direction;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -23,6 +25,7 @@ public class GameObject
 	/**
 	 * An {@code Event} can be used in various situations.
 	 */
+	@FunctionalInterface
 	public interface Event
 	{
 		/**
@@ -35,6 +38,7 @@ public class GameObject
 	 * A {@code HitEvent} is triggered by objects that have internal collision detections.
 	 * See a code example on how to use HitEvents.
 	 */
+	@FunctionalInterface
 	public interface HitEvent
 	{
 		/**
@@ -47,14 +51,7 @@ public class GameObject
 	/**
 	 * A {@code Comparator} for sorting the list after {@code zIndex}.
 	 */
-	public static final Comparator<GameObject> Z_INDEX_SORT = new Comparator<GameObject>()
-	{
-		@Override
-		public int compare(GameObject o1, GameObject o2) 
-		{
-			return o1.zIndex - o2.zIndex;
-		}
-	};
+	public static final Comparator<GameObject> Z_INDEX_SORT = (o1, o2) -> {return o1.zIndex - o2.zIndex;};
 	
 	/**
 	 * These constants define accuracy of certain "watch" methods.

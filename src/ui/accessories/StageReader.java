@@ -1,6 +1,7 @@
 package ui.accessories;
 
 import game.core.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import stages.demo.DemoStage;
 
 public class StageReader 

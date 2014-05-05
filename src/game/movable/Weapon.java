@@ -5,6 +5,7 @@ import game.core.GameObject;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
 
 /**

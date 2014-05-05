@@ -2,9 +2,12 @@ package ui.screens;
 
 import game.essentials.HighScore;
 import game.essentials.Utilities;
+
 import java.util.Collections;
 import java.util.List;
+
 import ui.screens.ScreenManager.Task;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;

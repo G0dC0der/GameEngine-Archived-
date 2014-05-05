@@ -3,11 +3,14 @@ package ui.screens;
 import game.core.Stage.Difficulty;
 import game.essentials.HighScore;
 import game.essentials.Utilities;
+
 import java.util.ArrayList;
 import java.util.Collections;
+
 import ui.accessories.Playable;
 import ui.accessories.StageReader;
 import ui.screens.ScreenManager.Task;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;

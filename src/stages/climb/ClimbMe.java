@@ -4,7 +4,6 @@ import game.core.Engine;
 import game.core.Engine.Direction;
 import game.core.EntityStuff;
 import game.core.GameObject;
-import game.core.GameObject.HitEvent;
 import game.core.GameObject.Hitbox;
 import game.core.Stage;
 import game.essentials.Controller;
@@ -19,10 +18,13 @@ import game.movable.Projectile;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
 import game.objects.Wind;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -361,15 +363,7 @@ public class ClimbMe extends Stage
 		/*
 		 * Finalizing
 		 */
-		gm.setHitEvent(new HitEvent()
-		{	
-			@Override
-			public void eventHandling(GameObject hitter) 
-			{
-				if(hitter.sameAs(arrow))
-					gm.hit(-1);
-			}
-		});
+		gm.setHitEvent(hitter -> { if(hitter.sameAs(arrow)) gm.hit(-1); });
 	}
 
 	@Override

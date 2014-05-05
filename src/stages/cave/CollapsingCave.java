@@ -3,7 +3,6 @@ package stages.cave;
 import game.core.Enemy;
 import game.core.EntityStuff;
 import game.core.GameObject;
-import game.core.GameObject.Event;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.core.MovableObject;
@@ -18,12 +17,15 @@ import game.movable.Dummy;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
+
 import java.io.File;
 import java.util.Random;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -31,7 +33,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-@Playable(name="Collapsing Cave", description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
+@Playable(name="Collapsing Cave", description="Stage: Collapsing Cave\nAuthor: Pojahn Moradi\nAverage time: 40 sec\nProfessional time: 32 sec\nObjective: Collect the four crystals and enter goal(the flag).")
 public class CollapsingCave extends Stage
 {
 	{
@@ -147,16 +149,12 @@ public class CollapsingCave extends Stage
 		 */
 		crusher = new SolidPlatform(0, -1300, gm);
 		crusher.setImage(crusherImg);
-		crusher.appendPath(0, -38, Integer.MAX_VALUE, false, new Event()
+		crusher.appendPath(0, -38, Integer.MAX_VALUE, false, () ->
 		{
-			@Override
-			public void eventHandling() 
-			{
-				game.drugVertical(0, 0);
-				game.drugHorizontal(0, 0);
-				collapsing.stop();
-				slam.play();
-			}
+			game.drugVertical(0, 0);
+			game.drugHorizontal(0, 0);
+			collapsing.stop();
+			slam.play();
 		});
 		crusher.zIndex(99);
 		crusher.setMoveSpeed(0);
@@ -170,34 +168,26 @@ public class CollapsingCave extends Stage
 		drill.setMoveSpeed(2);
 		drill.zIndex(10);
 		drill.setHitbox(Hitbox.EXACT);
-		drill.appendPath(547, 60, 0, false, new Event()
+		drill.appendPath(547, 60, 0, false, () ->
 		{	
-			@Override
-			public void eventHandling() 
-			{
-				drill.setMoveSpeed(.1f);
-				camera.unfreeze();
-				game.setFocusObject(camera);
-				add(dust);
-			}
+			drill.setMoveSpeed(.1f);
+			camera.unfreeze();
+			game.setFocusObject(camera);
+			add(dust);
 		});
-		drill.appendPath(547, -100, Integer.MAX_VALUE, false, new Event()
+		drill.appendPath(547, -100, Integer.MAX_VALUE, false, () ->
 		{
-			@Override
-			public void eventHandling() 
-			{
-				if(getDifficulty() == Difficulty.EASY)
-					crusher.setMoveSpeed(1f);
-				else if(getDifficulty() == Difficulty.NORMAL)
-					crusher.setMoveSpeed(2f);
-				else if(getDifficulty() == Difficulty.HARD)
-					crusher.setMoveSpeed(3.4f);
-				discard(dust);
-				collapsing.play(true);
-				drilling.stop();
-				game.drugVertical(2, 2);
-				game.drugHorizontal(2, 2);
-			}
+			if(getDifficulty() == Difficulty.EASY)
+				crusher.setMoveSpeed(1f);
+			else if(getDifficulty() == Difficulty.NORMAL)
+				crusher.setMoveSpeed(2f);
+			else if(getDifficulty() == Difficulty.HARD)
+				crusher.setMoveSpeed(3.4f);
+			discard(dust);
+			collapsing.play(true);
+			drilling.stop();
+			game.drugVertical(2, 2);
+			game.drugHorizontal(2, 2);
 		});
 		drill.addEvent(Factory.hitMain(drill, gm, -1));
 		
@@ -227,43 +217,31 @@ public class CollapsingCave extends Stage
 		final GameObject item2 = item1.getClone(826, 669);		
 		final GameObject item3 = item1.getClone(335, 584);		
 		final GameObject item4 = item1.getClone(957, 267);
-		item2.addEvent(new Event()
+		item2.addEvent(() ->
 		{	
-			@Override
-			public void eventHandling() 
+			if(item2.collidesWithMultiple(gm))
 			{
-				if(item2.collidesWithMultiple(gm))
-				{
-					discard(item2);
-					coll2 = true;
-					collect.play();
-				}
+				discard(item2);
+				coll2 = true;
+				collect.play();
 			}
 		});
-		item3.addEvent(new Event()
+		item3.addEvent(() ->
 		{	
-			@Override
-			public void eventHandling() 
+			if(item3.collidesWithMultiple(gm))
 			{
-				if(item3.collidesWithMultiple(gm))
-				{
-					discard(item3);
-					coll3 = true;
-					collect.play();
-				}
+				discard(item3);
+				coll3 = true;
+				collect.play();
 			}
 		});
-		item4.addEvent(new Event()
+		item4.addEvent(() ->
 		{	
-			@Override
-			public void eventHandling() 
+			if(item4.collidesWithMultiple(gm))
 			{
-				if(item4.collidesWithMultiple(gm))
-				{
-					discard(item4);
-					coll4 = true;
-					collect.play();
-				}
+				discard(item4);
+				coll4 = true;
+				collect.play();
 			}
 		});
 		

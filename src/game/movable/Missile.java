@@ -6,6 +6,7 @@ import game.essentials.Image2D;
 import game.objects.Particle;
 
 import java.awt.geom.Point2D;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**

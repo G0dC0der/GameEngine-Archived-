@@ -8,12 +8,21 @@ import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
 import kuusisto.tinysound.TinySound;
+
+import org.lwjgl.opengl.GL11;
+
+import pjjava.misc.OtherMath;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
@@ -21,10 +30,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
@@ -261,7 +273,7 @@ public final class Engine implements Screen
 	Stage stage;
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
-	private boolean showFps, justRestarted, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, increasingScale = true;
+	private boolean showFps, justRestarted, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, crashed, increasingScale = true;
 	private int fpsWriterCounter, fps;
 	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue;
 	private SpriteBatch batch;
@@ -271,6 +283,7 @@ public final class Engine implements Screen
 	private Event exitEvent;
 	private com.badlogic.gdx.scenes.scene2d.Stage gui;
 	private Skin skin;
+	private Texture errorIcon;
 	
 	/**
 	 * Constructs an Engine.
@@ -287,6 +300,8 @@ public final class Engine implements Screen
 		zoom = 1;
 		pressedKeys = new HashSet<>();
 		currTint = new Color(defaultTint);
+		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
+		justRestarted = true;
 		
 		if(replays == null)
 		{
@@ -305,39 +320,51 @@ public final class Engine implements Screen
 	@Override
 	public void render(float delta)
 	{
-		try
+		if(crashed)
 		{
-			boolean escDown = isKeyPressed(Keys.ESCAPE);
-			if((globalState == GameState.ONGOING || globalState == GameState.PAUSED) && !playReplay && escDown)
-				globalState = globalState == GameState.PAUSED ? GameState.ONGOING : GameState.PAUSED;
+			Gdx.gl.glClearColor(0, 0, 0, 1);
+			Gdx.gl.glClear(GL11.GL_COLOR_BUFFER_BIT);
 			
-			if(escDown && playReplay)
-				replayHelp = !replayHelp;
-			
-			if(globalState == GameState.PAUSED && !playReplay)
-			{
-				pressedKeys.clear();
-				if(stage.music != null  && stage.music.getVolume() != .1f)
-					stage.music.setVolume(.1f);
-				
-				batch.begin();
-				renderPause();
-				batch.end();
-			}
-			else
-			{
-				if(stage.music != null  && stage.music.getVolume() != Stage.MUSIC_VOLUME)
-					stage.music.setVolume(Stage.MUSIC_VOLUME);
-				
-				update();
-				paint();
-			}
+			gui.act(Gdx.graphics.getDeltaTime());
+			gui.draw();
 		}
-		catch(Exception e)
+		else
 		{
-			System.err.println("Ops, game crashed.");
-			e.printStackTrace();
-			Gdx.app.exit();
+			try
+			{
+				boolean escDown = isKeyPressed(Keys.ESCAPE);
+				if((globalState == GameState.ONGOING || globalState == GameState.PAUSED) && !playReplay && escDown)
+					globalState = globalState == GameState.PAUSED ? GameState.ONGOING : GameState.PAUSED;
+				
+				if(escDown && playReplay)
+					replayHelp = !replayHelp;
+				
+				if(globalState == GameState.PAUSED && !playReplay)
+				{
+					pressedKeys.clear();
+					if(stage.music != null  && stage.music.getVolume() != .1f)
+						stage.music.setVolume(.1f);
+					
+					batch.begin();
+					renderPause();
+					batch.end();
+				}
+				else
+				{
+					if(stage.music != null  && stage.music.getVolume() != Stage.MUSIC_VOLUME)
+						stage.music.setVolume(Stage.MUSIC_VOLUME);
+					
+					update();
+					paint();
+				}
+			}
+			catch(Exception e)
+			{
+				showCrashDialog(e);
+				crashed = true;
+				if(stage.music != null)
+					stage.music.stop();
+			}
 		}
 	}
 
@@ -504,6 +531,7 @@ public final class Engine implements Screen
 		stage.dispose();
 		timeFont.dispose();
 		fpsFont.dispose();
+		errorIcon.dispose();
 		if(!playReplay)
 		{
 			skin.dispose();
@@ -748,7 +776,7 @@ public final class Engine implements Screen
 			timeFont.setColor(Color.WHITE);
 		else
 			timeFont.setColor(timeColor);
-		timeFont.draw(batch, String.valueOf((double)elapsedTime/1000), 10, 10);
+		timeFont.draw(batch, OtherMath.round((double)elapsedTime/1000, 1) + "", 10, 10);
 
 		int y = 40;
 		
@@ -786,7 +814,7 @@ public final class Engine implements Screen
 			hs.name = playername;
 			hs.difficulty = stage.getDifficulty();
 			hs.stageName = Utilities.prettify(stage.getClass().getSimpleName());
-			hs.time = (double)elapsedTime/1000;
+			hs.time = OtherMath.round((double)elapsedTime/1000, 1);
 			hs.date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 			hs.className = stage.getClass();
 			hs.result = globalState == GameState.ENDED ? "Death" : "Victorious";
@@ -809,7 +837,7 @@ public final class Engine implements Screen
 			
 			{
 				field = new TextField("", skin);
-				text("Congratulations!\nIt took you " + (double)elapsedTime/1000 + " seconds to finish the stage.\nEnter your name to save your replay.");
+				text("Congratulations!\nIt took you " + OtherMath.round((double)elapsedTime/1000, 1) + " seconds to finish the stage.\nEnter your name to save your replay.");
 				getContentTable().row();
 				getContentTable().add(field);
 				button("Retry", "retry");
@@ -834,6 +862,36 @@ public final class Engine implements Screen
 					saveReplay(name);
 					runExitEvent();
 				}
+			}
+		}.show(gui);
+	}
+	
+	private void showCrashDialog(final Exception e)
+	{
+		Gdx.input.setInputProcessor(gui);
+		new Dialog("Fatal Error", skin)
+		{
+			{
+				Image img = new Image(errorIcon);
+				
+				getContentTable().add(img).left();
+				getContentTable().row();
+				getContentTable().add("Pojahns Game Engine have crashed and is unable to continue:\n").padRight(80).padTop(-52);
+				getContentTable().row();
+				
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				Label l = new Label(sw.toString(), skin, "default-font", Color.RED);
+				getContentTable().add(l);
+				
+				button("Return");
+				setModal(true);
+			}
+			
+			protected void result(Object object) 
+			{
+				runExitEvent();
 			}
 		}.show(gui);
 	}

@@ -1,13 +1,14 @@
 package game.mains;
 
 import static game.core.Engine.*;
-import kuusisto.tinysound.Sound;
+import game.core.Engine.Direction;
 import game.core.MainCharacter;
 import game.core.MovableObject;
 import game.core.Stage;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
+import kuusisto.tinysound.Sound;
 
 /*
  * Bugs:

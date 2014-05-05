@@ -4,6 +4,7 @@ import game.core.EntityStuff;
 import game.core.GameObject;
 import game.core.Stage;
 import game.movable.Projectile;
+
 import java.awt.geom.Point2D;
 import java.util.Random;
 
