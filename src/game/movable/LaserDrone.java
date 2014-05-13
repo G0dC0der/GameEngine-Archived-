@@ -216,6 +216,8 @@ public class LaserDrone extends PathDrone
 			if(firing)
 			{
 				firingBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
+				sounds.stop(0);
+				sounds.trySound(1, false);
 				
 				for(GameObject go : targets)
 					if(EntityStuff.checkLine((int)currX, (int) currY, (int)targetX, (int)targetY, go))
@@ -229,7 +231,10 @@ public class LaserDrone extends PathDrone
 				}
 			}
 			else
+			{
+				sounds.trySound(0, false);
 				chargeBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
+			}
 		}
 	}
 

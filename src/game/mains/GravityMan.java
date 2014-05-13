@@ -26,7 +26,7 @@ public class GravityMan extends MainCharacter
 {
 	public float maxX, maxY, accX, vx, vy, boostX, upSpeed, mass, gravity, damping, wallGravity, wallDamping, maxWallSlideSpeed, breakSpeed;
 	private boolean jumpAllowed, wallSliding, jumpStarted, oldInput, allowWallJump, allowWallSlide, blockInput, moving;
-	private int counter;
+	private int counter, flySpeed;
 	private float prevVX;
 	private byte[][] d;
 	
@@ -59,6 +59,23 @@ public class GravityMan extends MainCharacter
 	@Override
 	public void handleInput(PressedButtons pb) 
 	{
+		if(flySpeed != 0)
+		{
+			if(pb.up && canGoUp(currY - flySpeed))
+				currY-=flySpeed;
+			
+			if(pb.down && canGoDown(currY + flySpeed))
+				currY+=flySpeed;
+			
+			if(pb.left && canGoLeft(currX - flySpeed))
+				currX-=flySpeed;
+			
+			if(pb.right && canGoRight(currX + flySpeed))
+				currX+=flySpeed;
+			
+			return;
+		}
+		
 		/*
 		 * Global variables
 		 */
@@ -348,6 +365,11 @@ public class GravityMan extends MainCharacter
 	public void freeze()
 	{
 		blockInput = true;
+	}
+	
+	public void flyMode(int flySpeed)
+	{
+		this.flySpeed = flySpeed;
 	}
 	
 	/**

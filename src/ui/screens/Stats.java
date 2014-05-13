@@ -180,15 +180,17 @@ public class Stats implements Screen
 		dispose();
 	}
 	
+	private int nameW = 120, stageW = 145, timeW = 80, dateW = 100, diffW = 100, resultW = 100, replayW = 50;
+	
 	private void setColumns()
 	{		
-		table.add(" Player Name").width(120);
-		table.add(" Stage").width(125);
-		table.add(" Time").width(100);
-		table.add(" Date").width(100);
-		table.add(" Difficulty").width(100);
-		table.add(" Result").width(100);
-		table.add(" Replay").width(50);
+		table.add(" Player Name").width(nameW);
+		table.add(" Stage").width(stageW);
+		table.add(" Time").width(timeW);
+		table.add(" Date").width(dateW);
+		table.add(" Difficulty").width(diffW);
+		table.add(" Result").width(resultW);
+		table.add(" Replay").width(replayW);
 		table.row();
 		table.add(" ");
 		table.row();
@@ -223,12 +225,12 @@ public class Stats implements Screen
 		{
 			if(viewFail || (!viewFail && hs.result.equals("Victorious")))
 			{
-				table.add(" " + hs.name).width(120);
-				table.add(" " + hs.stageName).width(125);
-				table.add(" " + hs.time + " sec").width(100);
-				table.add(" " + hs.date).width(100);
-				table.add(" " + (hs.difficulty != null ? hs.difficulty : "-")).width(100);
-				table.add(" " + hs.result).width(100);
+				table.add(" " + hs.name).width(nameW);
+				table.add(" " + hs.stageName).width(stageW);
+				table.add(" " + hs.time + " sec").width(timeW);
+				table.add(" " + hs.date).width(dateW);
+				table.add(" " + (hs.difficulty != null ? hs.difficulty : "-")).width(diffW);
+				table.add(" " + hs.result).width(resultW);
 				TextButton viewButton = new TextButton("Watch",skin);
 				viewButton.addListener(new ClickListener()
 				{
@@ -242,7 +244,10 @@ public class Stats implements Screen
 						{
 							try 
 							{
-								manager.startGame((game.core.Stage)hs.className.newInstance(), hs);
+								game.core.Stage inst = (game.core.Stage)hs.className.newInstance();
+								if(hs != null && hs.difficulty != null)
+									inst.setDifficulty(hs.difficulty);
+								manager.startGame(inst, hs);
 							} 
 							catch (InstantiationException | IllegalAccessException e) 
 							{
@@ -252,7 +257,7 @@ public class Stats implements Screen
 						}
 					}
 				});
-				table.add(viewButton).width(50).height(20);
+				table.add(viewButton).width(replayW).height(20);
 				table.row();
 			}
 		}

@@ -108,7 +108,7 @@ public class Factory
 	 * @param animation The animation to manipulate the alpha on.
 	 * @return The event, which should be added to the stage and NOT a {@code GameObject}.
 	 */
-	public static Event fade(final float targetAlpha, final float strength, final int freq, final Event endEvent, final Image2D... animation)
+	public static Event fade(final float targetAlpha, final float strength, final int freq, final Event endEvent, final Image2D... animation)	//TODO: Rewrite, do not work.
 	{
 		return new Event()
 		{
@@ -267,35 +267,32 @@ public class Factory
 	 */
 	public static Event tileDeformer(final MovableObject target, final byte tileType, final boolean transformBack)
 	{
-		return new Event()
+		return ()->
 		{
-			@Override
-			public void eventHandling()
+			if(target.getPrevX() != target.currX || target.getPrevY() != target.currY)
 			{
-				if(target.getPrevX() != target.currX || target.getPrevY() != target.currY)
-				{
-					byte[][] data  = Stage.STAGE.stageData;
-					Frequency<Image2D> img = target.getImage();
-					boolean stopped = img.isStopped();
-					img.stop(true);
-					Image2D image = target.getFrame();
-					img.stop(stopped);
-					
-					int prevX = (int) target.getPrevX(),
-						prevY = (int) target.getPrevY(),
-						currX = (int) target.currX,
-						currY = (int) target.currY;
-					
-					for(int x1 = prevX, x2 = currX; x1 < prevX + target.width - 1; x1++, x2++)
-						for(int y1 = prevY, y2 = currY; y1 < prevY + target.height - 1; y1++, y2++)
-						{
-							if(transformBack)
-								data[y1][x1] = Stage.STAGE.getCloneData(x1, y1);
-							
-							if(image.getColor(x2 - currX, y2 - currY) != 0)
-								data[y2][x2] = tileType;
-						}
-				}
+				byte[][] data  = Stage.STAGE.stageData;
+				Frequency<Image2D> img = target.getImage();
+				boolean stopped = img.isStopped();
+				img.stop(true);
+				Image2D image = target.getFrame();
+				img.stop(stopped);
+				
+				int prevX = (int) target.getPrevX(),
+					prevY = (int) target.getPrevY(),
+					currX = (int) target.currX,
+					currY = (int) target.currY;
+				
+				for(int x1 = prevX, x2 = currX; x1 < prevX + target.width - 1; x1++, x2++)
+					for(int y1 = prevY, y2 = currY; y1 < prevY + target.height - 1; y1++, y2++)
+					{
+						if(transformBack)
+							data[y1][x1] = Stage.STAGE.getCloneData(x1, y1);
+						
+						int color = image.getColor(x2 - currX, y2 - currY);
+						if(color != 0)
+							data[y2][x2] = tileType;
+					}
 			}
 		};
 	}
@@ -318,6 +315,14 @@ public class Factory
 		{
 			boolean hasWork = true;
 			int counter;
+			BitmapFont theFont;
+			
+			{
+				if(font != null)
+					theFont = font;
+				else
+					theFont = Stage.STAGE.game.timeFont;
+			}
 			
 			@Override
 			public void drawSpecial(SpriteBatch g) 
@@ -331,9 +336,9 @@ public class Factory
 							endEvent.eventHandling();
 					}
 					if(textColor != null)
-						g.setColor(textColor);
+						theFont.setColor(textColor);
 					
-					font.draw(g, text,position.currX + ox, position.currY + oy);
+					theFont.draw(g, text,position.currX + ox, position.currY + oy);
 				}
 			}
 		};
@@ -608,14 +613,16 @@ public class Factory
 			int counter = 0;
 			
 			@Override
-			public void drawSpecial(SpriteBatch g) 
+			public void drawSpecial(SpriteBatch b) 
 			{
 				if(counter-- > 0)
 				{
-					if(textColor != null)
-						font.setColor(textColor);
+					BitmapFont f = (font == null) ? Stage.STAGE.game.timeFont : font;
 					
-					font.draw(g, text, printer.currX + ox, printer.currY + oy);
+					if(textColor != null)
+						f.setColor(textColor);
+					
+					f.draw(b, text, printer.currX + ox, printer.currY + oy);
 				}
 				else
 				{

@@ -513,6 +513,11 @@ public class MovableObject extends GameObject
 		return prevY;
 	}
 	
+	public boolean isMoving()
+	{
+		return currX != prevX || currY != prevY;
+	}
+	
 	/**
 	 * "Walks" towards the specified point, using property {@code moveSpeed} as the "walking speed".
 	 * @param targetX The X target coordinate to walk to.

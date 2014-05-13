@@ -326,7 +326,7 @@ public class SelectStage implements Screen
 		@Override
 		public String toString()
 		{
-			return hs.name + " " + hs.time + " sec";
+			return hs.name + " " + hs.time + " sec " + ((hs.difficulty != null) ? hs.difficulty.toString() : "");
 		}
 	}
 }

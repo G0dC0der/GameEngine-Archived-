@@ -360,10 +360,11 @@ public final class Engine implements Screen
 			}
 			catch(Exception e)
 			{
-				showCrashDialog(e);
 				crashed = true;
 				if(stage.music != null)
 					stage.music.stop();
+				e.printStackTrace();
+				showCrashDialog(e);
 			}
 		}
 	}
@@ -376,11 +377,14 @@ public final class Engine implements Screen
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		}
 		
-		float focusX = focus.currX + focus.width  / 2,
-		      focusY = focus.currY + focus.height / 2;
-		
-		tx = Math.min(stage.width  - stage.visibleWidth,   Math.max(0, focusX - stage.visibleWidth  / 2)) + stage.visibleWidth  / 2; 
-		ty = Math.min(stage.height - stage.visibleHeight,  Math.max(0, focusY - stage.visibleHeight / 2)) + stage.visibleHeight / 2;
+		if(focus != null)
+		{
+			float focusX = focus.currX + focus.width  / 2,
+			      focusY = focus.currY + focus.height / 2;
+			
+			tx = Math.min(stage.width  - stage.visibleWidth,   Math.max(0, focusX - stage.visibleWidth  / 2)) + stage.visibleWidth  / 2; 
+			ty = Math.min(stage.height - stage.visibleHeight,  Math.max(0, focusY - stage.visibleHeight / 2)) + stage.visibleHeight / 2;
+		}
 		
 		if(vertSpeed > 0)
 			moveVert();
@@ -468,7 +472,7 @@ public final class Engine implements Screen
 		
 		if(globalState == GameState.ENDED)
 		{
-			if(Gdx.input.isKeyPressed(Keys.R))
+			if(Gdx.input.isKeyPressed(Keys.R) && !playReplay)
 			{
 				restart();
 				stage.build();

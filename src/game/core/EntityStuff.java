@@ -245,14 +245,8 @@ public class EntityStuff
 	 */
 	public static boolean pixelPerfect(GameObject obj1, GameObject obj2)
 	{	
-		boolean obj1stopped = obj1.currImage.isStopped();
-		boolean obj2stopped = obj2.currImage.isStopped();
-		obj1.currImage.stop(true);
-		obj2.currImage.stop(true);
-		Image2D image1 = obj1.getFrame();
-		Image2D image2 = obj2.getFrame();
-		obj1.currImage.stop(obj1stopped);
-		obj2.currImage.stop(obj2stopped);
+		Image2D image1 = getEntityImage(obj1);
+		Image2D image2 = getEntityImage(obj2);
 		
 		if(image1 == null ||image2 == null)
 			return false;
@@ -269,10 +263,26 @@ public class EntityStuff
                 int colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
                 int colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
                 if (colorA != 0 && colorB != 0)
-                    return true;
+                	return true;
             }
         }
 		return false;
+	}
+	
+	private static Image2D getEntityImage(GameObject go)
+	{
+		if(!go.isVisible())
+			return null;
+		
+		boolean stopped = go.currImage.isStopped();
+		go.currImage.stop(true);
+		Image2D img = go.getFrame();
+		go.currImage.stop(stopped);
+
+		if(img != null)
+			return img;
+		else
+			return go.currImage.getCurrentObject();
 	}
 	
 //	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)

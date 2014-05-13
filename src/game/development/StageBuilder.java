@@ -179,7 +179,7 @@ public abstract class StageBuilder extends Stage
 			gm = new GravityMan();
 			gm.setImage(new Frequency<>(3, mainImage));
 			gm.setMultiFaced(true);
-			gm.setController(Controller.getDefaultP1Controller());
+			gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 			gm.hit(1);
 			gm.setJumpingSound(jump);
 			gm.moveTo(startX, startY);
@@ -189,6 +189,12 @@ public abstract class StageBuilder extends Stage
 			game.setFocusObject(gm);
 			add(gm);
 		}
+	}
+	
+	@Override
+	public void dispose() 
+	{
+		disposeBatch(backgroundImg, foregroundImg, deathImg, mainImage, extraHp, jump, stageImage, music);
 	}
 	
 	private static String fixPath(String path)

@@ -8,6 +8,7 @@ import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 
+import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -154,7 +156,7 @@ public abstract class Stage
 	 */
 	public void setStageMusic (String path, double loopStart)
 	{
-		setStageMusic(Utilities.loadMusic(path), loopStart);
+		setStageMusic(TinySound.loadMusic(new File(path),true), loopStart);
 	}
 	
 	/**
@@ -271,6 +273,9 @@ public abstract class Stage
 						enemy.inspectIntersections();
 					}
 					
+					enemy.removeQueuedEvents();
+					enemy.runEvents();
+					
 					updateFacing(enemy);
 					
 					enemy.prevX = enemy.currX;
@@ -281,8 +286,7 @@ public abstract class Stage
 			}
 			else if(isMain)
 				mains.add((MainCharacter)go);
-			
-			if(!isMain)
+			else
 			{
 				go.removeQueuedEvents();
 				go.runEvents();

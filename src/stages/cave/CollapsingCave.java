@@ -17,15 +17,12 @@ import game.movable.Dummy;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
-
 import java.io.File;
 import java.util.Random;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;

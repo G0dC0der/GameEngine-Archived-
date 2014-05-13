@@ -2,7 +2,6 @@ package game.essentials;
 
 import java.io.File;
 import java.util.ArrayList;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,7 +29,7 @@ public final class Image2D extends Sprite
 	public int getColor(int x, int y)
 	{
 		if(pixelData == null)
-			return -1;
+			throw new RuntimeException("The color data was not initialized during construction.");
 		else
 			return pixelData[x][y];
 	}
@@ -56,6 +55,11 @@ public final class Image2D extends Sprite
 		return loadImages(getFiles(folder),createPixelData);
 	}
 	
+	public static Image2D[] loadImages(File folder)
+	{
+		return loadImages(folder,false);
+	}
+	
 	public static Image2D[] loadImages(String[] files, boolean createPixelData)
 	{
 		Image2D[] imgs = new Image2D[files.length];
@@ -66,7 +70,7 @@ public final class Image2D extends Sprite
 	}
 	
 	private static int[][] getpixelData(String path)
-	{
+	{		
 		Pixmap img = new Pixmap(new FileHandle(path));
 		
 		int[][] cd = new int[img.getWidth()][img.getHeight()];
@@ -74,12 +78,12 @@ public final class Image2D extends Sprite
 		for (int x = 0; x < img.getWidth(); x++)
 			for (int y = 0; y < img.getHeight(); y++)
 			{
-				int color = img.getPixel(x, y);
+				int value = img.getPixel(x, y);
 				
-				if((color & 0xFF000000) == 0x00)
-					color = 0;
+				if((value & 0x000000ff) / 255f == 0.0f)
+					value = 0;
 				
-				cd[x][y] = color;
+				cd[x][y] = value;
 			}
 		return cd;
 	}

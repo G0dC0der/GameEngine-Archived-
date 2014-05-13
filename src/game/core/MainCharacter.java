@@ -28,7 +28,7 @@ public abstract class MainCharacter extends MovableObject
 	protected Controller con;
 	private CharacterState state;
 	private int hp, invincibleCounter, frameSkipCounter, replayCounter;
-	private boolean hurt;
+	private boolean hurt, deathActionUsed;
 	private PressedButtons[] ghostData;
 	
 	/**
@@ -80,7 +80,7 @@ public abstract class MainCharacter extends MovableObject
 	 */
 	public void hit(int strength)
 	{
-		if(strength > 0)
+		if(strength >= 0)
 			hp += strength;
 		else if(!hurt)
 		{
@@ -167,12 +167,16 @@ public abstract class MainCharacter extends MovableObject
 	 */
 	final void deathAction()
 	{
-		visible = false;
-		hitbox = Hitbox.INVINCIBLE;
-		state = CharacterState.DEAD;
-		halted = true;
-		
-		if(deathImg != null)
-			Stage.STAGE.add(deathImg.getClone(currX + (width / 2) - (deathImg.width / 2), currY + (height / 2) - (deathImg.height / 2)));
+		if(!deathActionUsed)
+		{
+			deathActionUsed = true;
+			visible = false;
+			hitbox = Hitbox.INVINCIBLE;
+			state = CharacterState.DEAD;
+			halted = true;
+			
+			if(deathImg != null)
+				Stage.STAGE.add(deathImg.getClone(currX + (width / 2) - (deathImg.width / 2), currY + (height / 2) - (deathImg.height / 2)));
+		}
 	}
 }
