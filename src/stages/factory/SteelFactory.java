@@ -111,8 +111,6 @@ public class SteelFactory extends StageBuilder
 		gm.hit(2);
 		gm.facing = Direction.W;
 		gm.zIndex(50);
-		gm.hit(5);//TODO:
-		gm.flyMode(5);//TODO:
 		
 		game.timeColor = game.deathTextColor = Color.WHITE;
 		collect1 = collect2 = collect3 = collect4 = collect5 = energy1 = energy2 = energy3 = once = false;

@@ -122,6 +122,11 @@ public abstract class MainCharacter extends MovableObject
 		return super.getFrame();
 	}
 	
+	Image2D getFrameByForce()
+	{
+		return super.getFrame();
+	}
+	
 	/**
 	 * The controller this character should use.<br>
 	 * A controller is linked keys on the keyboard.

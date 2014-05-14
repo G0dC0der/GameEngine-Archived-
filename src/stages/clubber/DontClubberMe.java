@@ -49,8 +49,8 @@ public class DontClubberMe extends Stage
 			foregroundImg = new Image2D("res/clubber/foreground.png",false);
 			stageImage	= new Pixmap(new FileHandle("res/clubber/stage.png"));
 			keyimg		= new Image2D("res/clubber/key.png",false);
-			pressure1	= new Image2D("res/clubber/pressure1.png",false);
-			pressure2	= new Image2D("res/clubber/pressurerot.png",false);
+			pressure1	= new Image2D("res/clubber/pressure1.png",true);
+			pressure2	= new Image2D("res/clubber/pressurerot.png",true);
 			sawimg		= new Image2D("res/clubber/saw.png",false);
 			missileimg	= new Image2D("res/clubber/missile.png",false);
 			weaponimg 	= new Image2D("res/clubber/turret.png",false);

@@ -52,9 +52,9 @@ public class Race extends Stage
 		{
 			mainImage   = Image2D.loadImages(new File("res/general/main"), true);
 			bo2Img	    = Image2D.loadImages(new File("res/race/bounce2"), true);
-			contImg1	= Image2D.loadImages(new File("res/race/cont1"),false);
-			contImg2	= Image2D.loadImages(new File("res/race/cont2"),false);
-			contImg3	= Image2D.loadImages(new File("res/race/cont3"),false);
+			contImg1	= Image2D.loadImages(new File("res/race/cont1"),true);
+			contImg2	= Image2D.loadImages(new File("res/race/cont2"),true);
+			contImg3	= Image2D.loadImages(new File("res/race/cont3"),true);
 			flagImg	    = Image2D.loadImages(new File("res/race/flag"),false);
 			blImg       = Image2D.loadImages("res/race/blocker.png");			
 			boImg       = Image2D.loadImages("res/race/bounce.png");
@@ -69,13 +69,6 @@ public class Race extends Stage
 			deathImg   		  = Image2D.loadImages(new File("res/general/main/death"), false);
 			stageImage        = new Pixmap(new FileHandle("res/race/map.png"));
 			game.timeColor = Color.WHITE;
-			
-			for(int i = 0; i < mainImage.length; i++)
-			{
-				mainImage[i].transferPixelData(contImg1[i]);
-				mainImage[i].transferPixelData(contImg2[i]);
-				mainImage[i].transferPixelData(contImg3[i]);
-			}
 			
 			jump	    = Utilities.loadSound("res/general/jump.wav");
 			jump1	    = Utilities.loadSound("res/general/jump.wav");

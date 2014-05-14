@@ -251,21 +251,21 @@ public class EntityStuff
 		if(image1 == null ||image2 == null)
 			return false;
 		
-        int top    = (int) Math.max(obj1.currY, obj2.currY);
-        int bottom = (int) Math.min(obj1.currY + obj1.height, obj2.currY + obj2.height);
-        int left   = (int) Math.max(obj1.currX, obj2.currX);
-        int right  = (int) Math.min(obj1.currX + obj1.width, obj2.currX + obj2.width);
+		int top    = (int) Math.max(obj1.currY, obj2.currY);
+		int bottom = (int) Math.min(obj1.currY + obj1.height, obj2.currY + obj2.height);
+		int left   = (int) Math.max(obj1.currX, obj2.currX);
+		int right  = (int) Math.min(obj1.currX + obj1.width, obj2.currX + obj2.width);
 
-        for (int y = top; y < bottom; y++)
-        {
-            for (int x = left; x < right; x++)
-            {
-                int colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
-                int colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
-                if (colorA != 0 && colorB != 0)
-                	return true;
-            }
-        }
+		for (int y = top; y < bottom; y++)
+		{
+			for (int x = left; x < right; x++)
+			{
+				int colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
+				int colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
+				if (colorA != 0 && colorB != 0)
+					return true;
+			}
+		}
 		return false;
 	}
 	
@@ -274,15 +274,17 @@ public class EntityStuff
 		if(!go.isVisible())
 			return null;
 		
+		Image2D img =  null;
 		boolean stopped = go.currImage.isStopped();
 		go.currImage.stop(true);
-		Image2D img = go.getFrame();
-		go.currImage.stop(stopped);
-
-		if(img != null)
-			return img;
+		
+		if(go instanceof MainCharacter)
+			img = ((MainCharacter)go).getFrameByForce();
 		else
-			return go.currImage.getCurrentObject();
+			img = go.getFrame();
+		
+		go.currImage.stop(stopped);
+		return img;
 	}
 	
 //	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)

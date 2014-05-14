@@ -59,9 +59,9 @@ public class ClimbMe extends Stage
 			weakImg 	= new Image2D("res/climb/weak.png");
 			weakdImg 	= new Image2D("res/climb/weakdest.png");
 			movapImg 	= new Image2D("res/climb/movablep.png");
-			enemyImg 	= new Image2D("res/climb/enemy.png");
+			enemyImg 	= new Image2D("res/climb/enemy.png",true);
 			arrowImg 	= new Image2D("res/climb/arrow.png");
-			blockImg 	= new Image2D("res/climb/block.png");
+			blockImg 	= new Image2D("res/climb/block.png",true);
 			block2Img 	= new Image2D("res/climb/block2.png");
 			solpImg 	= new Image2D("res/climb/platform.png");
 			cannonImg 	= new Image2D("res/climb/cannon.png");

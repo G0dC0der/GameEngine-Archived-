@@ -3,12 +3,9 @@ package stages.flyingbat;
 import game.core.Engine;
 import game.core.Engine.Direction;
 import game.core.GameObject;
-import game.core.GameObject.Event;
-import game.core.GameObject.HitEvent;
 import game.core.GameObject.Hitbox;
 import game.core.MovableObject;
 import game.core.MainCharacter.CharacterState;
-import game.core.MovableObject.TileEvent;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
@@ -30,7 +27,6 @@ import ui.accessories.Playable;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-
 
 @Playable(name="Flying Battery", description="Stage: Flying Batteri\nAuthor: Pojahn Moradi\nDifficulty: 5\nAverage time: 120 sec\nProfessional time: 45 sec\nObjective: Finish the stage.")
 public class FlyingBattery extends Stage
@@ -133,21 +129,17 @@ public class FlyingBattery extends Stage
 		final PathDrone button = new PathDrone(46, 455);
 		button.setImage(new Frequency<>(1, buttonImg));
 		button.setMoveSpeed(1);
-		gm.addTileEvent(new TileEvent()
+		gm.addTileEvent((tileType)->
 		{
-			@Override
-			public void eventHandling(byte tileType) 
+			if(tileType == Engine.AREA_TRIGGER_1)
 			{
-				if(tileType == Engine.AREA_TRIGGER_1)
+				button.appendPath(46,465,Integer.MAX_VALUE,false,null);
+				discard(door);
+				gm.allowOverlapping(door);
+				if(!used)
 				{
-					button.appendPath(46,465,Integer.MAX_VALUE,false,null);
-					discard(door);
-					gm.allowOverlapping(door);
-					if(!used)
-					{
-						doorOpen.play();
-						used = true;
-					}
+					doorOpen.play();
+					used = true;
 				}
 			}
 		});
@@ -156,25 +148,13 @@ public class FlyingBattery extends Stage
 		push.setImage(new Frequency<>(1, pushImg));
 		push.setPushingSound(pushed, 10);
 		push.setTriggerable(true);
-		push.addTileEvent(new TileEvent()
+		push.addTileEvent((tileType)-> {if(tileType == Engine.LETHAL) discard(push);});
+		push.addEvent(()->
 		{	
-			@Override
-			public void eventHandling(byte tileType) 
+			while(push.collidesWith(gm))
 			{
-				if(tileType == Engine.LETHAL)
-					discard(push);
-			}
-		});
-		push.addEvent(new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				while(push.collidesWith(gm))
-				{
-					gm.currX-=2;
-					push.moveTo(push.currX + 1, push.currY);
-				}
+				gm.currX-=2;
+				push.moveTo(push.currX + 1, push.currY);
 			}
 		});
 		
@@ -199,22 +179,8 @@ public class FlyingBattery extends Stage
 		
 		final PathDrone chain1 = new PathDrone(595, -30);
 		chain1.setImage(new Frequency<>(1, vchainImg));
-		chain1.appendPath(595, 100, 50, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain1.setMoveSpeed(1);
-			}
-		});
-		chain1.appendPath(595, -30, 20, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain1.setMoveSpeed(4);
-			}
-		});
+		chain1.appendPath(595, 100, 50, false, ()-> chain1.setMoveSpeed(1));
+		chain1.appendPath(595, -30, 20, false, ()-> chain1.setMoveSpeed(4));
 		
 		GameObject ball1 = new GameObject();
 		ball1.setHitbox(Hitbox.EXACT);
@@ -224,22 +190,8 @@ public class FlyingBattery extends Stage
 		
 		final PathDrone chain2 = new PathDrone(739, -30);
 		chain2.setImage(new Frequency<>(1, vchainImg));
-		chain2.appendPath(739, 100, 100, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain2.setMoveSpeed(0.5f);
-			}
-		});
-		chain2.appendPath(739, -30, 60, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain2.setMoveSpeed(3);
-			}
-		});
+		chain2.appendPath(739, 100, 100, false, ()-> chain2.setMoveSpeed(0.5f));
+		chain2.appendPath(739, -30, 60, false, ()-> chain2.setMoveSpeed(3));
 		
 		GameObject ball2 = new GameObject();
 		ball2.setHitbox(Hitbox.EXACT);
@@ -249,22 +201,8 @@ public class FlyingBattery extends Stage
 		
 		final PathDrone chain3 = new PathDrone(-640, 268);
 		chain3.setImage(new Frequency<>(1, hchainImg));
-		chain3.appendPath(-40, 268, 10, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain3.setMoveSpeed(3);
-			}
-		});
-		chain3.appendPath(-640, 268, 10, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain3.setMoveSpeed(3.5f);
-			}
-		});
+		chain3.appendPath(-40, 268, 10, false, ()-> chain3.setMoveSpeed(3));
+		chain3.appendPath(-640, 268, 10, false, ()-> chain3.setMoveSpeed(3.5f));
 		
 		GameObject ball3 = new GameObject();
 		ball3.setHitbox(Hitbox.EXACT);
@@ -274,22 +212,8 @@ public class FlyingBattery extends Stage
 		
 		final PathDrone chain4 = new PathDrone(-640, 315);
 		chain4.setImage(new Frequency<>(1, hchainImg));
-		chain4.appendPath(-40, 315, 10, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain4.setMoveSpeed(3);
-			}
-		});
-		chain4.appendPath(-640, 315, 10, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				chain4.setMoveSpeed(3.5f);
-			}
-		});
+		chain4.appendPath(-40, 315, 10, false, ()-> chain4.setMoveSpeed(3));
+		chain4.appendPath(-640, 315, 10, false, ()-> chain4.setMoveSpeed(3.5f));
 		
 		GameObject ball4 = new GameObject();
 		ball4.setHitbox(Hitbox.EXACT);
@@ -355,19 +279,15 @@ public class FlyingBattery extends Stage
 		tank.setFiringOffsets(35, -10);
 		tank.setHitbox(Hitbox.EXACT);
 		gm.avoidOverlapping(tank);
-		gm.setHitEvent(new HitEvent()
+		gm.setHitEvent((hitter)->
 		{
-			@Override
-			public void eventHandling(GameObject hitter) 
+			if(hitter.sameAs(mi))
+				gm.hit(-1);
+			
+			if(gm.getHP() <= 0)
 			{
-				if(hitter.sameAs(mi))
-					gm.hit(-1);
-				
-				if(gm.getHP() <= 0)
-				{
-					gm.setVisible(false);
-					gm.setState(CharacterState.DEAD);
-				}
+				gm.setVisible(false);
+				gm.setState(CharacterState.DEAD);
 			}
 		});
 		

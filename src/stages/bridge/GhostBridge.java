@@ -171,10 +171,11 @@ public class GhostBridge extends StageBuilder
 		/*
 		 * Goal
 		 */
-		GameObject coin = new GameObject();
+		final GameObject coin = new GameObject();
 		coin.setImage(new Frequency<>(7, coinImg));
 		coin.currX = 458;
 		coin.currY = 799;
+		coin.addEvent(()->{ if(coin.collidesWith(gm)) discard(coin); });
 		add(coin);
 		
 		/*

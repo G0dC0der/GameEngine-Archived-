@@ -179,7 +179,7 @@ public class CollapsingCave extends Stage
 			else if(getDifficulty() == Difficulty.NORMAL)
 				crusher.setMoveSpeed(2f);
 			else if(getDifficulty() == Difficulty.HARD)
-				crusher.setMoveSpeed(3.4f);
+				crusher.setMoveSpeed(3.8f);
 			discard(dust);
 			collapsing.play(true);
 			drilling.stop();
