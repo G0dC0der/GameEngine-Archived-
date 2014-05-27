@@ -216,7 +216,7 @@ public class CollapsingCave extends Stage
 		final GameObject item4 = item1.getClone(957, 267);
 		item2.addEvent(() ->
 		{	
-			if(item2.collidesWithMultiple(gm))
+			if(item2.collidesWithMultiple(gm) != null)
 			{
 				discard(item2);
 				coll2 = true;
@@ -225,7 +225,7 @@ public class CollapsingCave extends Stage
 		});
 		item3.addEvent(() ->
 		{	
-			if(item3.collidesWithMultiple(gm))
+			if(item3.collidesWithMultiple(gm) != null)
 			{
 				discard(item3);
 				coll3 = true;
@@ -234,7 +234,7 @@ public class CollapsingCave extends Stage
 		});
 		item4.addEvent(() ->
 		{	
-			if(item4.collidesWithMultiple(gm))
+			if(item4.collidesWithMultiple(gm) != null)
 			{
 				discard(item4);
 				coll4 = true;
@@ -301,14 +301,14 @@ public class CollapsingCave extends Stage
 			}
 		}
 		
-		if(!coll1 && item1.collidesWithMultiple(gm))
+		if(!coll1 && item1.collidesWithMultiple(gm) != null)
 		{
 			discard(item1);
 			coll1 = true;
 			collect.play();
 		}
 		
-		if(coll1 && coll2 && coll3 && coll4 && flag.collidesWithMultiple(gm))
+		if(coll1 && coll2 && coll3 && coll4 && flag.collidesWithMultiple(gm) != null)
 			gm.setState(CharacterState.FINISH);
 	
 		if(!done)

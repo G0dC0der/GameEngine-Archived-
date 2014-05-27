@@ -34,7 +34,8 @@ public class DontEatShroom extends StageBuilder
 	private Sound collect, eat, jumpdruged, boom, cannonfire;
 	private Music drugedSong;
 	private int counter = 0;
-
+	
+	@Override
 	public void init() 
 	{
 		try

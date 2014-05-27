@@ -701,6 +701,12 @@ public class EntityStuff
 							 target.currY + target.height / 2);
 	}
 	
+	public static void rotateTowardsPoint(GameObject src, GameObject target, float speed)
+	{
+		float rotation = rotateTowardsPoint(src.currX, src.currY, target.currX, target.currY, src.rotation, speed);
+		src.rotation = rotation;
+	}
+	
 	/**
 	 * Tries to rotate the abstract source so that it faces the abstract target.<br>
 	 * Like an turret in a 2D environment rotates so it faces its target.

@@ -158,12 +158,12 @@ public class MovableObject extends GameObject
 					case NE:
 					case E:
 					case SE:
-						img.setFlip(false, false);
+						img.setFlip(false, true);
 						break;
 					case SW:
 					case W:
 					case NW:
-						img.setFlip(true, false);
+						img.setFlip(true, true);
 						break;
 					default:
 						break;
@@ -606,7 +606,7 @@ public class MovableObject extends GameObject
 	 */
 	public void collisionRespone(MovableObject target)
 	{
-		if(!collidesWithMultiple(target))
+		if(collidesWithMultiple(target) == null)
 			return;
 		
 		float centerX = currX + width / 2;
@@ -786,7 +786,7 @@ public class MovableObject extends GameObject
 		currY = targetY;
 
 		for (GameObject go : solidObjects)
-			if (collidesWithMultiple(go))
+			if (collidesWithMultiple(go) != null)
 			{
 				bool = true;
 				break;

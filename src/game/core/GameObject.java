@@ -235,13 +235,13 @@ public class GameObject
 			return false;
 	}
 	
-	public boolean collidesWithMultiple(GameObject... objs)
+	public GameObject collidesWithMultiple(GameObject... objs)
 	{
 		for(GameObject go : objs)
 			if(collidesWith(go))
-				return true;
+				return go;
 		
-		return false;
+		return null;
 	}
 	
 	/**

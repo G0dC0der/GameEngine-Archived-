@@ -158,7 +158,7 @@ public class BlockSpawner extends GameObject implements Event
 		if(0 > index)
 			index = 0;
 		
-		if(trigger || collidesWithMultiple(users))
+		if(trigger || collidesWithMultiple(users)  != null)
 		{
 			if(actionImage != null)
 				currImage = actionImage;

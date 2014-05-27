@@ -59,8 +59,7 @@ public class Weapon extends PathDrone
 		
 		super.moveEnemy();
 
-		if(!haveTarget())
-			findTarget();
+		findTarget();
 		
 		rotateWeapon();
 		
@@ -72,13 +71,7 @@ public class Weapon extends PathDrone
 		if(haveTarget())
 		{
 			if(!haveBullets())
-			{
-				burstCounter = 0;
-				delayCounter = burstDelay - 1;
-				reloadCounter = reload;
-				rotationAllowed = rotateWhileRecover;
-				firing = false;
-			}
+				reset();
 			else if((firing || isTargeting()) && ++delayCounter % burstDelay == 0)
 			{
 				if(firingImage != null)
@@ -113,6 +106,8 @@ public class Weapon extends PathDrone
 					stage.add(partClone);
 			}
 		}
+		else
+			reset();
 	}
 	
 	/**
@@ -231,6 +226,16 @@ public class Weapon extends PathDrone
 			if(alwaysRotate || currTarget.canSee(this, Accuracy.MID))
 				rotation = EntityStuff.rotateTowardsPoint(x1,y1,x2,y2, rotation, rotationSpeed);
 		}
+	}
+	
+	protected void reset()
+	{
+		burstCounter = 0;
+		delayCounter = burstDelay - 1;
+		reloadCounter = reload;
+		rotationAllowed = rotateWhileRecover;
+		firing = false;
+		currTarget = null;
 	}
 	
 	/**

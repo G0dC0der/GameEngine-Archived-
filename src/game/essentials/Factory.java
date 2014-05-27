@@ -325,7 +325,7 @@ public class Factory
 			}
 			
 			@Override
-			public void drawSpecial(SpriteBatch g) 
+			public void drawSpecial(SpriteBatch b) 
 			{
 				if(hasWork)
 				{
@@ -337,8 +337,8 @@ public class Factory
 					}
 					if(textColor != null)
 						theFont.setColor(textColor);
-					
-					theFont.draw(g, text,position.currX + ox, position.currY + oy);
+
+					theFont.drawMultiLine(b, text, position.currX + ox, position.currY + oy);
 				}
 			}
 		};
@@ -448,7 +448,7 @@ public class Factory
 				dummy.width = target.width + 2;
 				dummy.height= target.height+ 2;
 				
-				if(!collapsing && dummy.collidesWithMultiple(users))
+				if(!collapsing && dummy.collidesWithMultiple(users) != null)
 				{
 					collapsing = true;
 					if(destroyAnim != null)
