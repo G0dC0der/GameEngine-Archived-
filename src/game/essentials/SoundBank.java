@@ -157,6 +157,16 @@ public class SoundBank
 		if (index < units.length && units[index] != null && units[index].sound != null)
 			units[index].allowed = true;
 	}
+
+	/**
+	 * Forbids the sound at the given index.
+	 * @param index The index.
+	 */
+	public void forbidSound(int index)
+	{
+		if (index < units.length && units[index] != null && units[index].sound != null)
+			units[index].allowed = false;
+	}
 	
 	/**
 	 * Stops the sound at the given index, if exists.
@@ -188,6 +198,7 @@ public class SoundBank
 		if(units[index] != null)
 			units[index].delay = delay;
 	}
+	
 	
 	/**
 	 * Reconstructs the instance to use the given sound array.

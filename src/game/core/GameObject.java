@@ -135,6 +135,17 @@ public class GameObject
 		id = new Random().nextInt();
 	}
 	
+	/**
+	 * Moves to the specified point, without any performing any checks at all.
+	 * @param x The X coordinate to jump to.
+	 * @param y The Y coordinate to jump to.
+	 */
+	public void moveTo(float x, float y)
+	{
+		currX = x;
+		currY = y;
+	}
+	
 	public void setImage(Image2D img)
 	{
 		setImage(new Frequency<>(1, new Image2D[]{img}));

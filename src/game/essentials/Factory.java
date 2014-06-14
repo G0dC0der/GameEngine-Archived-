@@ -85,12 +85,15 @@ public class Factory
 					}
 					
 					Music sound = sounds[indexes[counter]];
-					
-					if(!sound.playing())
+
+					if(sound.done())
+					{
+						sound.stop();
+						counter++;
+					}
+					else if(!sound.playing())
 						sound.play(false);
 					
-					if(sound.done())
-						counter++;
 				}
 			}
 		};
@@ -646,16 +649,12 @@ public class Factory
 	 */
 	public static Event hitMain(final GameObject obj, final MainCharacter main, final int power)
 	{
-		return new Event()
+		return ()->
 		{
-			@Override
-			public void eventHandling() 
+			if(obj.collidesWith(main))
 			{
-				if(obj.collidesWith(main))
-				{
-					main.hit(power);
-					main.runHitEvent(obj);
-				}
+				main.hit(power);
+				main.runHitEvent(obj);
 			}
 		};
 	}

@@ -529,6 +529,8 @@ public abstract class Stage
 					((Sound)obj).unload();
 				else if(obj instanceof Music)
 					((Music)obj).unload();
+				else
+					System.out.println("Unsupported type: " + obj.getClass());
 			}
 			catch(Exception e)
 			{

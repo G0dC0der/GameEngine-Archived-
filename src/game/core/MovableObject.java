@@ -452,17 +452,6 @@ public class MovableObject extends GameObject
 	}
 	
 	/**
-	 * Moves to the specified point, without any performing any checks at all.
-	 * @param x The X coordinate to jump to.
-	 * @param y The Y coordinate to jump to.
-	 */
-	public void moveTo(float x, float y)
-	{
-		currX = x;
-		currY = y;
-	}
-	
-	/**
 	 * Jumps back to the position this unit was standing on the previous frame.
 	 */
 	public void goBack()
