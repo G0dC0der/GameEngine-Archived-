@@ -74,7 +74,7 @@ public class Race extends Stage
 			bounceball  = Utilities.loadSound("res/race/bounceball.wav");
 			bounceblock = Utilities.loadSound("res/race/bounceblock.wav");
 			
-			setStageMusic(TinySound.loadMusic(new File("res/race/song.ogg"),true), 3.325);
+			setStageMusic(TinySound.loadMusic(new File("res/race/song.ogg"),true), 3.325, 1.0f);
 		}
 		catch(Exception e)
 		{
@@ -162,7 +162,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", view.width / 2 - 190, view.height / 2 - 50);
+							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
 							game.restoreTransformation();
 						}
@@ -209,7 +209,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", view.width / 2 - 190, view.height / 2 - 50);
+							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
 							game.restoreTransformation();
 						}
@@ -256,7 +256,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", view.width / 2 - 190, view.height / 2 - 50);
+							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
 							game.restoreTransformation();
 						}

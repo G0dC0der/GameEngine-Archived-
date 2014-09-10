@@ -77,7 +77,7 @@ public class ClimbMe extends Stage
 			arrowfire  = TinySound.loadSound(new File(("res/climb/arrowfire.wav")));
 			collapse   = TinySound.loadSound(new File(("res/climb/collapsing.wav")));
 
-			setStageMusic("res/climb/song.ogg", 0);
+			setStageMusic("res/climb/song.ogg", 0, 1.0f);
 		}
 		catch(Exception e)
 		{
@@ -100,7 +100,7 @@ public class ClimbMe extends Stage
 
 		basicInits();
 		game.timeColor = game.deathTextColor = Color.WHITE;
-		LETHAL_DAMAGE = -3;
+		lethalDamage = -3;
 		
 		foreground(RenderOption.PORTION, foregroundImg);
 		background(RenderOption.PORTION, backgroundImg);

@@ -55,7 +55,7 @@ public class TraningStage2  extends AbstractTraningStage
 			shut = Utilities.loadSound("res/traning2/doorshut.wav");
 			collect = Utilities.loadSound("res/general/collect1.wav");
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
-			setStageMusic("res/traning2/song.ogg",0f);
+			setStageMusic("res/traning2/song.ogg",0f, 1.0f);
 			
 			setFriendFont(game.fpsFont);
 			setFriendTextColor(Color.YELLOW);

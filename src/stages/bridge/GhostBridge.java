@@ -54,7 +54,7 @@ public class GhostBridge extends StageBuilder
 			collect.setVolume(0.4f);
 			boo.setVolume(0.1f);
 			
-			setStageMusic("res/ghostbridge/song.ogg", 24.19);
+			setStageMusic("res/ghostbridge/song.ogg", 24.19, 1.0f);
 		}
 		catch(Exception e)
 		{

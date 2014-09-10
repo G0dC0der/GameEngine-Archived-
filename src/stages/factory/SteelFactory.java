@@ -10,6 +10,7 @@ import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.core.MovableObject;
 import game.core.MovableObject.TileEvent;
+import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
@@ -26,18 +27,16 @@ import game.movable.SolidPlatform;
 import game.movable.Weapon;
 import game.objects.Particle;
 import game.objects.Shrapnel;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.graphics.Color;
 
+@AutoDispose
 @AutoInstall(mainPath="res/general",path="res/steelfactory")
 @Playable(name="Steel Factory", description="Stage: Steel Factory\nAuthor: Pojahn Moradi\nDifficulty: 9\nAverage time: 220 sec\nProfessional time: 150 sec\nObjective: Enter the exit door.")
 public class SteelFactory extends StageBuilder
@@ -85,8 +84,7 @@ public class SteelFactory extends StageBuilder
 			exp   = TinySound.loadSound(new File(("res/collapsingcave/exp2.wav")));
 			sexp  = TinySound.loadSound(new File(("res/collapsingcave/exp1.wav")));
 			
-			MUSIC_VOLUME = 0.7f;
-			setStageMusic(song, 4.48f);
+			setStageMusic(song, 4.48f, .7f);
 			magicfire.setVolume(0.65f);
 			magicexplode.setVolume(0.5f);
 			collapsing.setVolume(0.7f);

@@ -44,7 +44,7 @@ public class TraningStage5 extends StageBuilder
 			sawLoop.play(true);
 			
 			game.timeColor = Color.WHITE;
-			setStageMusic("res/traning5/song.ogg", 3.58f);
+			setStageMusic("res/traning5/song.ogg", 3.58f, 1.0f);
 		}
 		catch(Exception e)
 		{
@@ -117,11 +117,11 @@ public class TraningStage5 extends StageBuilder
 				drill.freeze();
 		}
 		
-		game.tx = Math.min(size.width  - view.width,   Math.max(0, gm.currX - view.width  / 2)) + view.width  / 2; 
+		game.tx = Math.min(size.width  - game.getScreenWidth(),   Math.max(0, gm.currX - game.getScreenWidth()  / 2)) + game.getScreenWidth()  / 2; 
 		
 		final PathDrone aDrill = allDrills.get(0);
 		
-		if(aDrill.currX + view.width / 2 > gm.currX)
-			game.tx = aDrill.currX + view.width / 2;
+		if(aDrill.currX + game.getScreenWidth() / 2 > gm.currX)
+			game.tx = aDrill.currX + game.getScreenWidth() / 2;
 	}
 }

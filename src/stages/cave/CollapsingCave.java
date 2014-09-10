@@ -89,7 +89,7 @@ public class CollapsingCave extends Stage
 			ps.getEmitters().get(0).setContinuous(true);
 			ps.start();
 			
-			setStageMusic(TinySound.loadMusic(new File("res/collapsingcave/song.ogg"), true), 0f);
+			setStageMusic(TinySound.loadMusic(new File("res/collapsingcave/song.ogg"), true), 0f, 1.0f);
 		}
 		catch(Exception e)
 		{

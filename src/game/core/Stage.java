@@ -6,26 +6,25 @@ import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
-import game.essentials.Utilities;
-
 import java.awt.Dimension;
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -74,35 +73,25 @@ public abstract class Stage
 	};
 	
 	/**
-	 * This is the stage that currently are being played. <br>
+	 * This is the stage that currently being played. <br>
 	 * This variable is set automatically when a stage has been launched.
 	 */
 	public static Stage STAGE;
-
-	/**
-	 * This is the damage a {@code MainCharacter} takes when he or she interact with LETHAL tile type.
-	 */
-	public static int LETHAL_DAMAGE = -1;
-	
-	/**
-	 * This is the volume of the stage music. Defaults to 1.0, which is 100%.
-	 */
-	public static float MUSIC_VOLUME = 1f;
 	
 	/**
 	 * The stage data, which stores all the tile information. The values stored in this matrix are constant found in {@code game.core.Engine}.
 	 */
 	public byte[][] stageData;
+
+	/**
+	 * This is the damage a {@code MainCharacter} takes when he or she interact with LETHAL tile type.
+	 */
+	public int lethalDamage = -1;
 	
 	/**
 	 * The size of the stage.
 	 */
 	public Dimension size;
-	
-	/**
-	 * This is the size of the game window. Can be manually set during development but can not be changed at runtime.
-	 */
-	public Dimension view;
 	
 	/**
 	 * A reference to the engine.
@@ -139,7 +128,6 @@ public abstract class Stage
 		events 		   = new LinkedList<>();
 		startX = startY = -1;
 		size = new Dimension();
-		view = new Dimension(800, 600);
 	}
 	
 	/**
@@ -147,9 +135,9 @@ public abstract class Stage
 	 * @param path The path to where the song can be found.
 	 * @param loopStart Where to start, in seconds, after the song have ended.
 	 */
-	public void setStageMusic (String path, double loopStart)
+	public void setStageMusic (String path, double loopStart, float volume)
 	{
-		setStageMusic(TinySound.loadMusic(new File(path),true), loopStart);
+		setStageMusic(TinySound.loadMusic(new File(path),true), loopStart, volume);
 	}
 	
 	/**
@@ -157,9 +145,9 @@ public abstract class Stage
 	 * @param music The song to start.
 	 * @param loopStart Where to start, in seconds, after the song have ended.
 	 */
-	public void setStageMusic(Music music, double loopStart)
+	public void setStageMusic(Music music, double loopStart, float volume)
 	{
-		music.setVolume(MUSIC_VOLUME);
+		music.setVolume(volume);
 		music.setLoopPositionBySeconds(loopStart);
 		music.play(true);
 		this.music = music;
@@ -476,6 +464,11 @@ public abstract class Stage
 		return stageClone[y][x];
 	}
 	
+	/**
+	 * Disposes the given objects. Support the following types:<br>
+	 * @code{Image2D, Image2D[], TextureRegion, TextureRegion[], Pixmap, Texture, Texture[], ParticleEffect, Disposable, Sound and Music}.
+	 * @param objs
+	 */
 	public static void disposeBatch(Object... objs)
 	{
 		for(Object obj : objs)
@@ -526,27 +519,33 @@ public abstract class Stage
 		}
 	}
 	
-	@Deprecated
-	public void nullBatch()
+	public static GameObject readTMX(final String path)
 	{
-		List<Field> fields = new LinkedList<>();
-		Utilities.getAllFields(fields, getClass());
-		
-		for(Field f : fields)
+		return new GameObject()
 		{
-			if(f.getType().isPrimitive())
-				continue;
+			TiledMap map = new TmxMapLoader().load(path);
+			OrthogonalTiledMapRenderer r;
 			
-			f.setAccessible(true);
-			try 
+			@Override
+			public void drawSpecial(SpriteBatch batch) 
 			{
-				f.set(this, null);
-			} 
-			catch (IllegalArgumentException | IllegalAccessException e) 
-			{
-				e.printStackTrace();
-			} 
-		}
+				if(r == null)
+				{
+					r = new OrthogonalTiledMapRenderer(map, batch)
+					{
+						@Override
+						protected void beginRender() {}
+						
+						@Override
+						protected void endRender() {}
+					};
+				}
+				
+				AnimatedTiledMapTile.updateAnimationBaseTime();
+				r.setView(Stage.STAGE.game.getCamera());
+				r.render();
+			}
+		};
 	}
 	
 	void updateFacing(MovableObject mo)
@@ -608,8 +607,8 @@ public abstract class Stage
 				case PORTION:
 					OrthographicCamera camera = STAGE.game.getCamera();
 					Engine e = STAGE.game;
-					int vw = Stage.STAGE.view.width;
-					int vh = Stage.STAGE.view.height;
+					int vw = Stage.STAGE.game.getScreenWidth();
+					int vh = Stage.STAGE.game.getScreenHeight();
 					
 					camera.up.set(0, 1, 0);
 					camera.direction.set(0, 0, -1);

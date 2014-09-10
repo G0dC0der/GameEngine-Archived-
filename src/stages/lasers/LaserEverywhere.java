@@ -53,7 +53,7 @@ public class LaserEverywhere extends StageBuilder
 			boom7     = TinySound.loadSound(new File(("res/lasereverywhere/boom.wav")));
 			boom8     = TinySound.loadSound(new File(("res/lasereverywhere/boom.wav")));
 			
-			setStageMusic("res/lasereverywhere/song.ogg", 1.869);
+			setStageMusic("res/lasereverywhere/song.ogg", 1.869, 1.0f);
 			
 		}
 		catch(Exception e)

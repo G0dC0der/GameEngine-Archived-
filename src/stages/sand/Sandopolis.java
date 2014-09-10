@@ -87,8 +87,7 @@ public class Sandopolis extends StageBuilder
 			lasercharge   = TinySound.loadSound(new File(("res/sandopolis/lasercharge.wav")));
 			laserattack   = TinySound.loadSound(new File(("res/sandopolis/laserattack.wav")));
 			
-			MUSIC_VOLUME = 0.5f;
-			setStageMusic("res/sandopolis/song.ogg", 6f);
+			setStageMusic("res/sandopolis/song.ogg", 6f, .5f);
 		}
 		catch(Exception e)
 		{
@@ -105,7 +104,7 @@ public class Sandopolis extends StageBuilder
 		 * Standard stuff
 		 */
 		super.build();
-		LETHAL_DAMAGE = -5;
+		lethalDamage = -5;
 		falling = falling2 = haveFired1 = haveFired2 = haveFired3 = antiBlowDone = won = pissed = false;
 
 		/*

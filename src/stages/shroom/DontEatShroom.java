@@ -15,14 +15,11 @@ import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.movable.Weapon;
 import game.objects.Particle;
-
 import java.io.File;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -62,7 +59,7 @@ public class DontEatShroom extends StageBuilder
 			boom       = TinySound.loadSound(new File(("res/shroom/boom.wav")));
 			cannonfire = TinySound.loadSound(new File(("res/shroom/cannonfire.wav")));
 			
-			setStageMusic("res/shroom/song.ogg", 7.631);
+			setStageMusic("res/shroom/song.ogg", 7.631, .8f);
 			drugedSong = TinySound.loadMusic(new File(("res/shroom/songdruged.ogg")),true);
 		}
 		catch(Exception e)
@@ -84,7 +81,6 @@ public class DontEatShroom extends StageBuilder
 		counter++;
 		gm.zIndex(50);
 		game.timeColor = Color.WHITE;
-		MUSIC_VOLUME = 0.8f;
 		
 		game.drugVertical(0, 0);
 		game.drugHorizontal(0, 0);
@@ -98,7 +94,7 @@ public class DontEatShroom extends StageBuilder
 			music.play(true);
 		}
 		drugedSong.setVolume(0);
-		music.setVolume(MUSIC_VOLUME);
+		music.setVolume(.8f);
 		
 		/*
 		 * Horizontal moving platforms

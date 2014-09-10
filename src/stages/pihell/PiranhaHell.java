@@ -37,7 +37,7 @@ public class PiranhaHell extends StageBuilder
 		
 		fireSound = TinySound.loadSound(new File("res/pihell/fireball.wav"));
 		fireSound.setVolume(.5f);
-		setStageMusic("res/pihell/song.ogg", 4.18f);
+		setStageMusic("res/pihell/song.ogg", 4.18f, 1.0f);
 	}
 	
 	@Override

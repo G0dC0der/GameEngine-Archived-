@@ -6,7 +6,6 @@ import game.core.Engine.Direction;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
-import game.core.Stage;
 import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
@@ -18,13 +17,10 @@ import game.essentials.Utilities;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.OneWay;
-
 import java.io.File;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.graphics.Color;
 
 @AutoDispose
@@ -60,15 +56,14 @@ public class SquareTown extends StageBuilder
 			crabMove2 = Utilities.loadMusic("res/blocks/crabMoveLoop.wav");
 			
 			game.timeColor = Color.WHITE;
-			Stage.LETHAL_DAMAGE = -5;
+			lethalDamage = -5;
 			
 			crabMove1.setVolume(0);
 			crabMove1.play(true);
 			crabMove2.setVolume(0);
 			crabMove2.play(true);
 			
-			MUSIC_VOLUME = .65f;
-			setStageMusic("res/blocks/song.ogg",29.57f);
+			setStageMusic("res/blocks/song.ogg",29.57f, .65f);
 		}
 		catch(Exception e)
 		{

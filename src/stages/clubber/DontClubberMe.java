@@ -63,7 +63,7 @@ public class DontClubberMe extends Stage
 			mainImage	= Image2D.loadImages(new File("res/general/main"),false);
 			deathImg	= Image2D.loadImages(new File("res/general/main/death"),false);
 
-			setStageMusic(TinySound.loadMusic(new File("res/clubber/song.ogg"),true), 0);
+			setStageMusic(TinySound.loadMusic(new File("res/clubber/song.ogg"),true), 0, 1.0f);
 			
 		}
 		catch(Exception e)
@@ -84,7 +84,7 @@ public class DontClubberMe extends Stage
 		basicInits();
 		
 		game.timeColor = Color.BLACK;
-		Stage.LETHAL_DAMAGE = -3;
+		lethalDamage = -3;
 		counter = 0;
 		collected1 = collected2 = collected3 = collected4 = false;
 		

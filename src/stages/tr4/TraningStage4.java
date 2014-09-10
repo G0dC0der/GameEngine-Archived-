@@ -62,7 +62,7 @@ public class TraningStage4 extends AbstractTraningStage
 			elevatorStop = TinySound.loadSound(new File("res/steelfactory/shut.wav"));
 			elevatorWorking = TinySound.loadSound(new File("res/steelfactory/elevator.wav"));
 			doorOpen = TinySound.loadSound(new File("res/flyingb/open.wav"));
-			setStageMusic(RES + "/song.ogg", 16.13f);
+			setStageMusic(RES + "/song.ogg", 16.13f, .7f);
 			weakDie.setVolume(.65f);
 			
 			flash = new Flash(Color.BLACK, 200);
@@ -88,7 +88,6 @@ public class TraningStage4 extends AbstractTraningStage
 		game.timeColor = Color.WHITE;
 		chaserHunting = false;
 		diamonds = collectedDiamonds = 0;
-		MUSIC_VOLUME = .7f;
 		setPeople(gm);
 		background(RenderOption.PORTION, backgroundImg);
 		foreground(RenderOption.PORTION, foregroundImg);

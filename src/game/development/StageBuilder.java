@@ -154,9 +154,6 @@ public abstract class StageBuilder extends Stage
 			stageData = Utilities.createStageData(stageImage);
 			basicInits();
 			
-			view.width = 800;
-			view.height = 600;
-			
 			if(backgroundImg != null)
 			{
 				GameObject wrapper = new GameObject();

@@ -55,7 +55,7 @@ public class GreenHill extends Stage
 			jump        = TinySound.loadSound(new File(("res/general/jump.wav")));
 			collectRing = TinySound.loadSound(new File(("res/hill/collectring.wav")));
 			pooSplash   = TinySound.loadSound(new File(("res/hill/splash.wav")));
-			setStageMusic("res/hill/song.ogg", 4.05);
+			setStageMusic("res/hill/song.ogg", 4.05, 1.0f);
 		}
 		catch(Exception e)
 		{

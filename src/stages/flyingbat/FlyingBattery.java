@@ -70,8 +70,7 @@ public class FlyingBattery extends Stage
 			jump     = TinySound.loadSound(new File(("res/general/jump.wav")));
 			tankfire = TinySound.loadSound(new File(("res/flyingb/tankfire.wav")));
 			
-			MUSIC_VOLUME = 0.6f;
-			setStageMusic("res/flyingb/song.ogg", 1.318f);
+			setStageMusic("res/flyingb/song.ogg", 1.318f, .6f);
 		}
 		catch(Exception e)
 		{
@@ -91,7 +90,7 @@ public class FlyingBattery extends Stage
 		
 		game.timeColor = Color.WHITE;
 		game.deathTextColor = Color.WHITE;
-		LETHAL_DAMAGE = -10;
+		lethalDamage = -10;
 		used = false;
 		
 		foreground(RenderOption.FULL, foregroundImg);

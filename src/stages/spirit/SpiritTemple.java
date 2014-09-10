@@ -94,8 +94,7 @@ public class SpiritTemple extends Stage
 			steel9   = TinySound.loadSound(new File(("res/sand/steelCollide.wav")));
 			steel10  = TinySound.loadSound(new File(("res/sand/steelCollide.wav")));
 
-			MUSIC_VOLUME = 0.8f;
-			setStageMusic("res/sand/song.ogg", 62.09);
+			setStageMusic("res/sand/song.ogg", 62.09, .8f);
 		}
 		catch(Exception e)
 		{

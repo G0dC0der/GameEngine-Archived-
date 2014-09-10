@@ -42,8 +42,7 @@ public class TraningStage1 extends AbstractTraningStage
 			talking = Utilities.loadSound("res/traning1/talking.wav");
 			collect = Utilities.loadSound("res/general/collect1.wav");
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
-			MUSIC_VOLUME = .6f;
-			setStageMusic("res/traning1/song.wav",7.80f);
+			setStageMusic("res/traning1/song.wav",7.80f, .6f);
 			
 			setFriendFont(game.fpsFont);
 			setFriendTextColor(Color.WHITE);

@@ -50,7 +50,7 @@ public abstract class MainCharacter extends MovableObject
 			if(tileType == SOLID)
 				deathAction();
 			else if(tileType == LETHAL)
-				hit(Stage.LETHAL_DAMAGE);
+				hit(Stage.STAGE.lethalDamage);
 			else if(tileType == GOAL)
 				stage.game.setGlobalState(GameState.FINISH);
 		});

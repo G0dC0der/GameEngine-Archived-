@@ -9,6 +9,7 @@ import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
 
+import java.awt.Dimension;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -272,16 +273,14 @@ public final class Engine implements Screen
 	 */
 	public int elapsedTime;
 	
-	/*
-	 * Private fields
-	 */
 	List<GameObject> focusObjs;
 	Stage stage;
+	Dimension viewport;
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
 	private boolean showFps, justRestarted, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, crashed, increasingScale = true;
 	private int fpsWriterCounter, fps;
-	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue;
+	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue, musicVolume;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private HashSet<Integer> pressedKeys;
@@ -309,6 +308,7 @@ public final class Engine implements Screen
 		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
 		justRestarted = true;
 		focusObjs = new ArrayList<>();
+		viewport = new Dimension(800, 600);
 		
 		if(replays == null)
 		{
@@ -349,8 +349,13 @@ public final class Engine implements Screen
 				if(globalState == GameState.PAUSED && !playReplay)
 				{
 					pressedKeys.clear();
-					if(stage.music != null  && stage.music.getVolume() != .1f)
-						stage.music.setVolume(.1f);
+					if(stage.music != null  && stage.music.getVolume() != .101f)
+					{
+						if(musicVolume != .1f)
+							musicVolume = (float) stage.music.getVolume();
+						
+						stage.music.setVolume(.101f);
+					}
 					
 					batch.begin();
 					renderPause();
@@ -358,8 +363,8 @@ public final class Engine implements Screen
 				}
 				else
 				{
-					if(stage.music != null  && stage.music.getVolume() != Stage.MUSIC_VOLUME)
-						stage.music.setVolume(Stage.MUSIC_VOLUME);
+					if(stage.music != null  && stage.music.getVolume() == .101f)
+						stage.music.setVolume(musicVolume);
 					
 					update();
 					paint();
@@ -422,7 +427,7 @@ public final class Engine implements Screen
 			}
 		}
 		
-		camera.position.set(stage.view.width / 2, stage.view.height / 2, 0);
+		camera.position.set(viewport.width / 2, viewport.height / 2, 0);
 		camera.zoom = 1;
 		camera.rotate(-angle);
 		camera.update();
@@ -433,12 +438,12 @@ public final class Engine implements Screen
 		if(globalState == GameState.ENDED)
 		{
 			if(!replayHelp && !playReplay)
-				timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", stage.view.width / 2 - 320, stage.view.height / 2);
+				timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", viewport.width / 2 - 320, viewport.height / 2);
 			else
-				timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.view.width / 2 - 230, stage.view.height / 2);
+				timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
 		}
 		else if(replayHelp)
-			timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.view.width / 2 - 230, stage.view.height / 2);
+			timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
 		
 		if(showFps)
 		{
@@ -446,7 +451,7 @@ public final class Engine implements Screen
 				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
 			
 			fpsFont.setColor(Color.WHITE);
-			fpsFont.draw(batch, fps + " fps", stage.view.width - 60, 5);
+			fpsFont.draw(batch, fps + " fps", viewport.width - 60, 5);
 		}
 			
 		batch.end();
@@ -512,10 +517,10 @@ public final class Engine implements Screen
 		stage.build();
 
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera(stage.view.width, stage.view.height);
-		camera.setToOrtho(true,stage.view.width, stage.view.height);
+		camera = new OrthographicCamera(viewport.width, viewport.height);
+		camera.setToOrtho(true,viewport.width, viewport.height);
 
-		Gdx.graphics.setDisplayMode(stage.view.width, stage.view.height, false);
+		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
 		ShaderProgram.pedantic = false;
 		
 		Gdx.input.setInputProcessor(new InputAdapter()
@@ -545,7 +550,7 @@ public final class Engine implements Screen
 		stage = null;
 	}
 	
-	public OrthographicCamera getCamera()
+	OrthographicCamera getCamera()
 	{
 		return camera;
 	}
@@ -587,7 +592,33 @@ public final class Engine implements Screen
 	{
 		focusObjs.add(focus);
 	}
-
+	
+	/**
+	 * Sets the size of the viewport.
+	 * @param width The width in pixels.
+	 * @param height The height in pixels.
+	 */
+	public void setViewport(int width, int height)
+	{
+		viewport.width = width;
+		viewport.height = height;
+		
+		camera = new OrthographicCamera(viewport.width, viewport.height);
+		camera.setToOrtho(true,viewport.width, viewport.height);
+		
+		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
+	}
+	
+	public int getScreenWidth()
+	{
+		return viewport.width;
+	}
+	
+	public int getScreenHeight()
+	{
+		return viewport.height;
+	}
+	
 	/**
 	 * Returns the focus objects. Remove objects by clearing them from the returned list.
 	 * @return The focus objects.
@@ -663,7 +694,7 @@ public final class Engine implements Screen
 	 */
 	public void clearTransformation()
 	{
-		camera.position.set(stage.view.width / 2, stage.view.height / 2, 0);
+		camera.position.set(viewport.width / 2, viewport.height / 2, 0);
 		camera.zoom = 1;
 		camera.rotate(-angle);
 		camera.update();
@@ -757,13 +788,13 @@ public final class Engine implements Screen
 		
 		if(size == 1)
 		{
-			tx = Math.min(stage.size.width  - stage.view.width,   Math.max(0, first.getCenterX() - stage.view.width  / 2)) + stage.view.width  / 2; 
-			ty = Math.min(stage.size.height - stage.view.height,  Math.max(0, first.getCenterY() - stage.view.height / 2)) + stage.view.height / 2;
+			tx = Math.min(stage.size.width  - viewport.width,   Math.max(0, first.getCenterX() - viewport.width  / 2)) + viewport.width  / 2; 
+			ty = Math.min(stage.size.height - viewport.height,  Math.max(0, first.getCenterY() - viewport.height / 2)) + viewport.height / 2;
 		}
 		else if(size > 1)
 		{
-			final float marginX = stage.view.width  / 2;
-			final float marginY = stage.view.height / 2;
+			final float marginX = viewport.width  / 2;
+			final float marginY = viewport.height / 2;
 			
 			float boxX	= first.currX;
 			float boxY	= first.currY; 
@@ -794,10 +825,10 @@ public final class Engine implements Screen
 			boxY = Math.max( boxY, 0 );
 			boxY = Math.min( boxY, stage.size.height - boxHeight );
 			
-			if(boxWidth > boxHeight)
-				zoom = boxWidth / stage.view.width;
+			if((float)boxWidth / (float)boxHeight > (float)viewport.width / (float)viewport.height)
+				zoom = boxWidth / viewport.width;
 			else
-				zoom = boxHeight / stage.view.height;
+				zoom = boxHeight / viewport.height;
 			
 			zoom = Math.max( zoom, 1.0f );
 
@@ -813,14 +844,8 @@ public final class Engine implements Screen
 				ty = marginY;
 			else if(ty > stage.size.height - marginY)
 				ty = stage.size.height - marginY;
-			
-			x = boxX;
-			y = boxY;
-			w = boxWidth;
-			h = boxHeight;
 		}
 	}
-	public float x, y, w, h;
 	
 	private void restart()
 	{
@@ -980,7 +1005,7 @@ public final class Engine implements Screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		timeFont.setColor(Color.WHITE);
-		timeFont.draw(batch, "Game is paused.", stage.view.width / 2 - 120, stage.view.height / 2);
+		timeFont.draw(batch, "Game is paused.", viewport.width / 2 - 120, viewport.height / 2);
 		renderStatusBar();
 	}
 	
