@@ -56,8 +56,6 @@ public class CollapsingCave extends Stage
 	{
 		game.timeColor = Color.WHITE;
 		game.deathTextColor = Color.WHITE;
-		visibleWidth = 800;
-		visibleHeight = 600;
 		
 		try
 		{
@@ -169,7 +167,7 @@ public class CollapsingCave extends Stage
 		{	
 			drill.setMoveSpeed(.1f);
 			camera.unfreeze();
-			game.setFocusObject(camera);
+			game.addFocusObject(camera);
 			add(dust);
 		});
 		drill.appendPath(547, -100, Integer.MAX_VALUE, false, () ->
@@ -198,7 +196,7 @@ public class CollapsingCave extends Stage
 		bottomPart.setHitbox(Hitbox.EXACT);
 		
 		gm.avoidOverlapping(middlePart, bottomPart);
-		game.setFocusObject(drill);
+		game.addFocusObject(drill);
 		
 		add(drill);
 		add(middlePart);
@@ -317,7 +315,7 @@ public class CollapsingCave extends Stage
 			if(EntityStuff.distance(camera, gm) < 200)
 			{
 				done = true;
-				game.setFocusObject(gm);
+				game.addFocusObject(gm);
 				gm.unfreeze();
 			}
 		}

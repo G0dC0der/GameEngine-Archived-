@@ -120,7 +120,7 @@ public class GhostBridge extends StageBuilder
 			if(d == Difficulty.NORMAL)
 				ghost.maxSpeed = 1.5f;
 			
-			add(ghost, ghost.getClone(width - 100, 100));
+			add(ghost, ghost.getClone(size.width - 100, 100));
 		}
 		
 		/*

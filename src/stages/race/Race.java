@@ -45,9 +45,6 @@ public class Race extends Stage
 	@SuppressWarnings("deprecation")
 	public void init() 
 	{
-		visibleWidth = 800;
-		visibleHeight = 600; 
-		
 		try
 		{
 			mainImage   = Image2D.loadImages(new File("res/general/main"), true);
@@ -120,7 +117,7 @@ public class Race extends Stage
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4,deathImg);
 		gm.deathImg.zIndex(101);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		add(gm);
 
 		/*
@@ -131,7 +128,7 @@ public class Race extends Stage
 		cont1 = new GravityMan();
 		cont1.setImage(new Frequency<>(3, contImg1));
 		cont1.moveTo(startX, startY);
-		cont1.addTileEvent(Factory.slipperWalls(gm));
+		cont1.addTileEvent(Factory.slipperWalls(cont1));
 		cont1.setMultiFaced(true);
 		cont1.setJumpingSound(jump1);
 		cont1.setSoundEmitter(cont1);
@@ -165,7 +162,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", view.width / 2 - 190, view.height / 2 - 50);
 							
 							game.restoreTransformation();
 						}
@@ -178,7 +175,7 @@ public class Race extends Stage
 		cont2 = new GravityMan();
 		cont2.setImage(new Frequency<>(3, contImg2));
 		cont2.moveTo(startX, startY);
-		cont2.addTileEvent(Factory.slipperWalls(gm));
+		cont2.addTileEvent(Factory.slipperWalls(cont2));
 		cont2.setMultiFaced(true);
 		cont2.setJumpingSound(jump2);
 		cont2.setSoundEmitter(cont2);
@@ -212,7 +209,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", view.width / 2 - 190, view.height / 2 - 50);
 							
 							game.restoreTransformation();
 						}
@@ -225,7 +222,7 @@ public class Race extends Stage
 		cont3 = new GravityMan();
 		cont3.setImage(new Frequency<>(3, contImg3));
 		cont3.moveTo(startX, startY);
-		cont3.addTileEvent(Factory.slipperWalls(gm));
+		cont3.addTileEvent(Factory.slipperWalls(cont3));
 		cont3.setMultiFaced(true);
 		cont3.setJumpingSound(jump3);
 		cont3.setSoundEmitter(cont3);
@@ -259,7 +256,7 @@ public class Race extends Stage
 							game.clearTransformation();
 							
 							game.timeFont.setColor(Color.WHITE);
-							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", visibleWidth / 2 - 190, visibleHeight / 2 - 50);
+							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", view.width / 2 - 190, view.height / 2 - 50);
 							
 							game.restoreTransformation();
 						}

@@ -6,13 +6,10 @@ import game.core.GameObject;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.objects.Particle;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
 import kuusisto.tinysound.Sound;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * The {@code Projectile} is scanning for a set of targets, firing at the closest visible one.<br>
@@ -287,23 +284,5 @@ public class Projectile extends Enemy
 			return super.getFrame();
 		else
 			return null;
-	}
-
-	@Override
-	public void drawSpecial(SpriteBatch batch) //TOOD:
-	{
-//		if (visible && specEffect && haveTarget())
-//		{
-//			float fX = targetX - currX;
-//		    float fY = targetY - currY;
-//		    double dist = Math.sqrt( fX*fX + fY*fY );
-//		    double step = 30 / dist;
-//		    float endX = (float) (currX - fX * step);
-//		    float endY = (float) (currY - fY * step);
-//			
-//		    g.setColor(new org.newdawn.slick.Color(227,208,118,100));
-//		    g.setLineWidth(3f);
-//		    g.drawLine(currX, currY, endX, endY);
-//		}
 	}
 }

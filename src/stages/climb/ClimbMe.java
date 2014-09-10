@@ -102,9 +102,6 @@ public class ClimbMe extends Stage
 		game.timeColor = game.deathTextColor = Color.WHITE;
 		LETHAL_DAMAGE = -3;
 		
-		visibleWidth = 800;
-		visibleHeight = 600;
-		
 		foreground(RenderOption.PORTION, foregroundImg);
 		background(RenderOption.PORTION, backgroundImg);
 		
@@ -121,7 +118,7 @@ public class ClimbMe extends Stage
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
 		gm.deathImg.zIndex(250);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		add(gm);
 		
 		/*
@@ -196,17 +193,17 @@ public class ClimbMe extends Stage
 		enemy2.appendPath(338 + enemy1.width, 3702, 0, false, null);
 		enemy2.appendPath(338 + enemy1.width, 3962, 0, false, null);
 		
-		PathDrone enemy3 = enemy1.getClone(width - 300, 3962);
+		PathDrone enemy3 = enemy1.getClone(size.width - 300, 3962);
 		enemy3.addEvent(Factory.hitMain(enemy3, gm, -1));
 		enemy3.clearData();
-		enemy3.appendPath(width - 300, 3702, 0, false, null);
-		enemy3.appendPath(width - 300, 3962, 0, false, null);
+		enemy3.appendPath(size.width - 300, 3702, 0, false, null);
+		enemy3.appendPath(size.width - 300, 3962, 0, false, null);
 		
-		PathDrone enemy4 = enemy1.getClone(width - 300 + enemy1.width, 3702);
+		PathDrone enemy4 = enemy1.getClone(size.width - 300 + enemy1.width, 3702);
 		enemy4.addEvent(Factory.hitMain(enemy4, gm, -1));
 		enemy4.clearData();
-		enemy4.appendPath(width - 300 + enemy1.width, 3962, 0, false, null);
-		enemy4.appendPath(width - 300 + enemy1.width, 3702, 0, false, null);
+		enemy4.appendPath(size.width - 300 + enemy1.width, 3962, 0, false, null);
+		enemy4.appendPath(size.width - 300 + enemy1.width, 3702, 0, false, null);
 		
 		add(enemy1, enemy2, enemy3, enemy4);
 		

@@ -77,8 +77,6 @@ public class GreenHill extends Stage
 			stageData = Utilities.createStageData(stageImage);
 		basicInits();
 
-		visibleWidth = 800;
-		visibleHeight = 600;
 		ringCounter = 0;
 		game.timeColor = new Color(100,255,100,255);
 		game.deathTextColor = Color.YELLOW;
@@ -100,7 +98,7 @@ public class GreenHill extends Stage
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		add(gm);
 		
 		/*
@@ -248,7 +246,7 @@ public class GreenHill extends Stage
 			this.initialX = parent.currX;
 			this.initialY = parent.currY;
 			this.targetX = parent.currX;
-			this.targetY = Stage.STAGE.height;
+			this.targetY = Stage.STAGE.size.height;
 			this.targets = targets;
 		}
 		

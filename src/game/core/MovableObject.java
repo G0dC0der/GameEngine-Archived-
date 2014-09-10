@@ -502,11 +502,6 @@ public class MovableObject extends GameObject
 		return prevY;
 	}
 	
-	public boolean isMoving()
-	{
-		return currX != prevX || currY != prevY;
-	}
-	
 	/**
 	 * "Walks" towards the specified point, using property {@code moveSpeed} as the "walking speed".
 	 * @param targetX The X target coordinate to walk to.
@@ -598,11 +593,11 @@ public class MovableObject extends GameObject
 		if(collidesWithMultiple(target) == null)
 			return;
 		
-		float centerX = currX + width / 2;
-		float centerY = currY + height / 2;
+		float centerX = currX + getWidth() / 2;
+		float centerY = currY + getHeight() / 2;
 		
-        double overX = ((target.width  + width ) /  2.0) - Math.abs((target.currX + target.width  / 2) - centerX);
-        double overY = ((target.height + height) /  2.0) - Math.abs((target.currY + target.height / 2) - centerY);
+        double overX = ((target.getWidth()  + getWidth() ) /  2.0) - Math.abs((target.currX + target.getWidth()  / 2) - centerX);
+        double overY = ((target.getHeight() + getHeight()) /  2.0) - Math.abs((target.currY + target.getHeight() / 2) - centerY);
        
         if(overY > overX)
         {
@@ -617,14 +612,6 @@ public class MovableObject extends GameObject
         		target.currY += overY;
         	else
         		target.currY -= overY;
-        	
-//        	float vy = target.currY - target.getPrevY();
-//        	
-//            if(vy > 0)
-//            	target.currY -= overY;
-//            else
-//        		target.currY += overY;
-//            }
         }
 	}
 	
@@ -796,8 +783,8 @@ public class MovableObject extends GameObject
 	{
 		Stage st = Stage.STAGE;
 		
-		if(x >= st.width  ||
-		   y >= st.height || 
+		if(x >= st.size.width  ||
+		   y >= st.size.height || 
 		   x < 0 ||
 		   y < 0)
 			return true;
@@ -834,6 +821,11 @@ public class MovableObject extends GameObject
 	public void halt(boolean halt)
 	{
 		this.halted = halt;
+	}
+	
+	public boolean isMoving()
+	{
+		return currX != prevX || currY != prevY;
 	}
 	
 	/**

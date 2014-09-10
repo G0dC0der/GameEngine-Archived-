@@ -94,9 +94,6 @@ public class FlyingBattery extends Stage
 		LETHAL_DAMAGE = -10;
 		used = false;
 		
-		visibleWidth = 800;
-		visibleHeight = 600;
-		
 		foreground(RenderOption.FULL, foregroundImg);
 		background(RenderOption.FULL, backgroundImg);
 
@@ -112,7 +109,7 @@ public class FlyingBattery extends Stage
 		gm.addTileEvent(Factory.pushEvent(gm, Engine.AREA_TRIGGER_2, 0.3f, Direction.E));
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		add(gm);
 		
 		GameObject dummyElectric = new GameObject();

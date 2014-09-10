@@ -122,8 +122,6 @@ public class SpiritTemple extends Stage
 		foreground(RenderOption.FULL, foregroundImg);
 		
 		basicInits();
-		visibleWidth = 800;
-		visibleHeight = 600;
 		game.zoom = 1;
 		game.angle = 0;
 		muted = true;
@@ -154,7 +152,7 @@ public class SpiritTemple extends Stage
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4,deathImg);
 		gm.deathImg.zIndex(101);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		add(gm);
 		
 		/*
@@ -480,7 +478,7 @@ public class SpiritTemple extends Stage
 				if(!angry && EntityStuff.checkLine(quaker.currX, quaker.currY, quaker.currX, 1640, gm))
 				{
 					quaker.setImage(new Frequency<>(1, quaImg));
-					game.setFocusObject(quaker);
+					game.addFocusObject(quaker);
 					gm.freeze();
 					
 					add(Factory.printText("May you be crushed to death!", null, null, 200, new PathDrone(quaker.currX - 60, quaker.currY + 90),0,0, null));
@@ -489,7 +487,7 @@ public class SpiritTemple extends Stage
 						@Override
 						public void eventHandling() 
 						{
-							game.setFocusObject(gm);
+							game.addFocusObject(gm);
 							gm.unfreeze();
 							debris.unfreeze();
 							debris2.unfreeze();

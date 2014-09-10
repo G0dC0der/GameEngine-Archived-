@@ -65,8 +65,8 @@ public class Shrapnel extends Particle
 			else
 			{
 				int splits = r.nextInt(max - min) + min,
-					width  = Stage.STAGE.width,
-					height = Stage.STAGE.height;
+					width  = Stage.STAGE.size.width,
+					height = Stage.STAGE.size.height;
 				
 				for(int i = 0; i < splits; i++)
 				{

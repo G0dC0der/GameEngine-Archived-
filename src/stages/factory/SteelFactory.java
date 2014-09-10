@@ -43,15 +43,15 @@ import com.badlogic.gdx.graphics.Color;
 public class SteelFactory extends StageBuilder
 {
 	@AutoLoad(path="res/steelfactory", type=VisualType.IMAGE)
-	public Image2D clocker[], laser[], beam[], electric[], electric2[], energy[], engine[], propeller[], zapper[], swleft[], swright[], thing[], splits[], explosion[], proj[], area, collect, saw, shutter, band, cup, cdown, cleft, mup, mdown, mleft, spikecar, spikecar2, turretimg, missileimg, pushup, stalker, metroit, goal, dummy, lobot;
+	private Image2D clocker[], laser[], beam[], electric[], electric2[], energy[], engine[], propeller[], zapper[], swleft[], swright[], thing[], splits[], explosion[], proj[], area, collect, saw, shutter, band, cup, cdown, cleft, mup, mdown, mleft, spikecar, spikecar2, turretimg, missileimg, pushup, stalker, metroit, goal, dummy, lobot;
 	
-	protected Image2D[] wind, smallExp, firingAnim, metExplode;
+	private Image2D[] wind, smallExp, firingAnim, metExplode;
 	
 	@AutoLoad(path="res/steelfactory", type=VisualType.SOUND)
-	public Sound laserremove, magicfire, magicexplode, collectsound, health, collectsound2, elpower, shut, magnetmove, magnetfinish, bam, elevator, robottalk;
+	private Sound laserremove, magicfire, magicexplode, collectsound, health, collectsound2, elpower, shut, magnetmove, magnetfinish, bam, elevator, robottalk;
 	
 	@AutoLoad(path="res/steelfactory", type=VisualType.MUSIC)
-	public Music laserloop, sawssound, collapsing, propellersound, bandmove, song;
+	private Music laserloop, sawssound, collapsing, propellersound, bandmove, song;
 	
 	private Sound tick1, tick2, boom, buzz1, buzz2, buzz3, buzz4, mfire, exp, sexp;
 	
@@ -194,7 +194,7 @@ public class SteelFactory extends StageBuilder
 		/*
 		 * Bottom saws
 		 */
-		for(int x = 55, y = 3900; x < width - 200 ; x += 282)
+		for(int x = 55, y = 3900; x < size.width - 200 ; x += 282)
 		{
 			GameObject sawObj = new GameObject();
 			sawObj.currX = x;
@@ -393,7 +393,7 @@ public class SteelFactory extends StageBuilder
 		moveMD = Factory.follow(crusherDown, magnetDown, 75, -magnetDown.height);
 		magnetDown.addEvent(moveMD);
 		
-		crusherLeft = new SolidPlatform(2400, height - 250, gm);
+		crusherLeft = new SolidPlatform(2400, size.height - 250, gm);
 		crusherLeft.setImage(cleft);
 		crusherLeft.setMoveSpeed(4);
 		
@@ -440,7 +440,7 @@ public class SteelFactory extends StageBuilder
 			discard(theWind);
 			add(Factory.soundFade(propellersound, 0, 1000, true));
 		});
-		theEngine.appendPath(30, height - 110, 0, false, ()-> theEngine.setMoveSpeed(0));
+		theEngine.appendPath(30, size.height - 110, 0, false, ()-> theEngine.setMoveSpeed(0));
 		
 		/*
 		 * Zapper
@@ -460,7 +460,7 @@ public class SteelFactory extends StageBuilder
 		zap.appendPath(1810, 3455, 0, false, ()-> zap.setMoveSpeed(6));
 		zap.appendPath(400, 3300,  0, false, ()-> zap.setMoveSpeed(3));
 		zap.appendPath(350, 3500);	
-		zap.appendPath(0, height - 40, 0, false, ()-> zap.setMoveSpeed(0));	
+		zap.appendPath(0, size.height - 40, 0, false, ()-> zap.setMoveSpeed(0));	
 		
 		/*
 		 * Top-Middle side saws
@@ -797,7 +797,7 @@ public class SteelFactory extends StageBuilder
 								
 							}
 							else
-								solp.appendPath(solp.currX - 400, height - solp.height);
+								solp.appendPath(solp.currX - 400, size.height - solp.height);
 						}
 						break;
 					case Engine.AREA_TRIGGER_4:
@@ -870,7 +870,7 @@ public class SteelFactory extends StageBuilder
 		proj.useSpecialEffect(false);
 		proj.useFastCollisionCheck(true);
 		proj.addEvent(()->proj.rotation+=6);
-		proj.setTarget(width, y);
+		proj.setTarget(size.width, y);
 		proj.setImage(metroit);
 		proj.setDisposable(true);
 		proj.setHitbox(Hitbox.CIRCLE);
@@ -893,7 +893,7 @@ public class SteelFactory extends StageBuilder
 					case 0:
 						magnetmove.play();
 						crusherDown.appendPath(4120, 3598, 0, false, ()-> crusherDown.setMoveSpeed(2.7f));
-						crusherDown.appendPath(4120, height - 176, 0, false, ()->
+						crusherDown.appendPath(4120, size.height - 176, 0, false, ()->
 						{
 							magnetfinish.play();
 							magnetDown.currX += 0.01f;

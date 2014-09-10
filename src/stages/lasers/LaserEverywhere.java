@@ -113,8 +113,8 @@ public class LaserEverywhere extends StageBuilder
 		/*
 		 * Circle pathing
 		 */
-		float mx = width / 2,
-			  my = height / 2;
+		float mx = size.width / 2,
+			  my = size.height / 2;
 		float movespeed = getSpeed();
 		
 		Circle c1 = new Circle(mx, my, 100, 0);

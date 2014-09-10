@@ -135,6 +135,26 @@ public class GameObject
 		id = new Random().nextInt();
 	}
 	
+	public float getWidth()
+	{
+		return width * scale;
+	}
+	
+	public float getHeight()
+	{
+		return height * scale;
+	}
+	
+	public float getCenterX()
+	{
+		return currX + (getWidth() / 2);
+	}
+	
+	public float getCenterY()
+	{
+		return currY + (getHeight() / 2);
+	}
+	
 	/**
 	 * Moves to the specified point, without any performing any checks at all.
 	 * @param x The X coordinate to jump to.
@@ -387,7 +407,7 @@ public class GameObject
 	
 	/**
 	 * Can be overridden to render extra stuff.
-	 * @param g The rendering context.
+	 * @param batch The rendering context.
 	 */
 	public void drawSpecial(SpriteBatch batch) {}
 	
@@ -440,8 +460,8 @@ public class GameObject
 	}
 	
 	/**
-	 * Execute the {@code HitEvent}, if exists. 
-	 * @param hitter This is the object that triggered the {@code HitEvent}.
+	 * Executes the {@code HitEvent}, if exists. 
+	 * @param hitter The object that triggered the {@code HitEvent}.
 	 */
 	public void runHitEvent(GameObject hitter)
 	{
@@ -500,11 +520,11 @@ public class GameObject
 	 */
 	public Point2D.Float getFrontPosition()
 	{
-		float locX = currX + width / 2;
-		float locY = currY + height / 2;
+		float locX = currX + getWidth() / 2;
+		float locY = currY + getHeight() / 2;
 		
-		locX += Math.cos(Math.toRadians(rotation)) * (width / 2);
-		locY += Math.sin(Math.toRadians(rotation)) * (height / 2);
+		locX += Math.cos(Math.toRadians(rotation)) * (getWidth() / 2);
+		locY += Math.sin(Math.toRadians(rotation)) * (getHeight() / 2);
 		
 		return new Point2D.Float(locX,locY);
 	}
@@ -515,11 +535,11 @@ public class GameObject
 	 */
 	public Point2D.Float getRarePosition()
 	{
-		float locX = currX + width / 2;
-		float locY = currY + height / 2;
+		float locX = currX + getWidth() / 2;
+		float locY = currY + getHeight() / 2;
 		
-		locX -= Math.cos(Math.toRadians(rotation)) * (width / 2);
-		locY -= Math.sin(Math.toRadians(rotation)) * (height / 2);
+		locX -= Math.cos(Math.toRadians(rotation)) * (getWidth() / 2);
+		locY -= Math.sin(Math.toRadians(rotation)) * (getHeight() / 2);
 		
 		return new Point2D.Float(locX,locY);
 	}
@@ -608,18 +628,18 @@ public class GameObject
 		if(!target.visible)
 			return false;
 		
-		int midX1   = (int) (target.currX + target.width / 2),
-			midY1   = (int) (target.currY + target.height / 2),
-			midX2   = (int) (currX + width / 2),
-			midY2   = (int) (currY + height / 2), 
+		int midX1   = (int) (target.currX + target.getWidth() / 2),
+			midY1   = (int) (target.currY + target.getHeight() / 2),
+			midX2   = (int) (currX + getWidth() / 2),
+			midY2   = (int) (currY + getHeight() / 2), 
 			left1   = (int) (target.currX), 
 			left2   = (int) (currX), 
-			right1  = (int) (target.currX + target.width), 
-			right2  = (int) (currX + width),
+			right1  = (int) (target.currX + target.getWidth()), 
+			right2  = (int) (currX + getWidth()),
 			top1    = (int) (target.currY),
 			top2    = (int) (currY),
-			bottom1 = (int) (target.currY + target.height), 
-			bottom2 = (int) (currY + height);
+			bottom1 = (int) (target.currY + target.getHeight()), 
+			bottom2 = (int) (currY + getHeight());
 		
 		switch (accuracy)
 		{

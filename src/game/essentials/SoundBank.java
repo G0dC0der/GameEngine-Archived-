@@ -94,7 +94,7 @@ public class SoundBank
 			
 			if(falloff && emitter != null)
 			{
-				double distance = EntityStuff.distance(emitter, Stage.STAGE.game.getFocusObject());
+				double distance = EntityStuff.distance(emitter, Stage.STAGE.game.getFocusList().get(0));
 				double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 				
 				units[index].sound.setVolume(Math.min(candidate, maxVolume));

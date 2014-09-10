@@ -7,6 +7,7 @@ import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.core.Stage;
+import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
@@ -26,6 +27,7 @@ import ui.accessories.Playable;
 
 import com.badlogic.gdx.graphics.Color;
 
+@AutoDispose
 @AutoInstall(mainPath="res/general", path="res/blocks")
 @Playable(name="Square Town", description="Stage: Square Town\nAuthor: Pojahn Moradi\nAverage time: - sec\nProfessional time: - sec\nObjective: Enter the goal.")
 public class SquareTown extends StageBuilder
@@ -35,7 +37,7 @@ public class SquareTown extends StageBuilder
 	}
 	
 	@AutoLoad(path="res/blocks", type=VisualType.IMAGE)
-	public Image2D backgroundImg, spikeyImg[], spikeyminiImg[], platformImg, crabImg[], gemImg[], yellowBlockImg, redBlockImg, eyeImg[], blockadeImg, gem2Img[], spikesnImg, spikeseImg, spikeswImg, steelBlockImg, flagPoleImg;
+	private Image2D backgroundImg, spikeyImg[], spikeyminiImg[], platformImg, crabImg[], gemImg[], yellowBlockImg, redBlockImg, eyeImg[], blockadeImg, gem2Img[], spikesnImg, spikeseImg, spikeswImg, steelBlockImg, flagPoleImg;
 	private Image2D flagImg[]; 
 	
 	private Sound collect1, collect2;
@@ -651,6 +653,5 @@ public class SquareTown extends StageBuilder
 	public void dispose() 
 	{
 		super.dispose();
-		disposeBatch(backgroundImg, spikeyImg, flagPoleImg, flagImg, platformImg, crabImg, gemImg, yellowBlockImg, redBlockImg, eyeImg, blockadeImg, gem2Img, spikesnImg, spikeseImg, spikeswImg, steelBlockImg, spikeyminiImg, collect1, collect2, crabMove1, crabMove2);
 	}
 }

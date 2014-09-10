@@ -111,7 +111,7 @@ public class Factory
 	 * @param animation The animation to manipulate the alpha on.
 	 * @return The event, which should be added to the stage and NOT a {@code GameObject}.
 	 */
-	public static Event fade(final float targetAlpha, final float strength, final int freq, final Event endEvent, final Image2D... animation)	//TODO: Rewrite, do not work.
+	public static Event fade(final float targetAlpha, final float strength, final int freq, final Event endEvent, final Image2D... animation)
 	{
 		return new Event()
 		{
@@ -857,7 +857,7 @@ public class Factory
 	 */
 	public static PathData[] randomWaypoints()
 	{
-		return randomWaypoints(0, 0, Stage.STAGE.width, Stage.STAGE.height, new Random().nextInt(100) + 100);
+		return randomWaypoints(0, 0, Stage.STAGE.size.width, Stage.STAGE.size.height, new Random().nextInt(100) + 100);
 	}
 	
 	/**
@@ -899,20 +899,20 @@ public class Factory
 		switch(dir)
 		{
 		case UP:
-			point.x = r.nextInt(Stage.STAGE.width);
+			point.x = r.nextInt(Stage.STAGE.size.width);
 			point.y = 0;
 			break;
 		case DOWN:
-			point.x = r.nextInt(Stage.STAGE.width);
-			point.y = Stage.STAGE.height - go.height;			
+			point.x = r.nextInt(Stage.STAGE.size.width);
+			point.y = Stage.STAGE.size.height - go.height;			
 			break;
 		case LEFT:
 			point.x = 0;
-			point.y = r.nextInt(Stage.STAGE.height);
+			point.y = r.nextInt(Stage.STAGE.size.height);
 			break;
 		case RIGHT:
-			point.x = Stage.STAGE.width - go.width;
-			point.y = r.nextInt(Stage.STAGE.height);
+			point.x = Stage.STAGE.size.width - go.width;
+			point.y = r.nextInt(Stage.STAGE.size.height);
 			break;
 		}
 		

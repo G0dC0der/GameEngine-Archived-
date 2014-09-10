@@ -1,6 +1,7 @@
 package game.essentials;
 
 import static game.core.Engine.*;
+import game.core.GameObject;
 import game.core.Stage;
 
 import java.io.File;
@@ -19,6 +20,11 @@ import kuusisto.tinysound.TinySound;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -292,5 +298,34 @@ public class Utilities
 	        fields = getAllFields(fields, type.getSuperclass());
 	    
 	    return fields;
+	}
+	
+	public static GameObject readTMX(final String path)
+	{
+		return new GameObject()
+		{
+			TiledMap map = new TmxMapLoader().load(path);
+			OrthogonalTiledMapRenderer r;
+			
+			@Override
+			public void drawSpecial(SpriteBatch batch) 
+			{
+				if(r == null)
+				{
+					r = new OrthogonalTiledMapRenderer(map, batch)
+					{
+						@Override
+						protected void beginRender() {}
+						
+						@Override
+						protected void endRender() {}
+					};
+				}
+				
+				AnimatedTiledMapTile.updateAnimationBaseTime();
+				r.setView(Stage.STAGE.game.getCamera());
+				r.render();
+			}
+		};
 	}
 }

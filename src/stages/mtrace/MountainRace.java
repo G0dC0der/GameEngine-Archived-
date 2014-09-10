@@ -26,6 +26,7 @@ import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 @AutoInstall(mainPath="res/general", path="res/mtrace")
 @Playable(name="Mountain Race", description="Stage: Mountain Race\nAuthor: Pojahn Moradi\nDifficulty: 5\nAverage time: 100 sec\nProfessional time: 70 sec\nObjective: Race to the finish.")
@@ -43,6 +44,8 @@ public class MountainRace extends StageBuilder
 	private Sound bouncesound, contjump1, contjump2, contjump3;
 	private Music blow;
 	
+	Image2D dot;
+	
 	private PressedButtons[] replay1, replay2, replay3;
 	
 	@Override
@@ -52,7 +55,7 @@ public class MountainRace extends StageBuilder
 		try
 		{
 			super.init();
-			
+			dot = new Image2D("C:/dot.png");
 			bouncesound = TinySound.loadSound(new File(("res/mtrace/bouncesound.wav")));
 			contjump1 = TinySound.loadSound(new File(("res/general/jump.wav")));
 			contjump2 = TinySound.loadSound(new File(("res/general/jump.wav")));
@@ -83,6 +86,18 @@ public class MountainRace extends StageBuilder
 		super.build();
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		gm.zIndex(50);
+		gm.flyMode(5);
+		
+		GameObject g = new GameObject()
+		{
+			@Override
+			public void drawSpecial(SpriteBatch batch) 
+			{
+				batch.draw(dot, game.x, game.y, game.w, game.h);
+			}
+		};
+		g.setVisible(true);
+		add(g);
 		
 		/*
 		 * Contestants
@@ -165,6 +180,8 @@ public class MountainRace extends StageBuilder
 		});
 		add(Factory.soundFalloff(contjump3, ghost3, gm, 500, 0, 20,1));
 		add(ghost1,ghost2,ghost3);
+		
+		game.addFocusObject(ghost2);
 		
 		/*
 		 * One-Way clouds

@@ -154,8 +154,8 @@ public abstract class StageBuilder extends Stage
 			stageData = Utilities.createStageData(stageImage);
 			basicInits();
 			
-			visibleWidth = 800;
-			visibleHeight = 600;
+			view.width = 800;
+			view.height = 600;
 			
 			if(backgroundImg != null)
 			{
@@ -186,7 +186,7 @@ public abstract class StageBuilder extends Stage
 			gm.deathImg = new Particle();
 			gm.deathImg.setImage(4,deathImg);
 			gm.deathImg.zIndex(101);
-			game.setFocusObject(gm);
+			game.addFocusObject(gm);
 			add(gm);
 		}
 	}
@@ -194,7 +194,48 @@ public abstract class StageBuilder extends Stage
 	@Override
 	public void dispose() 
 	{
-		disposeBatch(backgroundImg, foregroundImg, deathImg, mainImage, extraHp, jump, stageImage, music);
+		Field[] fields = this.getClass().getDeclaredFields();
+		
+		if(getClass().isAnnotationPresent(AutoDispose.class))
+		{
+			for(Field field : fields)
+			{
+				field.setAccessible(true);
+				try 
+				{
+					disposeBatch(field.get(this));
+				} 
+				catch (IllegalArgumentException | IllegalAccessException e) 
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else
+		{
+			disposeBatch(backgroundImg, foregroundImg, deathImg, mainImage, extraHp, jump, stageImage, music);
+			
+			for(Field field : fields)
+			{
+				field.setAccessible(true);
+				
+				Annotation[] ans = field.getDeclaredAnnotations();
+				for(Annotation an : ans)
+				{
+					if(an instanceof AutoDispose)
+					{
+						try 
+						{
+							disposeBatch(field.get(this));
+						} 
+						catch (IllegalArgumentException | IllegalAccessException e) 
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	private static String fixPath(String path)

@@ -23,10 +23,10 @@ public class EntityStuff
 	 */
 	public static final boolean rectangleVsRecganlte(GameObject rec1, GameObject rec2)
 	{
-		if ((rec1.currY + rec1.height < rec2.currY) ||
-	        (rec1.currY > rec2.currY + rec2.height) ||
-	        (rec1.currX + rec1.width < rec2.currX)  ||
-	        (rec1.currX > rec2.currX + rec2.width))
+		if ((rec1.currY + (rec1.height * rec1.scale) < rec2.currY) ||
+	        (rec1.currY > rec2.currY + (rec2.height * rec2.scale)) ||
+	        (rec1.currX + (rec1.width * rec1.scale) < rec2.currX)  ||
+	        (rec1.currX > rec2.currX + (rec2.width * rec2.scale)))
 	        return false;
 		return true;
 	}
@@ -41,13 +41,13 @@ public class EntityStuff
 	public static boolean rotatedRectanglesCollision(GameObject rec1, GameObject rec2)
 	{
 		RotRect rr1 = new RotRect();
-		rr1.C = new Vector2(rec1.currX + rec1.width / 2, rec1.currY + rec1.height / 2);
-		rr1.S = new Vector2(rec1.width / 2, rec1.height / 2);
+		rr1.C = new Vector2(rec1.currX + (rec1.width * rec1.scale) / 2, rec1.currY + (rec1.height * rec1.scale) / 2);
+		rr1.S = new Vector2((rec1.width * rec1.scale) / 2, (rec1.height * rec1.scale) / 2);
 		rr1.ang = (float) Math.toRadians(rec1.rotation);
 		
 		RotRect rr2 = new RotRect();
-		rr2.C = new Vector2(rec2.currX + rec2.width / 2, rec2.currY + rec2.height / 2);
-		rr2.S = new Vector2(rec2.width / 2, rec2.height / 2);
+		rr2.C = new Vector2(rec2.currX + (rec2.width * rec2.scale) / 2, rec2.currY + (rec2.height * rec2.scale) / 2);
+		rr2.S = new Vector2((rec2.width * rec2.scale) / 2, (rec2.height * rec2.scale) / 2);
 		rr2.ang = (float) Math.toRadians(rec2.rotation);
 		
 		Vector2 A,B,C,BL,TR;
@@ -161,18 +161,18 @@ public class EntityStuff
 	 */
 	public static boolean circleVsRectangle(GameObject circle, GameObject rect)
 	{
-	    float circleDistanceX = Math.abs((circle.currX + circle.width  / 2) - (rect.currX + rect.width  / 2));
-	    float circleDistanceY = Math.abs((circle.currY + circle.height / 2) - (rect.currY + rect.height / 2));
+	    float circleDistanceX = Math.abs((circle.currX + circle.getWidth()  / 2) - (rect.currX + rect.getWidth()  / 2));
+	    float circleDistanceY = Math.abs((circle.currY + circle.getHeight() / 2) - (rect.currY + rect.getHeight() / 2));
 	    float radius = circle.width / 2;
 
-	    if (circleDistanceX > (rect.width/2 + radius) || (circleDistanceY > (rect.height/2 + radius)))
+	    if (circleDistanceX > (rect.getWidth() / 2 + radius) || (circleDistanceY > (rect.getHeight() / 2 + radius)))
 	    	return false;
 	    
-	    if ((circleDistanceX <= (rect.width/2)) || (circleDistanceY <= (rect.height/2)))
+	    if ((circleDistanceX <= (rect.getWidth() / 2)) || (circleDistanceY <= (rect.getHeight() / 2)))
 	    	return true;
 
-	    double cornerDistance_sq = Math.pow(circleDistanceX - rect.width /2, 2) +
-	                               Math.pow(circleDistanceY - rect.height/2, 2);
+	    double cornerDistance_sq = Math.pow(circleDistanceX - rect.getWidth() /2, 2) +
+	                               Math.pow(circleDistanceY - rect.getHeight()/2, 2);
 
 	    return (cornerDistance_sq <= (radius * radius));
 	}
@@ -221,12 +221,12 @@ public class EntityStuff
 	 */
 	public static boolean circleVsCircle(GameObject c1, GameObject c2)
 	{
-		float x1 = c1.currX + c1.width  / 2,
-			  y1 = c1.currY + c1.height / 2,
-			  x2 = c2.currX + c2.width  / 2,
-			  y2 = c2.currY + c2.height / 2,
-			  r1 = c1.width / 2,
-			  r2 = c2.width / 2;
+		float x1 = c1.currX + c1.getWidth()  / 2,
+			  y1 = c1.currY + c1.getHeight() / 2,
+			  x2 = c2.currX + c2.getWidth()  / 2,
+			  y2 = c2.currY + c2.getHeight() / 2,
+			  r1 = c1.getWidth() / 2,
+			  r2 = c2.getHeight() / 2;
 
 	    float dx = x2 - x1;
 	    float dy = y2 - y1;
@@ -255,13 +255,27 @@ public class EntityStuff
 		int bottom = (int) Math.min(obj1.currY + obj1.height, obj2.currY + obj2.height);
 		int left   = (int) Math.max(obj1.currX, obj2.currX);
 		int right  = (int) Math.min(obj1.currX + obj1.width, obj2.currX + obj2.width);
+		
+		boolean flipped1 = image1.isFlipX();
+		boolean flipped2 = image2.isFlipX();
 
 		for (int y = top; y < bottom; y++)
 		{
 			for (int x = left; x < right; x++)
 			{
-				int colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
-				int colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
+				int colorA;
+				int colorB;
+				
+				if(flipped1)
+					colorA = image1.getColor((int)(obj1.width - (x - obj1.currX) - 1), (int) (y - obj1.currY));
+				else
+					colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
+				
+				if(flipped2)
+					colorB = image2.getColor((int)(obj2.width - (x - obj2.currX) - 1), (int) (y - obj2.currY));
+				else
+					colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
+				
 				if (colorA != 0 && colorB != 0)
 					return true;
 			}
@@ -370,9 +384,9 @@ public class EntityStuff
 	 */
 	public static boolean circleVsLine(float Ax, float Ay, float Bx, float By, GameObject circle)
 	{
-		float r = circle.width / 2;
+		float r = circle.getWidth() / 2;
 		float Cx = circle.currX + r;
-		float Cy = circle.currY + circle.height / 2;
+		float Cy = circle.currY + circle.getHeight() / 2;
 		
 		double LAB = Math.sqrt((Bx-Ax)*(Bx-Ax) + (By-Ay)*(By-Ay));
 		double Dx = (Bx-Ax)/LAB;
@@ -582,8 +596,8 @@ public class EntityStuff
 		{
 			if(lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX + go.width, go.currY)              			||
 			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX, go.currY + go.height)             			||
-			   lineIntersect(x1,y1,x2,y2, go.currX + go.width, go.currY, go.currX + go.width, go.currY + go.height) ||
-			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY + go.height, go.currX + go.width, go.currY + go.height))
+			   lineIntersect(x1,y1,x2,y2, go.currX + go.width, go.currY, go.currX + go.getWidth(), go.currY + go.getHeight()) ||
+			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY + go.height, go.currX + go.getWidth(), go.currY + go.getHeight()))
 				return true;
 					
 			return false;
@@ -646,7 +660,7 @@ public class EntityStuff
 	 */
 	public static double distance(GameObject go1, GameObject go2)
 	{
-		return EntityStuff.distance(go1.currX + go1.width / 2, go1.currY + go1.height / 2, go2.currX + go2.width / 2, go2.currY + go2.height / 2);
+		return EntityStuff.distance(go1.currX + go1.getWidth() / 2, go1.currY + go1.getHeight() / 2, go2.currX + go2.getWidth() / 2, go2.currY + go2.getHeight() / 2);
 	}
 	
 	/**
@@ -667,8 +681,8 @@ public class EntityStuff
 	 */
 	public static Point2D.Float findEdgePoint(float obsX, float obsY, float tarX, float tarY)
 	{
-		int width  = Stage.STAGE.width;
-		int height = Stage.STAGE.height;
+		int width  = Stage.STAGE.size.width;
+		int height = Stage.STAGE.size.height;
 		
 		Point2D.Float obs = new Point2D.Float(obsX, obsY);
 		Point2D.Float tar = new Point2D.Float(tarX, tarY);

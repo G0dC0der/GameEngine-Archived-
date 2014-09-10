@@ -227,7 +227,7 @@ public class Sandopolis extends StageBuilder
 				spikeBall.enableGravity(true);
 			}
 		});
-		spikeBall.appendPath(3114, height - spikeBall.height, 0, false, new Event()
+		spikeBall.appendPath(3114, size.height - spikeBall.height, 0, false, new Event()
 		{	
 			@Override
 			public void eventHandling() 
@@ -236,7 +236,7 @@ public class Sandopolis extends StageBuilder
 				falling = true;
 			}
 		});
-		spikeBall.appendPath(3114, height, 0, false, null);
+		spikeBall.appendPath(3114, size.height, 0, false, null);
 		spikeBall.appendPath(4300, 425, 0, true, new Event()
 		{	
 			@Override
@@ -259,7 +259,7 @@ public class Sandopolis extends StageBuilder
 				smallSpike.enableGravity(true);
 			}
 		});
-		smallSpike.appendPath(3114, height - smallSpike.height, 0, false, new Event()
+		smallSpike.appendPath(3114, size.height - smallSpike.height, 0, false, new Event()
 		{	
 			@Override
 			public void eventHandling() 
@@ -268,7 +268,7 @@ public class Sandopolis extends StageBuilder
 				falling2 = true;
 			}
 		});
-		smallSpike.appendPath(3114, height, 0, false, null);
+		smallSpike.appendPath(3114, size.height, 0, false, null);
 		smallSpike.appendPath(4300, 456, 0, true, new Event()
 		{	
 			@Override

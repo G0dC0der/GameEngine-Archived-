@@ -66,7 +66,7 @@ public class TraningStage1 extends AbstractTraningStage
 	{
 		super.build();
 		
-		collectedCrystals = 0;
+		crystals = collectedCrystals = 0;
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		setPeople(gm);
 		

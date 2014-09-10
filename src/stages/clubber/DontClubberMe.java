@@ -88,9 +88,6 @@ public class DontClubberMe extends Stage
 		counter = 0;
 		collected1 = collected2 = collected3 = collected4 = false;
 		
-		visibleWidth = 800;
-		visibleHeight = 600;
-
 		background(RenderOption.PORTION,backgroundImg);
 		foreground(RenderOption.PORTION,foregroundImg);
 
@@ -102,7 +99,7 @@ public class DontClubberMe extends Stage
 		gm.setJumpingSound(jump);
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
-		game.setFocusObject(gm);
+		game.addFocusObject(gm);
 		gm.currX = startX;
 		gm.currY = startY;
 		add(gm);

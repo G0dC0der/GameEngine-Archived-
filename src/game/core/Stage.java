@@ -8,6 +8,7 @@ import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -94,24 +95,14 @@ public abstract class Stage
 	public byte[][] stageData;
 	
 	/**
-	 * This is the width of the stage. It is usually set automatically.
+	 * The size of the stage.
 	 */
-	public int width;
+	public Dimension size;
 	
 	/**
-	 * This is the height of the stage. It is usually set automatically.
+	 * This is the size of the game window. Can be manually set during development but can not be changed at runtime.
 	 */
-	public int height;
-	
-	/**
-	 * This is the width of the game window. Can be manually set during development but can not be changed at runtime.
-	 */
-	public int visibleWidth;
-	
-	/**
-	 * This is the height of the game window. Can be manually set during development but can not be changed at runtime.
-	 */
-	public int visibleHeight;
+	public Dimension view;
 	
 	/**
 	 * A reference to the engine.
@@ -146,7 +137,9 @@ public abstract class Stage
 		mains          = new LinkedList<>();
 		trash		   = new LinkedList<>();
 		events 		   = new LinkedList<>();
-		visibleWidth = visibleHeight = startX = startY = -1;
+		startX = startY = -1;
+		size = new Dimension();
+		view = new Dimension(800, 600);
 	}
 	
 	/**
@@ -177,14 +170,8 @@ public abstract class Stage
 	 */
 	public void basicInits()
 	{
-		width = stageData[0].length;
-		height = stageData.length;
-		
-		if(visibleWidth == -1 || visibleHeight == -1)
-		{
-			visibleWidth  = width;
-			visibleHeight = height;
-		}
+		size.width = stageData[0].length;
+		size.height = stageData.length;
 		
 		if(startX == -1 || startY == -1)
 			for (int i = 0; i < stageData.length; i++)
@@ -584,8 +571,8 @@ public abstract class Stage
 	{
 		stageClone = new byte[stageData.length][stageData[0].length];
 		
-		for(int x = 0; x < width; x++)
-			for(int y = 0; y < height; y++)
+		for(int x = 0; x < size.width; x++)
+			for(int y = 0; y < size.height; y++)
 				stageClone[y][x] = stageData[y][x];
 	}
 	
@@ -621,8 +608,8 @@ public abstract class Stage
 				case PORTION:
 					OrthographicCamera camera = STAGE.game.getCamera();
 					Engine e = STAGE.game;
-					int vw = Stage.STAGE.visibleWidth;
-					int vh = Stage.STAGE.visibleHeight;
+					int vw = Stage.STAGE.view.width;
+					int vh = Stage.STAGE.view.height;
 					
 					camera.up.set(0, 1, 0);
 					camera.direction.set(0, 0, -1);

@@ -12,6 +12,7 @@ import game.essentials.Utilities;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -262,6 +263,11 @@ public final class Engine implements Screen
 	public float angle;
 	
 	/**
+	 * The padding to use when zooming out.
+	 */
+	public int focusPadding = 20;
+	
+	/**
 	 * The amount of milliseconds that have passed since last death or first start.
 	 */
 	public int elapsedTime;
@@ -269,7 +275,7 @@ public final class Engine implements Screen
 	/*
 	 * Private fields
 	 */
-	GameObject focus;
+	List<GameObject> focusObjs;
 	Stage stage;
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
@@ -302,6 +308,7 @@ public final class Engine implements Screen
 		currTint = new Color(defaultTint);
 		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
 		justRestarted = true;
+		focusObjs = new ArrayList<>();
 		
 		if(replays == null)
 		{
@@ -377,15 +384,6 @@ public final class Engine implements Screen
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		}
 		
-		if(focus != null)
-		{
-			float focusX = focus.currX + focus.width  / 2,
-			      focusY = focus.currY + focus.height / 2;
-			
-			tx = Math.min(stage.width  - stage.visibleWidth,   Math.max(0, focusX - stage.visibleWidth  / 2)) + stage.visibleWidth  / 2; 
-			ty = Math.min(stage.height - stage.visibleHeight,  Math.max(0, focusY - stage.visibleHeight / 2)) + stage.visibleHeight / 2;
-		}
-		
 		if(vertSpeed > 0)
 			moveVert();
 		if(horSpeed > 0)
@@ -424,7 +422,7 @@ public final class Engine implements Screen
 			}
 		}
 		
-		camera.position.set(stage.visibleWidth / 2, stage.visibleHeight / 2, 0);
+		camera.position.set(stage.view.width / 2, stage.view.height / 2, 0);
 		camera.zoom = 1;
 		camera.rotate(-angle);
 		camera.update();
@@ -435,12 +433,12 @@ public final class Engine implements Screen
 		if(globalState == GameState.ENDED)
 		{
 			if(!replayHelp && !playReplay)
-				timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", stage.visibleWidth / 2 - 320, stage.visibleHeight / 2);
+				timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", stage.view.width / 2 - 320, stage.view.height / 2);
 			else
-				timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.visibleWidth / 2 - 230, stage.visibleHeight / 2);
+				timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.view.width / 2 - 230, stage.view.height / 2);
 		}
 		else if(replayHelp)
-			timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.visibleWidth / 2 - 230, stage.visibleHeight / 2);
+			timeFont.draw(batch, "Press 'B' to return to the main menu.", stage.view.width / 2 - 230, stage.view.height / 2);
 		
 		if(showFps)
 		{
@@ -448,7 +446,7 @@ public final class Engine implements Screen
 				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
 			
 			fpsFont.setColor(Color.WHITE);
-			fpsFont.draw(batch, fps + " fps", stage.visibleWidth - 60, 5);
+			fpsFont.draw(batch, fps + " fps", stage.view.width - 60, 5);
 		}
 			
 		batch.end();
@@ -492,6 +490,9 @@ public final class Engine implements Screen
 		}
 		
 		stage.moveEnemies();
+		
+		updateCamera();
+		
 		stage.extra();
 
 		SoundBank.FRAME_COUNTER++;
@@ -511,10 +512,10 @@ public final class Engine implements Screen
 		stage.build();
 
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera(stage.visibleWidth, stage.visibleHeight);
-		camera.setToOrtho(true,stage.visibleWidth, stage.visibleHeight);
+		camera = new OrthographicCamera(stage.view.width, stage.view.height);
+		camera.setToOrtho(true,stage.view.width, stage.view.height);
 
-		Gdx.graphics.setDisplayMode(stage.visibleWidth, stage.visibleHeight, false);
+		Gdx.graphics.setDisplayMode(stage.view.width, stage.view.height, false);
 		ShaderProgram.pedantic = false;
 		
 		Gdx.input.setInputProcessor(new InputAdapter()
@@ -575,25 +576,25 @@ public final class Engine implements Screen
 	}
 	
 	/**
-	 * This function allow you to determine which {@code GameObject} the game should focus on. <br>
+	 * This function allow you to determine which {@code GameObjects} the game should focus on. <br>
 	 * The screen will follow the specified {@code GameObject} whenever it moves. <br>
 	 * This is usual set to the main character.<br><br>
 	 * 
-	 * This function will only work if {@code autoTranslate} is set to true.
+	 * If set, tx, ty and possibly scale will be modified.
 	 * @param focus The {@code GameObject} to follow.
 	 */
-	public void setFocusObject(GameObject focus)
+	public void addFocusObject(GameObject focus)
 	{
-		this.focus = focus;
+		focusObjs.add(focus);
 	}
 
 	/**
-	 * Returns the focus object.
-	 * @return The focus object.
+	 * Returns the focus objects. Remove objects by clearing them from the returned list.
+	 * @return The focus objects.
 	 */
-	public GameObject getFocusObject()
+	public List<GameObject> getFocusList()
 	{
-		return focus;
+		return focusObjs;
 	}
 	
 	public boolean isKeyPressed(int key)
@@ -662,7 +663,7 @@ public final class Engine implements Screen
 	 */
 	public void clearTransformation()
 	{
-		camera.position.set(stage.visibleWidth / 2, stage.visibleHeight / 2, 0);
+		camera.position.set(stage.view.width / 2, stage.view.height / 2, 0);
 		camera.zoom = 1;
 		camera.rotate(-angle);
 		camera.update();
@@ -749,6 +750,78 @@ public final class Engine implements Screen
 		replays.get(index).add(pbs);
 	}
 	
+	private void updateCamera()
+	{
+		final int size = focusObjs.size();
+		final GameObject first = focusObjs.get(0);
+		
+		if(size == 1)
+		{
+			tx = Math.min(stage.size.width  - stage.view.width,   Math.max(0, first.getCenterX() - stage.view.width  / 2)) + stage.view.width  / 2; 
+			ty = Math.min(stage.size.height - stage.view.height,  Math.max(0, first.getCenterY() - stage.view.height / 2)) + stage.view.height / 2;
+		}
+		else if(size > 1)
+		{
+			final float marginX = stage.view.width  / 2;
+			final float marginY = stage.view.height / 2;
+			
+			float boxX	= first.currX;
+			float boxY	= first.currY; 
+			float boxWidth	= boxX + first.getWidth();
+			float boxHeight	= boxY + first.getHeight();
+
+			for(int i = 1; i < focusObjs.size(); i++)
+			{
+				GameObject focus = focusObjs.get(i);
+				
+				boxX = Math.min( boxX, focus.currX );
+				boxY = Math.min( boxY, focus.currY );
+				
+				boxWidth  = Math.max( boxWidth,  focus.currX + focus.getWidth () );
+				boxHeight = Math.max( boxHeight, focus.currY + focus.getHeight() );
+			}
+			boxWidth = boxWidth - boxX;
+			boxHeight = boxHeight - boxY;
+			
+			boxX -= focusPadding;
+			boxY -= focusPadding;
+			boxWidth  += focusPadding * 2;
+			boxHeight += focusPadding * 2;
+			
+			boxX = Math.max( boxX, 0 );
+			boxX = Math.min( boxX, stage.size.width - boxWidth ); 			
+
+			boxY = Math.max( boxY, 0 );
+			boxY = Math.min( boxY, stage.size.height - boxHeight );
+			
+			if(boxWidth > boxHeight)
+				zoom = boxWidth / stage.view.width;
+			else
+				zoom = boxHeight / stage.view.height;
+			
+			zoom = Math.max( zoom, 1.0f );
+
+			tx = boxX + ( boxWidth  / 2 );
+			ty = boxY + ( boxHeight / 2 );
+			
+			if(marginX > tx)
+				tx = marginX;
+			else if(tx > stage.size.width - marginX)
+				tx = stage.size.width - marginX;
+			
+			if(marginY > ty)
+				ty = marginY;
+			else if(ty > stage.size.height - marginY)
+				ty = stage.size.height - marginY;
+			
+			x = boxX;
+			y = boxY;
+			w = boxWidth;
+			h = boxHeight;
+		}
+	}
+	public float x, y, w, h;
+	
 	private void restart()
 	{
 		justRestarted =  increasingScale = true;
@@ -759,6 +832,7 @@ public final class Engine implements Screen
 		horValue = vertValue = DELTA_VALUE = 0;
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
+		focusObjs.clear();
 		
 		if(!playReplay)
 		{
@@ -906,7 +980,7 @@ public final class Engine implements Screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		timeFont.setColor(Color.WHITE);
-		timeFont.draw(batch, "Game is paused.", stage.visibleWidth / 2 - 120, stage.visibleHeight / 2);
+		timeFont.draw(batch, "Game is paused.", stage.view.width / 2 - 120, stage.view.height / 2);
 		renderStatusBar();
 	}
 	

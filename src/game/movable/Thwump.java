@@ -372,7 +372,7 @@ public final class Thwump extends Enemy
 				scanDummy.currX = x1;
 				scanDummy.currY = currY + height;
 				scanDummy.width = width;
-				scanDummy.height = Stage.STAGE.height - currY - height;
+				scanDummy.height = Stage.STAGE.size.height - currY - height;
 				break;
 			case W:
 				scanDummy.currX = 0;
@@ -383,7 +383,7 @@ public final class Thwump extends Enemy
 			case E:
 				scanDummy.currX = currX + width;
 				scanDummy.currY = currY;
-				scanDummy.width = Stage.STAGE.width - currX - width;
+				scanDummy.width = Stage.STAGE.size.width - currX - width;
 				scanDummy.height = height;
 				break;
 			default:
