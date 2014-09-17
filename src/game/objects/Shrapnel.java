@@ -11,7 +11,6 @@ import java.util.Random;
 /**
  * A {@code Shrapnel} is a special type of {@code Particle} that spawns a bunch of projectiles(splits), flying in all directions.
  * @author Pojahn Moradi 
- *
  */
 public class Shrapnel extends Particle
 {
@@ -106,7 +105,7 @@ public class Shrapnel extends Particle
 	}
 	
 	/**
-	 * Causes the splits to be launched at N, NE, E, SE, S, SW, W and NW(meaning 8 sharpnels will be spawned upon the particle impact).<br>
+	 * Causes the splits to be launched at N, NE, E, SE, S, SW, W and NW(meaning 8 sharpnels will be spawned upon the impact).<br>
 	 * This is used by default.
 	 */
 	public void useSplitExplosion()

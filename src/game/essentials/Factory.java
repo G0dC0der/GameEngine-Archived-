@@ -13,18 +13,14 @@ import game.core.Stage;
 import game.mains.GravityMan;
 import game.movable.PathDrone;
 import game.movable.PathDrone.PathData;
-
 import java.awt.geom.Point2D;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -35,25 +31,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  *
  */
 public class Factory 
-{
-	private static Image2D[] LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE;
-	
-	static
-	{
-		try
-		{
-			LASER_BEAM = Image2D.loadImages(new File("res/data/laser"),false);
-			LASER_BEGIN = Image2D.loadImages(new File("res/data/laser/rear"),false);
-			LASER_IMPACT = Image2D.loadImages(new File("res/data/laser/end"),false);
-			LASER_CHARGE = Image2D.loadImages(new File("res/data/charge"),false);
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to load laser resources.");
-			e.printStackTrace();
-		}
-	}
-	
+{	
 	/**
 	 * Chains the given set of sounds, playing them after each other.
 	 * @param indexes Indexes to the sound array.
@@ -301,7 +279,7 @@ public class Factory
 	}
 	
 	/**
-	 * Creates an {@code EffectEvent} that prints text on the screen.
+	 * Prints text on the given {@code GameObject}.
 	 * @param text The text to print.
 	 * @param textColor The text color. Null is accepted.
 	 * @param font The font to use. 
@@ -355,7 +333,7 @@ public class Factory
 	 * @param yMin The minimum Y position of the wobble.
 	 * @param yMax The maximum Y position of the wobble.
 	 * @param freq How often to add the wobble effect.
-	 * @return
+	 * @return The event.
 	 */
 	public static Event wobble(final GameObject go, final float xMin, final float xMax, final float yMin, final float yMax, final float freq)
 	{
@@ -598,8 +576,7 @@ public class Factory
 	}
 	
 	/**
-	 * Prints the specified text when the printer collides with one of the subjects.
-	 * @param printer The GameObject that prints the text.
+	 * Prints the specified text when the returned {@code GameObject} collides with one of the subjects.
 	 * @param text The text to print.
 	 * @param textColor The color to use. If null is used, the current color of the graphic context will be used.
 	 * @param font The font to use.
@@ -607,9 +584,9 @@ public class Factory
 	 * @param ox The x offset of the text.
 	 * @param oy The y offset of the text.
 	 * @param subjects The {@code GameObjects} that can trigger this event.
-	 * @return The effect event.
+	 * @return The printer object.
 	 */
-	public static GameObject textPrinter(final GameObject printer, final String text, final Color textColor, final BitmapFont font, final int textDuration, final int ox, final int oy, final GameObject... subjects)
+	public static GameObject textPrinter(final String text, final Color textColor, final BitmapFont font, final int textDuration, final int ox, final int oy, final GameObject... subjects)
 	{
 		return new GameObject()
 		{
@@ -625,12 +602,12 @@ public class Factory
 					if(textColor != null)
 						f.setColor(textColor);
 					
-					f.draw(b, text, printer.currX + ox, printer.currY + oy);
+					f.draw(b, text, currX + ox, currY + oy);
 				}
 				else
 				{
 					for(GameObject go : subjects)
-						if(go.collidesWith(printer))
+						if(collidesWith(go))
 						{
 							counter = textDuration;
 							break;
@@ -720,7 +697,7 @@ public class Factory
 	 * Returns a laser beam with customized look.<br>
 	 * Each of the parameters accept null, which means "skip rendering this part".
 	 * @param laserBegin The "gunfire" animation, which will be rendered at the source coordinate.
-	 * @param laserBeam The actual laser beam. This should be a rectangular image and is stretched and rotated to target the destination coordinate.
+	 * @param laserBeam The actual laser beam. This should be a rectangular image and is stretched and rotated to target destination coordinate.
 	 * @param laserImpact The animation to render at the destination point.
 	 * @return The beam.
 	 */
@@ -861,8 +838,8 @@ public class Factory
 	}
 	
 	/**
-	 *  Return an array of random waypoints, where the coordinate simulates a bouncing effect.<br>
-	 *  For example, the first coordinate can be a the left most, and the second coordinate can be either right most, up most or down most.
+	 * Return an array of random waypoints, where the coordinate simulates a bouncing effect.<br>
+	 * For example, the first coordinate can be a the left most, and the second coordinate can be either right most, up most or down most.
 	 * @param go The object that will use these waypoints.
 	 * @return The data.
 	 */

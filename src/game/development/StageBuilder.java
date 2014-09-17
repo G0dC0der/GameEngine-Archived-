@@ -157,14 +157,14 @@ public abstract class StageBuilder extends Stage
 			if(backgroundImg != null)
 			{
 				GameObject wrapper = new GameObject();
-				wrapper.setImage(backgroundImg);
+				wrapper.setImage(3,backgroundImg);
 				wrapper.zIndex(-100);
 				add(wrapper);
 			}
 			if(foregroundImg != null)
 			{
 				GameObject wrapper = new GameObject();
-				wrapper.setImage(foregroundImg);
+				wrapper.setImage(3,foregroundImg);
 				wrapper.zIndex(100);
 				add(wrapper);
 			}

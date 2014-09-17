@@ -34,7 +34,8 @@ public class Particle extends GameObject implements Event
 	}
 	
 	/**
-	 * Constructs a {@code Particle} with no capabilities to interact with {@code GameObjects}.
+	 * Constructs a {@code Particle} with no capabilities to interact with {@code GameObjects}.<br>
+	 * The position of the {@code Particle} will later be set when cloning it.
 	 */
 	public Particle()
 	{

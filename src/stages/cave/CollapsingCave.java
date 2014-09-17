@@ -168,6 +168,7 @@ public class CollapsingCave extends Stage
 			drill.setMoveSpeed(.1f);
 			camera.unfreeze();
 			game.addFocusObject(camera);
+			game.removeFocusObject(drill);
 			add(dust);
 		});
 		drill.appendPath(547, -100, Integer.MAX_VALUE, false, () ->
@@ -192,7 +193,7 @@ public class CollapsingCave extends Stage
 		
 		Enemy bottomPart = new PathDrone(0,0);
 		bottomPart.addEvent(Factory.follow(drill, bottomPart, 17, 160));
-		bottomPart.setImage(bottomImg);
+		bottomPart.setImage(1,bottomImg);
 		bottomPart.setHitbox(Hitbox.EXACT);
 		
 		gm.avoidOverlapping(middlePart, bottomPart);
@@ -315,6 +316,7 @@ public class CollapsingCave extends Stage
 			if(EntityStuff.distance(camera, gm) < 200)
 			{
 				done = true;
+				game.removeFocusObject(camera);
 				game.addFocusObject(gm);
 				gm.unfreeze();
 			}

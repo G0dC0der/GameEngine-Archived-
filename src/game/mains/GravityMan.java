@@ -367,11 +367,6 @@ public class GravityMan extends MainCharacter
 		blockInput = true;
 	}
 	
-	public void flyMode(int flySpeed)
-	{
-		this.flySpeed = flySpeed;
-	}
-	
 	/**
 	 * Reenables the control of the character.
 	 */
@@ -379,6 +374,15 @@ public class GravityMan extends MainCharacter
 	public void unfreeze()
 	{
 		blockInput = false;
+	}
+	
+	/**
+	 * Allow the character to fly, for debugging purposes.
+	 * @param flySpeed The fly speed. 0 to disable.
+	 */
+	public void flyMode(int flySpeed)
+	{
+		this.flySpeed = flySpeed;
 	}
 	
 	protected boolean canSlopeLeft(float targetX)

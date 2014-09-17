@@ -5,13 +5,11 @@ import game.core.Engine.Direction;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -36,7 +34,7 @@ public class GameObject
 	
 	/**
 	 * A {@code HitEvent} is triggered by objects that have internal collision detections.
-	 * See a code example on how to use HitEvents.
+	 * Reefer to the tutorials on usage.
 	 */
 	@FunctionalInterface
 	public interface HitEvent
@@ -80,23 +78,21 @@ public class GameObject
 	
 	/**
 	 * The objects image size will multiply with this value when rendering. Defaults to 1. <br><br>
-	 * 
-	 * Note that scaling do not effect the objects hitbox.
 	 */
 	public float scale;
 	
 	/**
-	 * The units width.
+	 * The units width. Should be equal to the image width.
 	 */
 	public float width;
 	
 	/**
-	 * The units height.
+	 * The units height. Should be equal to the image height.
 	 */
 	public float height;
 	
 	/**
-	 * The relative X offset of the objects image.
+	 * The relative X offset of the objects image.<br>
 	 */
 	public float offsetX;
 	
@@ -121,7 +117,7 @@ public class GameObject
 	LinkedList<Event> removeQueue;
 	
 	/**
-	 * Constructs a {@code GameObject}.
+	 * Constructs a {@code GameObject} with with, height and scale set to 1 and visibility set to true.
 	 */
 	public GameObject()
 	{
@@ -135,21 +131,37 @@ public class GameObject
 		id = new Random().nextInt();
 	}
 	
+	/**
+	 * Returns the width times the scale of the unit.
+	 * @return The with.
+	 */
 	public float getWidth()
 	{
 		return width * scale;
 	}
 	
+	/**
+	 * Return the height times scale of the unit.
+	 * @return The height.
+	 */
 	public float getHeight()
 	{
 		return height * scale;
 	}
 	
+	/**
+	 * Returns the center X position, taking scale into account.
+	 * @return The X coordinate.
+	 */
 	public float getCenterX()
 	{
 		return currX + (getWidth() / 2);
 	}
 	
+	/**
+	 * Returns the center Y position, taking scale into account.
+	 * @return The Y coordinate.
+	 */
 	public float getCenterY()
 	{
 		return currY + (getHeight() / 2);
@@ -166,24 +178,19 @@ public class GameObject
 		currY = y;
 	}
 	
+	/**
+	 * Allow you to set the image for the {@code GameObject}.<br>
+	 * This method also set {@code width} and {@code height}.
+	 * @param img The image to use.
+	 */
 	public void setImage(Image2D img)
 	{
 		setImage(new Frequency<>(1, new Image2D[]{img}));
 	}
 	
 	/**
-	 * Sets the objects image with the default speed(1).<br>
-	 * <b>Warning</b>: If your {@code GameObject} is going to be involved in a pixel perfect collision detection, your image must be an instance of {@code DataImage}.
-	 * @param imgs The image/animation to use. 
-	 */
-	public void setImage(Image2D[] imgs)
-	{
-		setImage(new Frequency<>(1, imgs));
-	}
-	
-	/**
 	 * Sets the objects image with the specified speed.<br>
-	 * <b>Warning</b>: If your {@code GameObject} is going to be involved in a pixel perfect collision detection, your image must be an instance of {@code DataImage}.
+	 * This method also set {@code width} and {@code height}.
 	 * @param imgs The image/animation to use.
 	 */
 	public void setImage(int speed, Image2D[] imgs)
@@ -193,7 +200,7 @@ public class GameObject
 	
 	/**
 	 * Sets the objects image to the given object.<br>
-	 * <b>Warning</b>: If your {@code GameObject} is going to be involved in a pixel perfect collision detection, your image must be an instance of {@code DataImage}.
+	 * This method also set {@code width} and {@code height}.
 	 * @param imgs The image/animation to use.
 	 */
 	public void setImage(Frequency<Image2D> obj)
@@ -266,6 +273,11 @@ public class GameObject
 			return false;
 	}
 	
+	/**
+	 * Returns the first {@code GameObject} in the given list this object is colliding with.
+	 * @param objs The objects to check with.
+	 * @return The object this unit is colliding with.
+	 */
 	public GameObject collidesWithMultiple(GameObject... objs)
 	{
 		for(GameObject go : objs)
@@ -278,7 +290,7 @@ public class GameObject
 	/**
 	 * Checks which direction the given {@code GameObject} is in relation to this unit.
 	 * @param go The object.
-	 * @return The direction, a constant from game.core.Engine.
+	 * @return The direction, which is either N, S, E or W.
 	 */
 	public Direction monitor(GameObject go)
 	{
@@ -295,8 +307,7 @@ public class GameObject
 	}
 
 	/**
-	 * Return a clone of this object.
-	 * Note that no events are cloned.
+	 * Return a clone of this object. No events are cloned.
 	 * @param x The X position of the clone.
 	 * @param y The Y position of the clone.
 	 * @return The cloned object.
@@ -406,7 +417,7 @@ public class GameObject
 	}
 	
 	/**
-	 * Can be overridden to render extra stuff.
+	 * Can be overridden to render extra stuff. Called by the engine right before rendering and after updating the entities and translate/scale variables.
 	 * @param batch The rendering context.
 	 */
 	public void drawSpecial(SpriteBatch batch) {}
@@ -555,7 +566,7 @@ public class GameObject
 	}
 	
 	/**
-	 * Specifies if you want to use "sound falloff". For this to work, you also need to set an emitter.
+	 * Specifies if you want to use "sound falloff". For this to work, you also need to set an emitter.<br>
 	 * This value is set automatically in most constructor and this function is almost never used.
 	 * @param falloff True if you want the sounds emitted by this object to have distance checking.
 	 */
@@ -579,7 +590,7 @@ public class GameObject
 	
 	/**
 	 * Called when the object is discarded from the game via the {@code discard} method.<br>
-	 * Cleanup work should be done here.
+	 * Cleanup work should be done here by overriding it.
 	 */
 	public void endUse() {}
 

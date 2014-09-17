@@ -18,7 +18,7 @@ public abstract class MainCharacter extends MovableObject
 	public enum CharacterState { ALIVE, DEAD, FINISH };
 	
 	public static final PressedButtons STILL = new PressedButtons();
-	public static final Image2D DEFAULT_HEALTH_IMAGE = new Image2D("res/general/hearth.png", false);
+	public static Image2D DEFAULT_HEALTH_IMAGE;
 	
 	/**
 	 * This is the animation to play when the character have died. 
@@ -62,11 +62,19 @@ public abstract class MainCharacter extends MovableObject
 		});
 	}
 	
+	/**
+	 * Returns the state of the character.
+	 * @return The state.
+	 */
 	public CharacterState getState() 
 	{
 		return state;
 	}
 
+	/**
+	 * While this function is mostly set automatically by the engine, it can be set manually too.
+	 * @param state The state this character should have.
+	 */
 	public void setState(CharacterState state) 
 	{
 		this.state = state;
@@ -93,7 +101,7 @@ public abstract class MainCharacter extends MovableObject
 	}
 	
 	/**
-	 * Return the amount of lives this character have.
+	 * Returns the amount of lives this character have.
 	 * @return The lives.
 	 */
 	public int getHP()
@@ -137,22 +145,37 @@ public abstract class MainCharacter extends MovableObject
 		this.con = con;
 	}
 	
+	/**
+	 * Transforms this main character to a ghost. Pass null to humanize again. 
+	 * @param ghostData The ghost data.
+	 */
 	public void ghostify(List<PressedButtons> ghostData)
 	{
-		this.ghostData = ghostData.toArray(new PressedButtons[ghostData.size()]);
+		if(ghostData == null)
+			this.ghostData = null;
+		else
+			this.ghostData = ghostData.toArray(new PressedButtons[ghostData.size()]);
 	}
 	
+	/**
+	 * Transforms this main character to a ghost. Pass null to humanize again. 
+	 * @param ghostData The ghost data.
+	 */
 	public void ghostify(PressedButtons[] ghostData)
 	{
 		this.ghostData = ghostData;
 	}
 	
+	/**
+	 * Checks whether or not this {@code MainCharacter} is a  ghost.
+	 * @return True if this unit is a ghost.
+	 */
 	public boolean isGhost()
 	{
 		return ghostData != null;
 	}
 	
-	public PressedButtons getNext()
+	PressedButtons getNext()
 	{
 		if(ghostData == null)
 			throw new IllegalStateException("This method can only be called if the MainCharacter is a ghost.");
@@ -161,14 +184,13 @@ public abstract class MainCharacter extends MovableObject
 	}
 	
 	/**
-	 * This function is called by the engine every frame and handles all the movement of this character.
+	 * This function is called once by the engine every frame and handles all the movement of this character.
 	 * @param pb The buttons that are being held down by the player.
 	 */
 	public abstract void handleInput(PressedButtons pb);
 	
 	/**
-	 * Called upon death. Can be called manually if engine fail to call it.<br>
-	 * Usually, you in this method hides or discard your character, sets its hitbox to INVINCIBLE, state to DEAD and finally adding a death particle.
+	 * Called upon death.
 	 */
 	final void deathAction()
 	{

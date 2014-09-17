@@ -12,9 +12,12 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -120,6 +123,11 @@ public class Utilities
 			sound.unload();
 	}
 	
+	/**
+	 * Saves the given object at the given path.
+	 * @param obj The object to save.
+	 * @param path The full path(inclusive file name).
+	 */
 	public static void exportObject(Object obj, String path)
 	{
 		ObjectOutputStream out = null;
@@ -155,6 +163,11 @@ public class Utilities
 		}
 	}
 	
+	/**
+	 * Loads the object from the given path.
+	 * @param path The full path(inclusive file name). 
+	 * @return The object.
+	 */
 	public static Object importObject(String path)
 	{
 		ObjectInputStream in = null;
@@ -227,6 +240,10 @@ public class Utilities
 		}
 	}
 	
+	/**
+	 * Disposes the given objects.
+	 * @param arr The objects to dispose.
+	 */
 	public static void dispose(Disposable... arr)
 	{
 		for(Disposable obj : arr)
@@ -242,6 +259,10 @@ public class Utilities
 		}
 	}
 	
+	/**
+	 * Read all highscores from the highscore directory.
+	 * @return The highscores.
+	 */
 	public static List<HighScore> readAllHighScores()
 	{
 		ArrayList<HighScore> highscores = new ArrayList<>();
@@ -265,6 +286,11 @@ public class Utilities
 		return highscores;
 	}
 	
+	/**
+	 * Adds a space before all capital characters.
+	 * @param str The string to fix.
+	 * @return The fixed string.
+	 */
 	public static String prettify(String str)
 	{
 		StringBuilder bu = new StringBuilder(str.length() + 5);
@@ -281,6 +307,12 @@ public class Utilities
 		return bu.toString();
 	}
 	
+	/**
+	 * Fills the given {@code List} with all the fields found in the given class.
+	 * @param fields The {@code List} to fill.
+	 * @param type The class to check.
+	 * @return Same as the given {@code List}.
+	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) 
 	{
 	    for (Field field: type.getDeclaredFields()) 
@@ -290,5 +322,18 @@ public class Utilities
 	        fields = getAllFields(fields, type.getSuperclass());
 	    
 	    return fields;
+	}
+	
+	/**
+	 * Returns a random element from the given array.
+	 * @param array The array.
+	 * @return A random element.
+	 */
+	public static <T> T getRandomElement(T[] array)
+	{
+		if(array.length == 0)
+			return null;
+		
+		return array[new Random().nextInt(array.length)];
 	}
 }

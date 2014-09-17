@@ -69,7 +69,7 @@ public class ScreenManager extends Game
 		engine.showFps(settings.showFps);
 		engine.streamSounds = settings.streamSounds;
 		engine.saveReplays = settings.saveReplays;
-		engine.gameVolume = settings.volume;
+		engine.masterVolume = settings.masterVolume;
 		engine.setExitEvent(new Event()
 		{
 			@Override

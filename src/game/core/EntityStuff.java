@@ -2,10 +2,8 @@ package game.core;
 
 import game.core.Engine.Direction;
 import game.essentials.Image2D;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -23,10 +21,10 @@ public class EntityStuff
 	 */
 	public static final boolean rectangleVsRecganlte(GameObject rec1, GameObject rec2)
 	{
-		if ((rec1.currY + (rec1.height * rec1.scale) < rec2.currY) ||
-	        (rec1.currY > rec2.currY + (rec2.height * rec2.scale)) ||
-	        (rec1.currX + (rec1.width * rec1.scale) < rec2.currX)  ||
-	        (rec1.currX > rec2.currX + (rec2.width * rec2.scale)))
+		if ((rec1.currY + rec1.getHeight() < rec2.currY) ||
+	        (rec1.currY > rec2.currY + rec2.getHeight()) ||
+	        (rec1.currX + rec1.getWidth() < rec2.currX)  ||
+	        (rec1.currX > rec2.currX + rec2.getWidth()))
 	        return false;
 		return true;
 	}
@@ -238,7 +236,7 @@ public class EntityStuff
 	 * Check if the two objects image(the current one) are colliding using pixel perfect detection.<br>
 	 * In other words, the precision if this function is exact.<br>
 	 * If one of the {@code GameObjects} do not have any image, the function will return false.<br> This function also require that the image have color data(which they have by default).
-	 * Rotation is not supported.
+	 * Rotation, scale customization and width/height manipulation is not supported.
 	 * @param obj1 The first GameObject.
 	 * @param obj2 The second GameObject.
 	 * @return True if the two GameObjects are colliding.
@@ -374,7 +372,7 @@ public class EntityStuff
 	}
 	
 	/**
-	 * Checks if the specified line collides with the specified GameObject.
+	 * Checks if the specified line collides with the specified circle({@code GameObject}).
 	 * @param Ax
 	 * @param Ay
 	 * @param Bx
@@ -776,15 +774,21 @@ public class EntityStuff
 		return new Point2D.Float(dx,dy);
 	}
 
+	/**
+	 * Normalizes the points of the two {@code GameObjects}.
+	 * @param go1 The first object.
+	 * @param go2 The second object.
+	 * @return The normalized point.
+	 */
 	public static Point2D.Float normalize(GameObject go1, GameObject go2)
 	{
 		return normalize(go1.currX, go1.currY, go2.currX, go2.currY);
 	}
 
 	/**
-	 * Returns an constant from game.core.Engine that represent the angle of the point.
-	 * @param normalizedPoint
-	 * @return A constant from game.core.Engine.
+	 * Returns an enum from {@code game.core.Engine.Direction} that represent the angle of the point.
+	 * @param normalizedPoint A normalized point.
+	 * @return The direction of the point.
 	 */
 	public static Direction getDirection(Point2D.Float normalizedPoint)
 	{

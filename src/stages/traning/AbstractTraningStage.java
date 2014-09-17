@@ -28,7 +28,7 @@ public class AbstractTraningStage extends StageBuilder
 	public GameObject getFriend(final float x, final float y, final float textOffsetX, final float textOffsetY, final String text)
 	{
 		final MovableObject friend = new MovableObject();
-		friend.setImage(friendImage);
+		friend.setImage(1,friendImage);
 		friend.moveTo(x, y);
 		friend.setDoubleFaced(true, true);
 		friend.facing = Direction.N;

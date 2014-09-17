@@ -8,8 +8,8 @@ import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
-
 import java.awt.Dimension;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -18,13 +18,9 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import kuusisto.tinysound.TinySound;
-
 import org.lwjgl.opengl.GL11;
-
 import pjjava.misc.OtherMath;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
@@ -53,7 +49,7 @@ public final class Engine implements Screen
 	/**
 	 * The default delta value.
 	 */
-	public static final float DELTA = (float) 1 / 60;
+	public static final float DELTA = 1.0f / 60.0f;
 	
 	/**
 	 * The constant that represent solid tile.
@@ -191,6 +187,11 @@ public final class Engine implements Screen
 	public static final Color GREEN_9	  = Color.valueOf("000000ff");
 	
 	/**
+	 * Default graphics used by laser firing entities. Can of course be changed.
+	 */
+	public static Image2D[] LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE;
+	
+	/**
 	 * The font of the timer.
 	 */
 	public BitmapFont timeFont, fpsFont;
@@ -214,11 +215,6 @@ public final class Engine implements Screen
 	 * The default tint color.
 	 */
 	public final Color defaultTint = Color.valueOf("fffffffe");
-	
-	/**
-	 * The volume of the game, where 1.0 is 100%.
-	 */
-	public double gameVolume = 1.0;
 	
 	/**
 	 * Whether or not to streams sounds directly from the file rather than loading it to the memory. Must be changed before launching game in order for it to take effect.
@@ -264,14 +260,19 @@ public final class Engine implements Screen
 	public float angle;
 	
 	/**
-	 * The padding to use when zooming out.
+	 * The padding in pixels to use when zooming out.
 	 */
-	public int focusPadding = 20;
+	public int zoomPadding = 20;
 	
 	/**
 	 * The amount of milliseconds that have passed since last death or first start.
 	 */
 	public int elapsedTime;
+	
+	/**
+	 * The master volume.
+	 */
+	public double masterVolume = 1.0;
 	
 	List<GameObject> focusObjs;
 	Stage stage;
@@ -279,8 +280,8 @@ public final class Engine implements Screen
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
 	private boolean showFps, justRestarted, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, crashed, increasingScale = true;
-	private int fpsWriterCounter, fps;
 	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue, musicVolume;
+	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private HashSet<Integer> pressedKeys;
@@ -292,7 +293,6 @@ public final class Engine implements Screen
 	
 	/**
 	 * Constructs an Engine.
-	 * @param title The title of the game window.
 	 * @param stage The stage to play.
 	 * @param replay The replay to watch. If null is set, you will play the stage rather than watching a replay.
 	 */
@@ -510,8 +510,16 @@ public final class Engine implements Screen
 		timeFont = new BitmapFont(Gdx.files.internal("res/data/sansserif32.fnt"), true);
 		fpsFont  = new BitmapFont(Gdx.files.internal("res/data/cambria20.fnt"), true);
 		
+		LASER_BEAM = Image2D.loadImages(new File("res/data/laser"),false);
+		LASER_BEGIN = Image2D.loadImages(new File("res/data/laser/rear"),false);
+		LASER_IMPACT = Image2D.loadImages(new File("res/data/laser/end"),false);
+		LASER_CHARGE = Image2D.loadImages(new File("res/data/charge"),false);
+		
+		if(MainCharacter.DEFAULT_HEALTH_IMAGE == null)
+			MainCharacter.DEFAULT_HEALTH_IMAGE = new Image2D("res/general/hearth.png", false);
+		
 		TinySound.init();
-		TinySound.setGlobalVolume(gameVolume);
+		TinySound.setGlobalVolume(masterVolume);
 
 		stage.init();
 		stage.build();
@@ -542,11 +550,13 @@ public final class Engine implements Screen
 		timeFont.dispose();
 		fpsFont.dispose();
 		errorIcon.dispose();
+		Stage.disposeBatch(LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE, MainCharacter.DEFAULT_HEALTH_IMAGE);
 		if(!playReplay)
 		{
 			skin.dispose();
 			gui.dispose();
 		}
+		MainCharacter.DEFAULT_HEALTH_IMAGE = null;
 		stage = null;
 	}
 	
@@ -581,19 +591,6 @@ public final class Engine implements Screen
 	}
 	
 	/**
-	 * This function allow you to determine which {@code GameObjects} the game should focus on. <br>
-	 * The screen will follow the specified {@code GameObject} whenever it moves. <br>
-	 * This is usual set to the main character.<br><br>
-	 * 
-	 * If set, tx, ty and possibly scale will be modified.
-	 * @param focus The {@code GameObject} to follow.
-	 */
-	public void addFocusObject(GameObject focus)
-	{
-		focusObjs.add(focus);
-	}
-	
-	/**
 	 * Sets the size of the viewport.
 	 * @param width The width in pixels.
 	 * @param height The height in pixels.
@@ -609,25 +606,60 @@ public final class Engine implements Screen
 		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
 	}
 	
+	/**
+	 * Returns the width of the viewport.
+	 * @return The width in pixels.
+	 */
 	public int getScreenWidth()
 	{
 		return viewport.width;
 	}
 	
+	/**
+	 * Returns the height of the viewport.
+	 * @return The height in pixels.
+	 */
 	public int getScreenHeight()
 	{
 		return viewport.height;
 	}
 	
 	/**
-	 * Returns the focus objects. Remove objects by clearing them from the returned list.
+	 * This function allow you to determine which {@code GameObjects} the game should focus on. <br>
+	 * The screen will follow the specified {@code GameObjects} whenever they moves. <br>
+	 * This is usual set to the main character(s).<br><br>
+	 * 
+	 * If set, {@code tx, ty} and possibly {@code scale} will be modified.
+	 * @param focus The {@code GameObject} to follow.
+	 */
+	public void addFocusObject(GameObject focus)
+	{
+		focusObjs.add(focus);
+	}
+	
+	/**
+	 * Returns a copy of the focus list.
 	 * @return The focus objects.
 	 */
 	public List<GameObject> getFocusList()
 	{
-		return focusObjs;
+		return new ArrayList<>(focusObjs);
 	}
 	
+	/**
+	 * Stops the camera from focusing on the specified object.
+	 * @param obj The object to stop film.
+	 */
+	public void removeFocusObject(GameObject obj)
+	{
+		focusObjs.remove(obj);
+	}
+	
+	/**
+	 * Checks if the specified key is down. Works only the first frame the key was down.
+	 * @param key The key to check.
+	 * @return True if the specified key was down.
+	 */
 	public boolean isKeyPressed(int key)
 	{
 		return pressedKeys.contains(key);
@@ -690,7 +722,6 @@ public final class Engine implements Screen
 	
 	/**
 	 * Clears the transformation matrix.
-	 * @param g The rendering context.
 	 */
 	public void clearTransformation()
 	{
@@ -703,7 +734,6 @@ public final class Engine implements Screen
 	
 	/**
 	 * Restores the transformation matrix.
-	 * @param g The rendering context.
 	 */
 	public void restoreTransformation()
 	{
@@ -714,21 +744,40 @@ public final class Engine implements Screen
 		batch.setProjectionMatrix(camera.combined);
 	}
 	
+	/**
+	 * Whether or not to show the fps.
+	 * @param showFps True to enable fps display.
+	 */
 	public void showFps(boolean showFps)
 	{
 		this.showFps = showFps;
 	}
 	
+	/**
+	 * The event to launch when the game is exiting. More precise, this event is launched when a stage is terminated.<br>
+	 * You usually want to unhide the main menu(or reconstruct it) as well as nullifying the {@code Stage} and {@code Engine} instance.<br>
+	 * The resources used by the engine is cleared automatically. The resources used by the stage as disposed by the stage creator, so those do not need to be included here.
+	 * @param exitEvent The event to execute upon disposal.
+	 */
 	public void setExitEvent(Event exitEvent)
 	{
 		this.exitEvent = exitEvent;
 	}
 	
+	/**
+	 * Whether or not the engine is currently displaying a replay and not game play.
+	 * @return True if a replay displayed.
+	 */
 	public boolean playingReplay()
 	{
 		return playReplay;
 	}
 
+	/**
+	 * Checks which button of the given controller are down.
+	 * @param con The controller.
+	 * @return The buttons being held down.
+	 */
 	public PressedButtons getPressedButtons(Controller con)
 	{
 		PressedButtons pb = new PressedButtons();
@@ -814,10 +863,10 @@ public final class Engine implements Screen
 			boxWidth = boxWidth - boxX;
 			boxHeight = boxHeight - boxY;
 			
-			boxX -= focusPadding;
-			boxY -= focusPadding;
-			boxWidth  += focusPadding * 2;
-			boxHeight += focusPadding * 2;
+			boxX -= zoomPadding;
+			boxY -= zoomPadding;
+			boxWidth  += zoomPadding * 2;
+			boxHeight += zoomPadding * 2;
 			
 			boxX = Math.max( boxX, 0 );
 			boxX = Math.min( boxX, stage.size.width - boxWidth ); 			
@@ -903,7 +952,7 @@ public final class Engine implements Screen
 	private void drawObject(GameObject go)
 	{
 		Image2D img = go.getFrame();
-		if (img != null && go.visible)
+		if (img != null)
 			batch.draw(img, go.currX + go.offsetX, go.currY + go.offsetY, img.getWidth() / 2,img.getHeight() / 2, go.width * go.scale, go.height * go.scale, 1, 1, go.rotation);
 	}
 	

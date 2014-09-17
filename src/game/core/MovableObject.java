@@ -11,13 +11,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class extends GameObject to add more capabilities such as movement handling and control, multi facing, tile intersection and collision response.
+ * This class extends GameObject to add more capabilities such as movement handling and control, multi and double facing, tile intersection and collision response.
  * @author Pojahn Moradi
  */
 public class MovableObject extends GameObject
 {
 	/**
-	 * A {@code triggerable MovableObject} is going to call its {@code TileEvent} N times every frame, where N is the amount of tile types this object is currently standing at.
+	 * A {@code triggerable MovableObject} is going to call its {@code TileEvent} N times every frame, where N is the amount of different tile types the object is currently standing on.
 	 * The objects hitbox is <i>not</i> taken into consideration when scanning. All objects are treated as rectangles.<br>
 	 * {@code TileEvents} are called automatically by the engine and should not be called manually.
 	 */
@@ -31,9 +31,10 @@ public class MovableObject extends GameObject
 	};
 	
 	/**
-	 * This is the current facing if the unit. The values points to one of the border constants found in {@code game.core.Engine}.
+	 * This is the current facing if the unit. Is set by the engine by default.
 	 */
 	public Direction facing;
+	
 	protected float moveSpeed;
 	protected boolean canMove, triggerable, doubleFaced, multiFacings, flipImage, manualFacings;
 	protected ArrayList<TileEvent> tileEvents;
@@ -44,7 +45,7 @@ public class MovableObject extends GameObject
 	private float tempX, tempY;
 	
 	/**
-	 * Constructs a {@code MovableObject} with default move speed 3.
+	 * Constructs a {@code MovableObject} with move speed set to 3.
 	 */
 	public MovableObject ()
 	{
@@ -62,13 +63,13 @@ public class MovableObject extends GameObject
 	 * Whether or not this unit have 8 direction images rather than one.<br>
 	 * This require a special structure in its image array, example:<br>
 	 * NORTH:img1 img2 img3 <br>
-	 * NORTH EAST: img1, img2, im3<br>
-	 * EAST: img1 img2 img3<br>
-	 * SOUTH EAST: img1 img2 img3<br>
-	 * SOUTH: img1 img2 img3<br>
-	 * SOUTH WEST: img1 img2 img3<br>
-	 * WEST: img1 img2 img3<br>
-	 * NORTH WEST: img1 img2 img3<br><br>
+	 * NORTH EAST: img4, img5, im6<br>
+	 * EAST: img7 img8 img9<br>
+	 * SOUTH EAST: img10 img11 img12<br>
+	 * SOUTH: img13 img14 img15<br>
+	 * SOUTH WEST: img16 img17 img18<br>
+	 * WEST: img19 img20 img21<br>
+	 * NORTH WEST: img22 img23 img24<br><br>
 	 * 
 	 * Every angle must have exact amount of frames and the order must match with the given example.
 	 * @param multiFacings If this object is multi-faced.
@@ -82,6 +83,13 @@ public class MovableObject extends GameObject
 			currImage.setLimit(currImage.getArray().length / 8);
 	}
 	
+	/**
+	 * Allow you enable double facing for the unit. The unit will face east when moving E,NE and SE and west when facing W,NW and SW.<br>
+	 * By default, the image is single faced, meaning no matter what the current direction is, it will always use the same image.
+	 * @param doubleFaced Whether or not to activate double facing.
+	 * @param flipImage If false, the first half of the image array is used when moving east and the other half when moving west.<br>
+	 * If true, the entire image array will be used when moving east and flipped horizontally when moving west.
+	 */
 	public void setDoubleFaced(boolean doubleFaced, boolean flipImage)
 	{
 		if(multiFacings && doubleFaced)
@@ -461,7 +469,7 @@ public class MovableObject extends GameObject
 	}
 	
 	/**
-	 * Moves to a temporary position, without any performing any checks.<br>
+	 * Moves to a temporary position, without performing any checks.<br>
 	 * You can later use {@code tempBack()} to jump back to your original position.
 	 * @param x The X coordinate to jump to.
 	 * @param y The Y coordinate to jump to.
@@ -818,11 +826,20 @@ public class MovableObject extends GameObject
 		return !canMove;
 	}
 	
+	/**
+	 * Tells the game to ignore this entity. No events or movement can be made. Even pushing it forces it back on its previous position.<br>
+	 * Note: Does not stop it from being rendered.
+	 * @param halt True to suspend the entity.
+	 */
 	public void halt(boolean halt)
 	{
 		this.halted = halt;
 	}
 	
+	/**
+	 * Test if the entity is currently moving.
+	 * @return True if its moving.
+	 */
 	public boolean isMoving()
 	{
 		return currX != prevX || currY != prevY;

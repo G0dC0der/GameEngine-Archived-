@@ -3,13 +3,17 @@ package game.objects;
 import game.core.Engine;
 import game.core.GameObject;
 import game.core.Stage;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Allows easy creation of a flash GFX, which is displayed over the entire screen.<br>
+ * The flash starts at full strength and fade down.
+ * @author Pojahn Moradi
+ */
 public class Flash extends GameObject
 {
 	private float duration, framesAlive;
@@ -19,6 +23,11 @@ public class Flash extends GameObject
 		zIndex(10_000);
 	}
 	
+	/**
+	 * Creates a flash.
+	 * @param color The color of the frames.
+	 * @param duration The amount of frames the flash will last.
+	 */
 	public Flash(Color color, float duration)
 	{
 		this.duration = (float) duration;
@@ -31,6 +40,11 @@ public class Flash extends GameObject
 		px.dispose();
 	}
 	
+	/**
+	 * Creates a flash with a texture rather than a single color. If the image is not the same size as the viewport, it will be stretched to cover it.
+	 * @param flashImage The image, which should not contain any transparency. 
+	 * @param duration The amount of frames the flash will last.
+	 */
 	public Flash(Texture flashImage, float duration)
 	{
 		this.duration = duration;
@@ -59,6 +73,7 @@ public class Flash extends GameObject
 			Stage.STAGE.discard(this);
 	}
 	
+	@Override
 	public Flash getClone(float x, float y) 
 	{
 		Flash flash = new Flash(flashImage,duration);

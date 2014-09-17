@@ -57,6 +57,9 @@ public class LaserDrone extends PathDrone
 		chargeBeam = Factory.defaultChargeLaser();
 	}
 	
+	/**
+	 * Creates a {@code LaserDrone} with a customized laser beam. Reefer to the constructor float, float, int, int, int, GameObject[] for more details.
+	 */
 	public LaserDrone(float x, float y, int laserStartup, int laserDuration, int reload, LaserBeam firingBeam, LaserBeam chargeBeam, GameObject... targets)
 	{
 		this(x,y,laserStartup,laserDuration,reload,targets);

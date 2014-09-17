@@ -3,7 +3,6 @@ package game.movable;
 import game.core.Enemy;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**

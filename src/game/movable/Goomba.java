@@ -14,10 +14,8 @@ import kuusisto.tinysound.Sound;
 public class Goomba extends PathDrone 
 {
 	private MovableObject[] enemies;
-//	private GameObject dummyScan;
 	private Particle deathImg;
 	private int[] hitSubjects;
-//	private float margin;
 	private int hitFrames;
 	private Direction dir;
 	
@@ -39,9 +37,7 @@ public class Goomba extends PathDrone
 		
 		this.enemies = enemies;
 		hitSubjects = new int[enemies.length];
-//		dummyScan = new GameObject();
-//		margin = 3;
-//		initDummy();
+		hitFrames = 100;
 		sounds = new SoundBank(2);//1 = Walking Sound, 2 = Hit Sound
 	}
 	
@@ -49,7 +45,6 @@ public class Goomba extends PathDrone
 	public void moveEnemy()
 	{
 		super.moveEnemy();
-//		moveDummy();
 
 		sounds.playSound(0);
 		
@@ -79,13 +74,6 @@ public class Goomba extends PathDrone
 		}
 	}
 	
-//	@Override
-//	public void setImage(Frequency<DataImage> obj)
-//	{
-//		super.setImage(obj);
-//		initDummy();
-//	}
-	
 	/**
 	 * The particle to add at the current position of the {@code Goomba} upon death.
 	 * @param deathImg The particle.
@@ -94,16 +82,6 @@ public class Goomba extends PathDrone
 	{
 		this.deathImg = deathImg;
 	}
-	
-//	/**
-//	 * The size of the hurtbox. Usually not changed.
-//	 * @param margin
-//	 */
-//	public void setMargin(float margin)
-//	{
-//		this.margin = margin;
-//		initDummy();
-//	}
 	
 	/**
 	 * The sound to play when the {@code Goomba} is moving.
@@ -157,44 +135,4 @@ public class Goomba extends PathDrone
 				throw new RuntimeException();
 		}
 	}
-	
-//	void moveDummy()
-//	{
-//		switch(dir)
-//		{
-//		case N:
-//			dummyScan.currX = currX;
-//			dummyScan.currY = currY - 1;
-//			break;
-//		case S:
-//			dummyScan.currX = currX;
-//			dummyScan.currY = currY + height + 1 - margin;
-//			break;
-//		case E:
-//			dummyScan.currX = currX + width - margin + 1;
-//			dummyScan.currY = currY;
-//			break;
-//		case W:
-//			dummyScan.currX = currX - 1;
-//			dummyScan.currY = currY;
-//			break;
-//		}
-//	}
-//	
-//	void initDummy()
-//	{
-//		switch(dir)
-//		{
-//			case N:
-//			case S:
-//				dummyScan.width = width;
-//				dummyScan.height = margin;
-//				break;
-//			case E:
-//			case W:
-//				dummyScan.width = margin;
-//				dummyScan.height = height;
-//				break;
-//		}
-//	}
 }

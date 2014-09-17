@@ -49,6 +49,9 @@ public class Weapon extends PathDrone
 	@Override
 	public void moveEnemy()
 	{
+		if(proj == null)
+			throw new IllegalStateException("The projectile must be set before usage.");
+		
 		if(usingTemp && currImage.hasEnded())
 		{
 			usingTemp = false;

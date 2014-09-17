@@ -55,6 +55,9 @@ public class TargetLaser extends PathDrone
 		dummy.setMoveSpeed(17.2f);
 	}
 	
+	/**
+	 * Constructs a {@code TargetLaser} with a customized laser beam. Reefer to constructor float, float, GameObject, GameObject[] for more information.
+	 */
 	public TargetLaser(float x, float y, LaserBeam beam, GameObject laserTarget, GameObject... targets) 
 	{
 		this(x,y,laserTarget,targets);

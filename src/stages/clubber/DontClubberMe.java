@@ -209,10 +209,10 @@ public class DontClubberMe extends Stage
 		weap.setRotationSpeed(1.2f);
 		weap.setFiringParticle(gunfire);
 		
-		final GameObject sign = new GameObject();
+		final GameObject sign = Factory.textPrinter("Collect all the diamonds to finish the stage.", Color.WHITE, null, 200, -200, -50, gm);
 		sign.currX = 580;
 		sign.currY = 73;
-		add(Factory.textPrinter(sign, "Collect all the diamonds to finish the stage.", Color.WHITE, null, 200, -200, -50, gm));
+		add(sign);
 		
 		GameObject weakp = new GameObject();
 		weakp.currX = 300;

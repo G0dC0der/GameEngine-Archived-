@@ -108,7 +108,7 @@ public class GhostBridge extends StageBuilder
 		if(d != Difficulty.EASY)
 		{
 			ghost = new Boo(100,100,gm);
-			ghost.setImage(booaImg);
+			ghost.setImage(1,booaImg);
 			Frequency<Image2D> hideImg = new Frequency<>(1, boohImg);
 			hideImg.setMultiFaced(true);
 			ghost.setHideImage(hideImg);

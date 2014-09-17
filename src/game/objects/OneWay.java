@@ -26,6 +26,12 @@ public class OneWay extends GameObject implements Event
 	 */
 	public OneWay(float x, float y, Direction direction, MovableObject... targets)
 	{
+		if( direction == Direction.NE ||
+			direction == Direction.SE ||
+			direction == Direction.SW ||
+			direction == Direction.NW)
+			throw new IllegalArgumentException("The direction must be either N, S, W or E.");
+		
 		currX = x;
 		currY = y;
 		this.direction = direction;

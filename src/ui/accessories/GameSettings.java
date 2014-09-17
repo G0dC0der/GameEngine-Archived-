@@ -9,13 +9,13 @@ public class GameSettings
 {
 	public boolean vsync, showFps, streamSounds, clearEachFrame, saveReplays;
 	public int fps;
-	public double volume;
+	public double masterVolume;
 
 	public GameSettings()
 	{
 		vsync = clearEachFrame = saveReplays = true;
 		fps = 60;
-		volume = 1.0;
+		masterVolume = 1.0;
 	}
 	
 	public void loadSettings(String path)
@@ -50,7 +50,7 @@ public class GameSettings
 								vsync = Boolean.parseBoolean(value);
 								break;
 							case "volume":
-								volume = Double.parseDouble(value);
+								masterVolume = Double.parseDouble(value);
 								break;
 							case "streamsounds":
 								streamSounds = Boolean.parseBoolean(value);

@@ -134,6 +134,7 @@ public abstract class Stage
 	 * Loads and starts the song found on the given path.
 	 * @param path The path to where the song can be found.
 	 * @param loopStart Where to start, in seconds, after the song have ended.
+	 * @param volume The volume.
 	 */
 	public void setStageMusic (String path, double loopStart, float volume)
 	{
@@ -144,6 +145,7 @@ public abstract class Stage
 	 * Starts the given song.
 	 * @param music The song to start.
 	 * @param loopStart Where to start, in seconds, after the song have ended.
+	 * @param volume The volume.
 	 */
 	public void setStageMusic(Music music, double loopStart, float volume)
 	{
@@ -154,7 +156,8 @@ public abstract class Stage
 	}
 		
 	/**
-	 * Initialize the starting position, size and the visible size of the stage.
+	 * Initialize the starting position, size and the visible size of the stage.<br>
+	 * Should be called after {@code stageData} is initialized.
 	 */
 	public void basicInits()
 	{
@@ -177,14 +180,14 @@ public abstract class Stage
 	 * @param go The {@code MovableObject} that have moved.
 	 * @param tileType A constant representing which tile type this {@code MovableObject} is currently "standing" on.
 	 */
-	public void tileIntersection(MovableObject mo, byte tileType)
+	void tileIntersection(MovableObject mo, byte tileType)
 	{
 		if (tileType != Engine.HOLLOW)
 			mo.runTileEvents(tileType);
 	}
 
 	/**
-	 * This method is called every frame by the engine and add or removes entities and update all the existing ones.
+	 * This method is called once every frame by the engine and add or removes entities and update all the existing ones.
 	 */
 	final void moveEnemies() 
 	{
@@ -369,24 +372,28 @@ public abstract class Stage
 	 * An optional way of setting the background. Wraps the given image in a {@code GameObject} with {@code z-index} set to -100.
 	 * @param img The image to use as background.
 	 */
-	public void background(RenderOption type, Image2D... img)
+	public GameObject background(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
-		wrapper.setImage(img);
+		wrapper.setImage(3,img);
 		wrapper.zIndex(-100);
 		add(wrapper);
+		
+		return wrapper;
 	}
 	
 	/**
 	 * An optional way of setting the foreground. Wraps the given image in a {@code GameObject} with {@code z-index} set to 100.
 	 * @param img The image to use as foreground.
 	 */
-	public void foreground(RenderOption type, Image2D... img)
+	public GameObject foreground(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
-		wrapper.setImage(img);
+		wrapper.setImage(3,img);
 		wrapper.zIndex(100);
 		add(wrapper);
+		
+		return wrapper;
 	}
 	
 	/**
@@ -417,7 +424,7 @@ public abstract class Stage
 	public abstract void dispose();
 	
 	/**
-	 * Optional and is called once every frame.
+	 * Optional and is called once every frame after updating all the entities and translation, right before rendering.
 	 */
 	public void extra()
 	{}
@@ -440,14 +447,44 @@ public abstract class Stage
 	 */
 	public void setMeta(Serializable meta) {}
 	
+	/**
+	 * The difficulty the stage being played at.
+	 * @return The difficulty.
+	 */
 	public Difficulty getDifficulty() 
 	{
 		return difficulty;
 	}
 
+	/**
+	 * The difficulty to use when playing.
+	 * @return The difficulty.
+	 */
 	public void setDifficulty(Difficulty difficulty) 
 	{
 		this.difficulty = difficulty;
+	}
+	
+	/**
+	 * Checks if the specified point contains solid tile.
+	 * @param x The x coordinate.
+	 * @param y The y coordinate.
+	 * @return True if the given point is solid.
+	 */
+	public boolean isSolid(float x, float y)
+	{
+		return stageData[(int)x][(int)y] == Engine.SOLID;
+	}
+	
+	/**
+	 * Checks if the specified point contains hollow tile.
+	 * @param x The x coordinate.
+	 * @param y The y coordinate.
+	 * @return True if the given point is hollow.
+	 */
+	public boolean isHollow(float x, float y)
+	{
+		return stageData[(int)x][(int)y] == Engine.HOLLOW;
 	}
 
 	/**
@@ -570,9 +607,8 @@ public abstract class Stage
 	{
 		stageClone = new byte[stageData.length][stageData[0].length];
 		
-		for(int x = 0; x < size.width; x++)
-			for(int y = 0; y < size.height; y++)
-				stageClone[y][x] = stageData[y][x];
+	    for (int i = 0; i < stageData.length; i++) 
+	        System.arraycopy(stageData[i], 0, stageClone[i], 0, stageData[i].length);
 	}
 	
 	private static class SceneImage extends GameObject
