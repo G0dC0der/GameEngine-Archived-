@@ -29,6 +29,7 @@ public class Particle extends GameObject implements Event
 		if(victims != null && victims.length > 0)
 			this.victims = victims;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 		
 		addEvent(this);
 	}

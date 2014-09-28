@@ -170,7 +170,6 @@ public class SteelFactory extends StageBuilder
 		Projectile magic = new Projectile(0, 0, gm);
 		magic.setMoveSpeed(3);
 		magic.setImage(3, proj);
-		magic.useSpecialEffect(false);
 		magic.setHitbox(Hitbox.EXACT);
 		magic.setFiringSound(magicfire);
 		
@@ -576,7 +575,6 @@ public class SteelFactory extends StageBuilder
 		split.setImage(3, splits);
 		split.setMoveSpeed(8);
 		split.setImpact(splitImpact);
-		split.useSpecialEffect(false);
 		split.setHitbox(Hitbox.EXACT);
 		
 		Shrapnel shra = new Shrapnel(0, 0, split, gm);
@@ -865,7 +863,6 @@ public class SteelFactory extends StageBuilder
 		Projectile proj = new Projectile(x,y,gm, stalk);
 		proj.setMoveSpeed(6.5f);
 		proj.setImpact(exp);
-		proj.useSpecialEffect(false);
 		proj.useFastCollisionCheck(true);
 		proj.addEvent(()->proj.rotation+=6);
 		proj.setTarget(size.width, y);

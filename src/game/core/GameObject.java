@@ -5,12 +5,15 @@ import game.core.Engine.Direction;
 import game.essentials.Frequency;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 /**
  * A {@code GameObject} is the primary entity used by Pojahns Game Engine. <br>
@@ -30,6 +33,15 @@ public class GameObject
 		 * The events handling code.
 		 */
 		void eventHandling(); 
+		
+		/**
+		 * Events that are done are discarded by the engine. The default method always returns false.
+		 * @return True if this event is dont and should be discarded by the game.
+		 */
+		default boolean done()
+		{
+			return false;
+		}
 	};
 	
 	/**
@@ -87,6 +99,21 @@ public class GameObject
 	public float width;
 	
 	/**
+	 * The alpha value used when rendering.
+	 */
+	public float alpha;
+	
+	/**
+	 * Whether or not to flip the entity´s image horizontally when rendering.
+	 */
+	public boolean flipX;
+
+	/**
+	 * Whether or not to flip the entity´s image vertically when rendering.
+	 */
+	public boolean flipY;
+	
+	/**
 	 * The units height. Should be equal to the image height.
 	 */
 	public float height;
@@ -121,6 +148,7 @@ public class GameObject
 	 */
 	public GameObject()
 	{
+		alpha = 1;
 		visible = true;
 		hitbox = Hitbox.RECTANGLE;
 		width = height = scale = 1;
@@ -135,7 +163,7 @@ public class GameObject
 	 * Returns the width times the scale of the unit.
 	 * @return The with.
 	 */
-	public float getWidth()
+	public float width()
 	{
 		return width * scale;
 	}
@@ -144,7 +172,7 @@ public class GameObject
 	 * Return the height times scale of the unit.
 	 * @return The height.
 	 */
-	public float getHeight()
+	public float height()
 	{
 		return height * scale;
 	}
@@ -153,18 +181,34 @@ public class GameObject
 	 * Returns the center X position, taking scale into account.
 	 * @return The X coordinate.
 	 */
-	public float getCenterX()
+	public float centerX()
 	{
-		return currX + (getWidth() / 2);
+		return currX + (width() / 2);
 	}
 	
 	/**
 	 * Returns the center Y position, taking scale into account.
 	 * @return The Y coordinate.
 	 */
-	public float getCenterY()
+	public float centerY()
 	{
-		return currY + (getHeight() / 2);
+		return currY + (height() / 2);
+	}
+	
+	/**
+	 * The half width.
+	 */
+	public float halfWidth()
+	{
+		return width / 2;
+	}
+	
+	/**
+	 * The half height.
+	 */
+	public float halfHeight()
+	{
+		return height / 2;
 	}
 	
 	/**
@@ -226,28 +270,29 @@ public class GameObject
 	 */
 	public boolean collidesWith(GameObject obj)
 	{
-		boolean notRotated = fast || obj.fast || (this.rotation == 0 && obj.rotation == 0);
+		boolean straight1 = fast || rotation == 0;
+		boolean straight2 = obj.fast || obj.rotation == 0;
 		
 		if (hitbox == Hitbox.RECTANGLE && obj.hitbox == Hitbox.RECTANGLE)
 		{
-			if(notRotated)
-				return rectangleVsRecganlte(this, obj);
+			if(straight1 && straight2)
+				return rectangleVsRecganle(this, obj);
 			else
 				return rotatedRectanglesCollision(this, obj);
 		}
 		else if (hitbox == Hitbox.RECTANGLE && obj.hitbox == Hitbox.CIRCLE)
 		{
-//			if(notRotated)
+			if(straight1)
 				return circleVsRectangle(obj, this);
-//			else
-//				return rotatedRectangleVsCircle(this, obj);
+			else
+				return rotatedRectangleVsCircle(this, obj);
 		}
 		else if (hitbox == Hitbox.CIRCLE && obj.hitbox == Hitbox.RECTANGLE)
 		{
-//			if(notRotated)
+			if(straight2)
 				return circleVsRectangle(this, obj);
-//			else
-//				return rotatedRectangleVsCircle(this, obj);
+			else
+				return rotatedRectangleVsCircle(this, obj);
 		}
 		else if (obj.hitbox == Hitbox.CIRCLE && hitbox == Hitbox.CIRCLE)
 		{
@@ -259,15 +304,23 @@ public class GameObject
 		}
 		else if (obj.hitbox == Hitbox.EXACT || hitbox == Hitbox.EXACT)
 		{
-//			if(notRotated)
-//			{
-				if (!rectangleVsRecganlte(this, obj))
+			if(straight1 && straight2)
+			{
+				if (!rectangleVsRecganle(this, obj))
 					return false;
 				
 				return pixelPerfect(this,obj);
-//			}
-//			else
-//				return pixelPerfectRotation(this,obj);
+			}
+			else
+			{
+				Rectangle r1 = (rotation == 0) ? new Rectangle(currX, currY, width, height)					: getBoundingBox(this);
+				Rectangle r2 = (rotation == 0) ? new Rectangle(obj.currX, obj.currY, obj.width, obj.height) : getBoundingBox(obj);
+				
+				if(!rectangleVsRectangle(r1.x, r1.y, r1.width, r1.height, r2.x, r2.y, r2.width, r2.height))
+					return false;
+				
+				return pixelPerfectRotation(this, obj);
+			}
 		}
 		else
 			return false;
@@ -339,6 +392,9 @@ public class GameObject
 		dest.offsetY = offsetY;
 		dest.zIndex = zIndex;
 		dest.drawSpecialBehind = drawSpecialBehind;
+		dest.alpha = alpha;
+		dest.flipX = flipX;
+		dest.flipY = flipY;
 	}
 	
 	/**
@@ -531,11 +587,11 @@ public class GameObject
 	 */
 	public Point2D.Float getFrontPosition()
 	{
-		float locX = currX + getWidth() / 2;
-		float locY = currY + getHeight() / 2;
+		float locX = currX + width() / 2;
+		float locY = currY + height() / 2;
 		
-		locX += Math.cos(Math.toRadians(rotation)) * (getWidth() / 2);
-		locY += Math.sin(Math.toRadians(rotation)) * (getHeight() / 2);
+		locX += Math.cos(Math.toRadians(rotation)) * (width() / 2);
+		locY += Math.sin(Math.toRadians(rotation)) * (height() / 2);
 		
 		return new Point2D.Float(locX,locY);
 	}
@@ -546,46 +602,21 @@ public class GameObject
 	 */
 	public Point2D.Float getRarePosition()
 	{
-		float locX = currX + getWidth() / 2;
-		float locY = currY + getHeight() / 2;
+		float locX = currX + width() / 2;
+		float locY = currY + height() / 2;
 		
-		locX -= Math.cos(Math.toRadians(rotation)) * (getWidth() / 2);
-		locY -= Math.sin(Math.toRadians(rotation)) * (getHeight() / 2);
+		locX -= Math.cos(Math.toRadians(rotation)) * (width() / 2);
+		locY -= Math.sin(Math.toRadians(rotation)) * (height() / 2);
 		
 		return new Point2D.Float(locX,locY);
 	}
 	
 	/**
-	 * The {@code GameObject} that emits the sound this unit makes. This is most often set to "this" as it makes the most sense.<br>
-	 * This value is set automatically in most constructor and this function is almost never used.
-	 * @param go The {@code GameObject} that emits the sound this object makes.
+	 * Returns the {@code SoundBank} used by the unit.
 	 */
-	public void setSoundEmitter(GameObject go)
+	public SoundBank getSoundBank()
 	{
-		sounds.setEmitter(go);
-	}
-	
-	/**
-	 * Specifies if you want to use "sound falloff". For this to work, you also need to set an emitter.<br>
-	 * This value is set automatically in most constructor and this function is almost never used.
-	 * @param falloff True if you want the sounds emitted by this object to have distance checking.
-	 */
-	public void useSoundFallOff(boolean falloff)
-	{
-		sounds.useFallOff(falloff);
-	}
-	
-	/**
-	 * The values to use when calculating sound volume(which is the distance between the emitter and the focus object).
-	 * @param maxDistance Exceed this distance and the volume of the sound emitted by this object is zero.
-	 * @param maxVolume The max volume of the sound emitted by this unit.
-	 * @param power The power.
-	 */
-	public void emitterProps(float maxDistance, float maxVolume, float power)
-	{
-		sounds.maxDistance = maxDistance;
-		sounds.maxVolume = maxVolume;
-		sounds.power = power;
+		return sounds;
 	}
 	
 	/**
@@ -639,18 +670,18 @@ public class GameObject
 		if(!target.visible)
 			return false;
 		
-		int midX1   = (int) (target.currX + target.getWidth() / 2),
-			midY1   = (int) (target.currY + target.getHeight() / 2),
-			midX2   = (int) (currX + getWidth() / 2),
-			midY2   = (int) (currY + getHeight() / 2), 
+		int midX1   = (int) (target.currX + target.width() / 2),
+			midY1   = (int) (target.currY + target.height() / 2),
+			midX2   = (int) (currX + width() / 2),
+			midY2   = (int) (currY + height() / 2), 
 			left1   = (int) (target.currX), 
 			left2   = (int) (currX), 
-			right1  = (int) (target.currX + target.getWidth()), 
-			right2  = (int) (currX + getWidth()),
+			right1  = (int) (target.currX + target.width()), 
+			right2  = (int) (currX + width()),
 			top1    = (int) (target.currY),
 			top2    = (int) (currY),
-			bottom1 = (int) (target.currY + target.getHeight()), 
-			bottom2 = (int) (currY + getHeight());
+			bottom1 = (int) (target.currY + target.height()), 
+			bottom2 = (int) (currY + height());
 		
 		switch (accuracy)
 		{

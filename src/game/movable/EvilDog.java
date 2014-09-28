@@ -1,0 +1,115 @@
+package game.movable;
+
+import game.core.Enemy;
+import game.core.Engine;
+import game.core.EntityStuff;
+import game.core.GameObject;
+import game.core.Stage;
+import game.essentials.Frequency;
+import game.essentials.Image2D;
+import game.essentials.SoundBank;
+import game.objects.Particle;
+
+import java.awt.geom.Point2D;
+
+import kuusisto.tinysound.Sound;
+
+/**
+ * This enemy chases the closest given target if not to far away and launches its {@code HitEvent} upon collision. <br>
+ * The movement is similar to the {@code Missile},  but the big difference between the two is that the {@code EvilDog} go through walls rather than exploding.
+ * @author Pojahn Moradi
+ */
+public class EvilDog extends Enemy
+{
+	public float thrust, drag, delta;
+	private float vx, vy, maxDistance;
+	private GameObject[] targets;
+	private Particle impact;
+	private Frequency<Image2D> idleImg, huntImg;
+	
+	/**
+	 * Constructs an {@code EvilDog} at the given point with {@code thrust, drag} and {@code delta} set to move very fast.
+	 * @param x The x coordinate to start at.
+	 * @param y The y coordinate to start at.
+	 * @param maxDistance The maximum distance operating at.
+	 * @param targets The objects to hunt.
+	 */
+	public EvilDog(float x, float y, float maxDistance, GameObject... targets)
+	{
+		super();
+		moveTo(x,y);
+		this.maxDistance = maxDistance;
+		this.targets = targets;
+		thrust = 500f;
+		drag = .5f;
+		delta = Engine.DELTA;
+		
+		sounds = new SoundBank(1); //Collision
+		sounds.setDelay(0, 60);
+	}
+	
+	/**
+	 * The {@code Particle} to display when colliding with a target.
+	 * @param impact The impact animation.
+	 */
+	public void collisionAnim(Particle impact)
+	{
+		this.impact = impact;
+	}
+	
+	/**
+	 * The sound to play when colliding with a target.
+	 * @param sound The sound.
+	 */
+	public void setCollisionSound(Sound sound)
+	{
+		sounds.setSound(0, sound);
+	}
+	
+	/**
+	 * The image to use when all targets are out of range.
+	 * @param idleImg The image.
+	 */
+	public void idleImage(Frequency<Image2D> idleImg)
+	{
+		this.idleImg = idleImg;
+	}
+
+	@Override
+	public void moveEnemy() 
+	{
+		GameObject closest = EntityStuff.findClosest(this, targets);
+
+		if(closest != null && maxDistance > EntityStuff.distance(this, closest))
+		{
+			currImage = huntImg;
+			
+			Point2D.Float norP = EntityStuff.normalize(closest, this);
+				 
+			float accelx = thrust * norP.x - drag * vx;
+			float accely = thrust * norP.y - drag * vy;
+		 
+			vx = vx + delta * accelx;
+			vy = vy + delta * accely;
+			
+			currX = currX + delta * vx;
+			currY = currY + delta * vy;
+			
+			if(collidesWith(closest))
+			{
+				if(impact != null)
+					Stage.STAGE.add(impact.getClone(currX, currY));
+				
+				closest.runHitEvent(this);
+				sounds.trySound(0, true);
+			}
+		}
+		else if(idleImg != null)
+		{
+			if(huntImg != currImage)
+				huntImg = currImage;
+			
+			currImage = idleImg;
+		}
+	}
+}

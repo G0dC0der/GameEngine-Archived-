@@ -128,9 +128,9 @@ public class Race extends Stage
 		cont1.addTileEvent(Factory.slipperWalls(cont1));
 		cont1.setMultiFaced(true);
 		cont1.setJumpingSound(jump1);
-		cont1.setSoundEmitter(cont1);
-		cont1.useSoundFallOff(true);
-		cont1.emitterProps(700, 1, 80);
+		cont1.getSoundBank().useFallOff(true);
+		cont1.getSoundBank().maxDistance = 700;
+		cont1.getSoundBank().power = 80;
 		cont1.removeTileEvent(null);
 		cont1.ghostify(replay1);
 		cont1.addTileEvent(new TileEvent()
@@ -175,9 +175,9 @@ public class Race extends Stage
 		cont2.addTileEvent(Factory.slipperWalls(cont2));
 		cont2.setMultiFaced(true);
 		cont2.setJumpingSound(jump2);
-		cont2.setSoundEmitter(cont2);
-		cont2.useSoundFallOff(true);
-		cont2.emitterProps(700, 1, 80);
+		cont2.getSoundBank().useFallOff(true);
+		cont2.getSoundBank().maxDistance = 700;
+		cont2.getSoundBank().power = 80;
 		cont2.removeTileEvent(null);
 		cont2.ghostify(replay2);
 		cont2.addTileEvent(new TileEvent()
@@ -222,9 +222,9 @@ public class Race extends Stage
 		cont3.addTileEvent(Factory.slipperWalls(cont3));
 		cont3.setMultiFaced(true);
 		cont3.setJumpingSound(jump3);
-		cont3.setSoundEmitter(cont3);
-		cont3.emitterProps(700, 1, 80);
-		cont3.useSoundFallOff(true);
+		cont3.getSoundBank().useFallOff(true);
+		cont3.getSoundBank().maxDistance = 700;
+		cont3.getSoundBank().power = 80;
 		cont3.removeTileEvent(null);
 		cont3.ghostify(replay3);
 		cont3.addTileEvent(new TileEvent()
@@ -309,8 +309,7 @@ public class Race extends Stage
 		b.appendPath(1670, 491, 0, false, null);
 		b.appendPath(1670, 350, 0, false, null);
 		b.setShakeSound(bounceball, 5);
-		b.setSoundEmitter(b);
-		b.useSoundFallOff(true);
+		b.getSoundBank().useFallOff(true);
 		
 		Bouncer b2 = new Bouncer(1800, 532, 400, 3, Direction.W, gm, cont1, cont2, cont3);
 		b2.setImage(new Frequency<>(5, bo2Img));
@@ -339,6 +338,9 @@ public class Race extends Stage
 		flag.moveTo(3912, 514);
 		add(flag);
 	}
+	
+	Image2D rec = new Image2D("res/data/rec.png");
+	Image2D rec2 = new Image2D("res/data/rec2.png");
 
 	@Override
 	public void dispose() 

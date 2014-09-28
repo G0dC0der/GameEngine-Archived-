@@ -469,7 +469,6 @@ public class Sandopolis extends StageBuilder
 		proj.setImage(projImg);
 		proj.setImpact(explosion);
 		proj.setFiringSound(weap2fire);
-		proj.useSpecialEffect(false);
 		proj.setMoveSpeed(10);
 		proj.setDisposable(true);
 		

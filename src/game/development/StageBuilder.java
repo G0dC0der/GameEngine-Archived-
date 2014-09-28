@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -104,7 +105,7 @@ public abstract class StageBuilder extends Stage
 								if(!file.exists())
 									throw new RuntimeException(path + field.getName() + ".wav/ogg could not be found.");
 									
-								Music music = Utilities.loadMusic(file.toString());
+								Music music = TinySound.loadMusic(new File(file.toString()));
 								field.set(this, music);
 								break;
 							case REPLAY:

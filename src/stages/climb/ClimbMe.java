@@ -18,13 +18,10 @@ import game.movable.Projectile;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
 import game.objects.Wind;
-
 import java.io.File;
-
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -215,7 +212,6 @@ public class ClimbMe extends Stage
 		arrow.setMoveSpeed(7);
 		arrow.setTarget(0, 2830);
 		arrow.addOtherTarget(gm);
-		arrow.useSpecialEffect(false);
 		arrow.setFiringSound(arrowfire);
 		
 		/*
@@ -362,7 +358,7 @@ public class ClimbMe extends Stage
 		 */
 		gm.setHitEvent(hitter -> { if(hitter.sameAs(arrow)) gm.hit(-1); });
 	}
-
+	
 	@Override
 	public void extra()
 	{

@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class Stats implements Screen
 {
@@ -57,7 +58,7 @@ public class Stats implements Screen
 	{
 		highScores = Utilities.readAllHighScores();
 		
-		stage = new Stage(800, 600, false);
+		stage = new Stage(new ScreenViewport());
 		Gdx.input.setInputProcessor(stage);
 		
 		batch = new SpriteBatch(1);

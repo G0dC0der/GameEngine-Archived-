@@ -6,15 +6,19 @@ import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
+import game.essentials.Pair;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -116,6 +120,7 @@ public abstract class Stage
 	List<GameObject> stageObjects;
 	List<MainCharacter> mains;
 	List<Event> events;
+	List<Pair<Object, Integer>> delayedObject;
 	
 	public Stage()
 	{
@@ -126,6 +131,7 @@ public abstract class Stage
 		mains          = new LinkedList<>();
 		trash		   = new LinkedList<>();
 		events 		   = new LinkedList<>();
+		delayedObject  = new LinkedList<>();
 		startX = startY = -1;
 		size = new Dimension();
 	}
@@ -191,6 +197,20 @@ public abstract class Stage
 	 */
 	final void moveEnemies() 
 	{
+		int size = delayedObject.size();
+		for(int i = 0; i < size; i++)
+		{
+			Pair<?, Integer> pair = delayedObject.get(i);
+			
+			if(--pair.obj2 < 0)
+			{
+				add(pair.obj1);
+				delayedObject.remove(i);
+				size--;
+				i--;
+			}
+		}
+			
 		if(pending)
 		{
 			Object obj;
@@ -332,7 +352,12 @@ public abstract class Stage
 		
 		if(!events.isEmpty())
 			for(Event event : events)
-				event.eventHandling();
+			{
+				if(event.done())
+					discard(event);
+				else
+					event.eventHandling();
+			}
 	}
 
 	/**
@@ -346,6 +371,20 @@ public abstract class Stage
 		for(Object obj : objs)
 			if(obj != null)
 				appendList.add(obj);
+	}
+	
+	/**
+	 * Adds the specified object after the given amount of time elapsed.
+	 * @param obj The object to be added.
+	 * @param delay The time in frames.
+	 */
+	public void add(Object obj, int delay)
+	{
+		Pair<Object, Integer> pair = new Pair<>();
+		pair.obj1 = obj;
+		pair.obj2 = delay;
+		
+		delayedObject.add(pair);
 	}
 	
 	/**
@@ -372,28 +411,24 @@ public abstract class Stage
 	 * An optional way of setting the background. Wraps the given image in a {@code GameObject} with {@code z-index} set to -100.
 	 * @param img The image to use as background.
 	 */
-	public GameObject background(RenderOption type, Image2D... img)
+	public void background(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
 		wrapper.setImage(3,img);
 		wrapper.zIndex(-100);
 		add(wrapper);
-		
-		return wrapper;
 	}
 	
 	/**
 	 * An optional way of setting the foreground. Wraps the given image in a {@code GameObject} with {@code z-index} set to 100.
 	 * @param img The image to use as foreground.
 	 */
-	public GameObject foreground(RenderOption type, Image2D... img)
+	public void foreground(RenderOption type, Image2D... img)
 	{
 		SceneImage wrapper = new SceneImage(type);
 		wrapper.setImage(3,img);
 		wrapper.zIndex(100);
 		add(wrapper);
-		
-		return wrapper;
 	}
 	
 	/**
@@ -587,9 +622,9 @@ public abstract class Stage
 	
 	void updateFacing(MovableObject mo)
 	{
-		if((mo.multiFacings || mo.doubleFaced) && !mo.manualFacings)
+		if(!mo.manualFacings)
 		{
-			Direction dir = EntityStuff.getDirection(EntityStuff.normalize(mo.prevX + mo.width / 2, mo.prevY + mo.height / 2, mo.currX + mo.width / 2, mo.currY + mo.height / 2));
+			Direction dir = EntityStuff.getDirection(EntityStuff.normalize(mo.prevX, mo.prevY, mo.currX, mo.currY));
 			if(dir != null)
 			{
 				if(mo.doubleFaced)

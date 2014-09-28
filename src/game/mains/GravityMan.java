@@ -52,6 +52,7 @@ public class GravityMan extends MainCharacter
 		breakSpeed = -800;
 		
 		sounds = new SoundBank(1); //Jump sound
+		sounds.setEmitter(this);
 		
 		d = Stage.STAGE.stageData;
 	}

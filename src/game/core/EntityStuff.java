@@ -2,9 +2,15 @@ package game.core;
 
 import game.core.Engine.Direction;
 import game.essentials.Image2D;
+
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * This class holds a number of static methods for essential calculations such as collision detection etc.
@@ -19,13 +25,29 @@ public class EntityStuff
 	 * @param rec2 The second rectangle.
 	 * @return True if the two rectangles are colliding.
 	 */
-	public static final boolean rectangleVsRecganlte(GameObject rec1, GameObject rec2)
+	public static final boolean rectangleVsRecganle(GameObject rec1, GameObject rec2)
 	{
-		if ((rec1.currY + rec1.getHeight() < rec2.currY) ||
-	        (rec1.currY > rec2.currY + rec2.getHeight()) ||
-	        (rec1.currX + rec1.getWidth() < rec2.currX)  ||
-	        (rec1.currX > rec2.currX + rec2.getWidth()))
+		if ((rec1.currY + rec1.height() < rec2.currY) ||
+	        (rec1.currY > rec2.currY + rec2.height()) ||
+	        (rec1.currX + rec1.width() < rec2.currX)  ||
+	        (rec1.currX > rec2.currX + rec2.width()))
 	        return false;
+		
+		return true;
+	}
+	
+	/**
+	 * Checks if the two given rectangle collides.
+	 * @return True if the two rectangle collides.
+	 */
+	public static boolean rectangleVsRectangle(float x1, float y1, float width1, float height1, float x2, float y2, float width2, float height2)
+	{
+		if(	y1 + height1 < y2 ||
+	        y1 > y2 + height2 ||
+	        x1 + width1 < x2  ||
+	        x1 > x2 + width2)
+				return false;
+			
 		return true;
 	}
 	
@@ -159,57 +181,65 @@ public class EntityStuff
 	 */
 	public static boolean circleVsRectangle(GameObject circle, GameObject rect)
 	{
-	    float circleDistanceX = Math.abs((circle.currX + circle.getWidth()  / 2) - (rect.currX + rect.getWidth()  / 2));
-	    float circleDistanceY = Math.abs((circle.currY + circle.getHeight() / 2) - (rect.currY + rect.getHeight() / 2));
+	    float circleDistanceX = Math.abs((circle.currX + circle.width()  / 2) - (rect.currX + rect.width()  / 2));
+	    float circleDistanceY = Math.abs((circle.currY + circle.height() / 2) - (rect.currY + rect.height() / 2));
 	    float radius = circle.width / 2;
 
-	    if (circleDistanceX > (rect.getWidth() / 2 + radius) || (circleDistanceY > (rect.getHeight() / 2 + radius)))
+	    if (circleDistanceX > (rect.width() / 2 + radius) || (circleDistanceY > (rect.height() / 2 + radius)))
 	    	return false;
 	    
-	    if ((circleDistanceX <= (rect.getWidth() / 2)) || (circleDistanceY <= (rect.getHeight() / 2)))
+	    if ((circleDistanceX <= (rect.width() / 2)) || (circleDistanceY <= (rect.height() / 2)))
 	    	return true;
 
-	    double cornerDistance_sq = Math.pow(circleDistanceX - rect.getWidth() /2, 2) +
-	                               Math.pow(circleDistanceY - rect.getHeight()/2, 2);
+	    double cornerDistance_sq = Math.pow(circleDistanceX - rect.width() /2, 2) +
+	                               Math.pow(circleDistanceY - rect.height()/2, 2);
 
 	    return (cornerDistance_sq <= (radius * radius));
 	}
 
-//	public static boolean rotatedRectangleVsCircle(GameObject rect, GameObject circle)
-//	{	
-//		double rectCx = rect.currX + rect.width / 2,	//Rectangle center x
-//			   rectCy = rect.currY + rect.height / 2,	//Rectangle center y
-//			   ccX = circle.currX + circle.width / 2,	//Circle center x
-//			   ccY = circle.currY + circle.height/ 2,	//Circle center y
-//			   rot = Math.toRadians(rect.rotation),
-//			   rotSin = Math.sin(rot),
-//			   rotCos = Math.cos(rot),
-//			   cx = rotCos * (ccX - rectCx) - rotSin * (ccY - rectCy) + rectCx,
-//			   cy = rotSin * (ccX - rectCx) + rotCos * (ccY - rectCy) + rectCy,
-//			   x,y;
-//		 
-//		if (cx < rect.currX)
-//		    x = rect.currX;
-//		else if (cx > rect.currX + rect.width)
-//		    x = rect.currX + rect.width;
-//		else
-//		    x = cx;
-//		 
-//		if (cy < rect.currY)
-//		    y = rect.currY;
-//		else if (cy > rect.currY + rect.height)
-//		    y = rect.currY + rect.height;
-//		else
-//		    y = cy;
-//		 
-//		boolean result;
-//		if (findDistance(cx, cy, x, y) < circle.width / 2)
-//			result = true;
-//		else
-//			result = false;
-//		
-//		return result;
-//	}
+	public static boolean rotatedRectangleVsCircle(GameObject rect, GameObject circle)
+	{	
+		float oldRot = circle.rotation;
+		circle.rotation = 0;
+		boolean results = rotatedRectanglesCollision(rect, circle);
+		circle.rotation = oldRot;
+		
+		return results;
+		/*
+		double rectCx = rect.currX + rect.width / 2,	//Rectangle center x
+			   rectCy = rect.currY + rect.height / 2,	//Rectangle center y
+			   ccX = circle.currX + circle.width / 2,	//Circle center x
+			   ccY = circle.currY + circle.height/ 2,	//Circle center y
+			   rot = Math.toRadians(rect.rotation),
+			   rotSin = Math.sin(rot),
+			   rotCos = Math.cos(rot),
+			   cx = rotCos * (ccX - rectCx) - rotSin * (ccY - rectCy) + rectCx,
+			   cy = rotSin * (ccX - rectCx) + rotCos * (ccY - rectCy) + rectCy,
+			   x,y;
+		 
+		if (cx < rect.currX)
+		    x = rect.currX;
+		else if (cx > rect.currX + rect.width)
+		    x = rect.currX + rect.width;
+		else
+		    x = cx;
+		 
+		if (cy < rect.currY)
+		    y = rect.currY;
+		else if (cy > rect.currY + rect.height)
+		    y = rect.currY + rect.height;
+		else
+		    y = cy;
+		 
+		boolean result;
+		if (findDistance(cx, cy, x, y) < circle.width / 2)
+			result = true;
+		else
+			result = false;
+		
+		return result;
+		*/
+	}
 	
 	/**
 	 * Check if the two circles are colliding.
@@ -219,12 +249,12 @@ public class EntityStuff
 	 */
 	public static boolean circleVsCircle(GameObject c1, GameObject c2)
 	{
-		float x1 = c1.currX + c1.getWidth()  / 2,
-			  y1 = c1.currY + c1.getHeight() / 2,
-			  x2 = c2.currX + c2.getWidth()  / 2,
-			  y2 = c2.currY + c2.getHeight() / 2,
-			  r1 = c1.getWidth() / 2,
-			  r2 = c2.getHeight() / 2;
+		float x1 = c1.currX + c1.width()  / 2,
+			  y1 = c1.currY + c1.height() / 2,
+			  x2 = c2.currX + c2.width()  / 2,
+			  y2 = c2.currY + c2.height() / 2,
+			  r1 = c1.width() / 2,
+			  r2 = c2.height() / 2;
 
 	    float dx = x2 - x1;
 	    float dy = y2 - y1;
@@ -243,60 +273,55 @@ public class EntityStuff
 	 */
 	public static boolean pixelPerfect(GameObject obj1, GameObject obj2)
 	{	
+		if(obj1.rotation != 0 || obj2.rotation != 0)
+			throw new IllegalStateException("Pixel pefect do not work on rotated entities.");
+		
 		Image2D image1 = getEntityImage(obj1);
 		Image2D image2 = getEntityImage(obj2);
 		
 		if(image1 == null ||image2 == null)
 			return false;
 		
-		int top    = (int) Math.max(obj1.currY, obj2.currY);
-		int bottom = (int) Math.min(obj1.currY + obj1.height, obj2.currY + obj2.height);
-		int left   = (int) Math.max(obj1.currX, obj2.currX);
-		int right  = (int) Math.min(obj1.currX + obj1.width, obj2.currX + obj2.width);
+		final float width1  = image1.getWidth();
+		final float height1 = image1.getHeight();
+		final float width2  = image2.getWidth();
+		final float height2 = image2.getHeight();
+		final int top    = (int) Math.max(obj1.currY, obj2.currY);
+		final int bottom = (int) Math.min(obj1.currY + height1, obj2.currY + height2);
+		final int left   = (int) Math.max(obj1.currX, obj2.currX);
+		final int right  = (int) Math.min(obj1.currX + width1, obj2.currX + width2);
 		
-		boolean flipped1 = image1.isFlipX();
-		boolean flipped2 = image2.isFlipX();
-
 		for (int y = top; y < bottom; y++)
 		{
 			for (int x = left; x < right; x++)
 			{
-				int colorA;
-				int colorB;
+				int x1 = (obj1.flipX) ? (int)(width1  - (x - obj1.currX) - 1) : (int) (x - obj1.currX);
+				int y1 = (obj1.flipY) ? (int)(height1 - (y - obj1.currY) - 1) : (int) (y - obj1.currY);
 				
-				if(flipped1)
-					colorA = image1.getColor((int)(obj1.width - (x - obj1.currX) - 1), (int) (y - obj1.currY));
-				else
-					colorA = image1.getColor((int) (x - obj1.currX), (int) (y - obj1.currY));
+				int x2 = (obj2.flipX) ? (int)(width2  - (x - obj2.currX) - 1) : (int) (x - obj2.currX);
+				int y2 = (obj2.flipY) ? (int)(height2 - (y - obj2.currY) - 1) : (int) (y - obj2.currY);
 				
-				if(flipped2)
-					colorB = image2.getColor((int)(obj2.width - (x - obj2.currX) - 1), (int) (y - obj2.currY));
-				else
-					colorB = image2.getColor((int) (x - obj2.currX), (int) (y - obj2.currY));
-				
-				if (colorA != 0 && colorB != 0)
+				if (image1.getColor(x1, y1) != 0 && image2.getColor(x2, y2) != 0)
 					return true;
 			}
 		}
 		return false;
 	}
 	
-	private static Image2D getEntityImage(GameObject go)
+	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)
 	{
-		if(!go.isVisible())
-			return null;
+		Image2D image1 = getEntityImage(obj1);
+		Image2D image2 = getEntityImage(obj2);
 		
-		Image2D img =  null;
-		boolean stopped = go.currImage.isStopped();
-		go.currImage.stop(true);
+		if(image1 == null ||image2 == null)
+			return false;
 		
-		if(go instanceof MainCharacter)
-			img = ((MainCharacter)go).getFrameByForce();
-		else
-			img = go.getFrame();
+		Matrix3 m1 = new Matrix3().setToRotation(new Vector3(obj1.centerX(), obj1.centerY(), 0), obj1.rotation);
+		Matrix3 m2 = new Matrix3().setToRotation(new Vector3(obj2.centerX(), obj2.centerY(), 0), obj2.rotation);
 		
-		go.currImage.stop(stopped);
-		return img;
+		Matrix3 transformAToB = new Matrix3(m1).mul(new Matrix3(m2).inv());
+		
+		return false;
 	}
 	
 //	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)
@@ -382,9 +407,9 @@ public class EntityStuff
 	 */
 	public static boolean circleVsLine(float Ax, float Ay, float Bx, float By, GameObject circle)
 	{
-		float r = circle.getWidth() / 2;
+		float r = circle.width() / 2;
 		float Cx = circle.currX + r;
-		float Cy = circle.currY + circle.getHeight() / 2;
+		float Cy = circle.currY + circle.height() / 2;
 		
 		double LAB = Math.sqrt((Bx-Ax)*(Bx-Ax) + (By-Ay)*(By-Ay));
 		double Dx = (Bx-Ax)/LAB;
@@ -397,41 +422,6 @@ public class EntityStuff
 			return true;
 		
 		return false;
-	}
-	
-	static double findDistance(double x1, double y1, double x2, double y2){
-	    double a = Math.abs(x1 - x2);
-	    double b = Math.abs(y1 - y2);
-	 
-	    return Math.sqrt((a * a) + (b * b));
-	}
-	
-	private static void addVectors2D(Vector2 v1, Vector2 v2)
-	{
-		v1.x += v2.x;
-		v1.y += v2.y;
-	}
-
-	private static void subVectors2D(Vector2 v1, Vector2 v2)
-	{
-		v1.x -= v2.x;
-		v1.y -= v2.y;
-	}
-
-	private static void rotateVector2DClockwise(Vector2 v, float ang)
-	{
-		float cosa = (float) Math.cos(ang),
-			  sina = (float) Math.sin(ang),
-			  t = v.x;
-		 
-		v.x =  t * cosa + v.y * sina;
-		v.y = -t * sina + v.y * cosa;
-	}
-	
-	private static class RotRect
-	{
-		Vector2 C, S;
-		float ang;
 	}
 	
 	/**
@@ -470,9 +460,99 @@ public class EntityStuff
 		}
 	}
 	
+	/**
+	 * Reefer to findWallPoint(int, int, int, int)
+	 */
 	public static Point2D.Float findWallPoint(float x0, float y0, float x1, float y1)
 	{
 		return EntityStuff.findWallPoint((int)x0,(int)y0,(int)x1,(int)y1);
+	}
+	
+	/**
+	 * Returns the bounding box of the rotated rectangle.
+	 * @param go The {@code GameObject} to calculate the bounding box on.
+	 * @return The bounding box.
+	 */
+	public static Rectangle getBoundingBox(GameObject go)
+	{
+		ArrayList<Point2D.Float> points = new ArrayList<>(4);
+		float[] arr = new float[8];
+		
+		for(int i = 0; i < 4; i++)
+		{
+			float 	x = 0,
+					y = 0;
+			
+			switch(i)
+			{
+				case 0:
+					x = go.currX;
+					y = go.currY;
+					break;
+				case 1:
+					x = go.currX + go.width();
+					y = go.currY;
+					break;
+				case 2:
+					x = go.currX;
+					y = go.currY + go.height();
+					break;
+				case 3:
+					x = go.currX + go.width();
+					y = go.currY + go.height();
+					break;
+			}
+
+			arr[0] = x;
+			arr[1] = y;
+			arr[2] = arr[3] = arr[4] = arr[5] = arr[6] = arr[7] = 0;
+			
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians(go.rotation), go.centerX(), go.centerY());
+			at.transform(arr, 0, arr, 0, 4);
+			
+			points.add(new Point2D.Float(arr[0], arr[1]));
+		}
+		
+		float minX, maxX, minY, maxY, value1, value2;
+		
+		value1 = Math.min(points.get(0).x, points.get(1).x);
+		value2 = Math.min(points.get(2).x, points.get(3).x);
+		minX = Math.min(value1, value2);
+		
+		value1 = Math.max(points.get(0).x, points.get(1).x);
+		value2 = Math.max(points.get(2).x, points.get(3).x);
+		maxX = Math.max(value1, value2);
+		
+		value1 = Math.min(points.get(0).y, points.get(1).y);
+		value2 = Math.min(points.get(2).y, points.get(3).y);
+		minY = Math.min(value1, value2);
+		
+		value1 = Math.max(points.get(0).y, points.get(1).y);
+		value2 = Math.max(points.get(2).y, points.get(3).y);
+		maxY = Math.max(value1, value2);
+		
+		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+	}
+	
+	/**
+	 * Rotates {@code x} and {@code y} and return the new coordinates.
+	 * @param x The relative x position we want after a rotation.
+	 * @param y The relative y position we want after a rotation.
+	 * @param cx Center x coordinate of the rectangle.
+	 * @param cy Center y coordinate of the rectangle.
+	 * @param rotation The angle in degrees.
+	 * @return The point that contains the absolute coordinates.
+	 */
+	public static Point2D.Float getRotatedPoint(float x, float y, float cx, float cy, float rotation)
+	{
+		final float[] arr = {x, y, 0, 0, 0, 0, 0, 0};
+		
+		AffineTransform at = new AffineTransform();
+		at.rotate(Math.toRadians(rotation), cx, cy);
+		at.transform(arr, 0, arr, 0, 4);
+		
+		return new Point2D.Float(arr[0], arr[1]);
 	}
 	
 	/**
@@ -594,8 +674,8 @@ public class EntityStuff
 		{
 			if(lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX + go.width, go.currY)              			||
 			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX, go.currY + go.height)             			||
-			   lineIntersect(x1,y1,x2,y2, go.currX + go.width, go.currY, go.currX + go.getWidth(), go.currY + go.getHeight()) ||
-			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY + go.height, go.currX + go.getWidth(), go.currY + go.getHeight()))
+			   lineIntersect(x1,y1,x2,y2, go.currX + go.width, go.currY, go.currX + go.width(), go.currY + go.height()) ||
+			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY + go.height, go.currX + go.width(), go.currY + go.height()))
 				return true;
 					
 			return false;
@@ -642,7 +722,7 @@ public class EntityStuff
 	}
 	
 	/**
-	 * Returns the angle between the two points.
+	 * Returns the angle between the two points in degrees.
 	 */
 	public static double getAngle(float x1, float y1, float x2, float y2)
 	{
@@ -658,7 +738,7 @@ public class EntityStuff
 	 */
 	public static double distance(GameObject go1, GameObject go2)
 	{
-		return EntityStuff.distance(go1.currX + go1.getWidth() / 2, go1.currY + go1.getHeight() / 2, go2.currX + go2.getWidth() / 2, go2.currY + go2.getHeight() / 2);
+		return EntityStuff.distance(go1.currX + go1.width() / 2, go1.currY + go1.height() / 2, go2.currX + go2.width() / 2, go2.currY + go2.height() / 2);
 	}
 	
 	/**
@@ -815,5 +895,109 @@ public class EntityStuff
 		    return Direction.SE;
 		
 		return null;
+	}
+	
+	/**
+	 * Continues from the start point {@code x} and {@code y} with the given direction until the edge of the stage has been reached, which is the point returned.
+	 * @param x The x coordinate to start at.
+	 * @param y The y coordinate to start at.
+	 * @param dir The direction to move in.
+	 * @return The point.
+	 */
+	public static Point2D.Float getEdgePoint(float x, float y, Direction dir)
+	{
+		float targetX, targetY;
+		
+		switch (dir)
+		{
+			case NW:
+				targetX = x - 1;
+				targetY = y - 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case N:
+				targetX = x;
+				targetY = y - 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case NE:
+				targetX = x + 1;
+				targetY = y - 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case E:
+				targetX = x + 1;
+				targetY = y;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case SE:
+				targetX = x + 1;
+				targetY = y + 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case S:
+				targetX = x;
+				targetY = y + 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case SW:
+				targetX = x - 1;
+				targetY = y + 1;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+			
+			case W:
+				targetX = x - 1;
+				targetY = y;
+				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+		
+			default:
+				return null;
+		}
+	}
+	
+	private static Image2D getEntityImage(GameObject go)
+	{
+		if(!go.isVisible())
+			return null;
+		
+		Image2D img =  null;
+		boolean stopped = go.currImage.isStopped();
+		go.currImage.stop(true);
+		
+		if(go instanceof MainCharacter)
+			img = ((MainCharacter)go).getFrameByForce();
+		else
+			img = go.getFrame();
+		
+		go.currImage.stop(stopped);
+		return img;
+	}
+	
+	private static void addVectors2D(Vector2 v1, Vector2 v2)
+	{
+		v1.x += v2.x;
+		v1.y += v2.y;
+	}
+
+	private static void subVectors2D(Vector2 v1, Vector2 v2)
+	{
+		v1.x -= v2.x;
+		v1.y -= v2.y;
+	}
+
+	private static void rotateVector2DClockwise(Vector2 v, float ang)
+	{
+		float cosa = (float) Math.cos(ang),
+			  sina = (float) Math.sin(ang),
+			  t = v.x;
+		 
+		v.x =  t * cosa + v.y * sina;
+		v.y = -t * sina + v.y * cosa;
+	}
+	
+	private static class RotRect
+	{
+		Vector2 C, S;
+		float ang;
 	}
 }

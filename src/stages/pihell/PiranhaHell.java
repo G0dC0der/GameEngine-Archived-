@@ -206,7 +206,6 @@ public class PiranhaHell extends StageBuilder
 		fireBall.setImage(fireball);
 		fireBall.useFastCollisionCheck(true);
 		fireBall.addEvent(()->{fireBall.rotation += 5;});
-		fireBall.useSpecialEffect(false);
 		fireBall.setMoveSpeed(3);
 		fireBall.setFiringSound(fireSound);
 		

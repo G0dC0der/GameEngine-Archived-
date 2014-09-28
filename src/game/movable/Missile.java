@@ -36,7 +36,7 @@ public class Missile extends Projectile
 	public float thrust, drag, delta;
 	private float vx, vy;
 	private int trailerDelay, delayCounter, reloadCounter;
-	private boolean faceTarget;
+	private boolean faceTarget, pointAtDirection;
 	private Particle trailer;
 	GameObject currTarget;
 	
@@ -170,6 +170,15 @@ public class Missile extends Projectile
 	}
 	
 	/**
+	 * Whether or not this missile should rotate towards its direction.
+	 * @param pointAtDirection True to rottate towards its current direction.
+	 */
+	public void pointAtDirection(boolean pointAtDirection)
+	{
+		this.pointAtDirection = pointAtDirection;
+	}
+	
+	/**
 	 * The animation to spawn at the missiles tail.
 	 * @param trailer The animation.
 	 */
@@ -202,17 +211,14 @@ public class Missile extends Projectile
 		float centerX = currX + width / 2;
 		float centerY = currY + height / 2;
 		
-		if (specEffect)
-		{
 			if(faceTarget)
 				rotation = (float) EntityStuff.getAngle(centerX, centerY, targetX, targetY);
-			else
+			else if (pointAtDirection)
 				rotation = (float) Math.toDegrees(Math.atan2(vy, vx));
-		}
 		
 		if(visible && haveTarget() && trailer != null && ++delayCounter % trailerDelay == 0)
 		{
-			if(specEffect)
+			if(pointAtDirection)
 			{
 				Point2D.Float loc = getRarePosition();
 				stage.add(trailer.getClone(loc.x - trailer.width / 2, loc.y - trailer.height / 2));

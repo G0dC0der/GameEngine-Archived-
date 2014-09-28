@@ -31,6 +31,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class SelectStage implements Screen
 {
@@ -68,7 +71,8 @@ public class SelectStage implements Screen
 			stages.add(ch);
 		}
 		
-		stage = new Stage(800,600,false);
+		
+		stage = new Stage(new ScreenViewport());
 		Gdx.input.setInputProcessor(stage);
 		
 		skin = new Skin(Gdx.files.internal("res/data/uiskin3.json"));

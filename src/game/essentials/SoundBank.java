@@ -45,7 +45,7 @@ public class SoundBank
 	public SoundBank(int size)
 	{
 		units = new Unit[size];
-		maxDistance = 400;
+		maxDistance = 800;
 		maxVolume = 1.0f;
 		power = 40;
 	}
@@ -92,6 +92,11 @@ public class SoundBank
 			if(units[index].delay > 0 && FRAME_COUNTER < units[index].time)
 				return;
 			
+			if(falloff && emitter == null)
+				throw new IllegalStateException("Sound fall off enabled but no emitter is set.");
+			
+			double volume = units[index].sound.getVolume();
+			
 			if(falloff && emitter != null)
 			{
 				GameObject[] focusObjs = Stage.STAGE.game.getFocusList().toArray(new GameObject[Stage.STAGE.game.getFocusList().size()]);
@@ -99,18 +104,18 @@ public class SoundBank
 				double distance = EntityStuff.distance(emitter, EntityStuff.findClosest(emitter, focusObjs));
 				double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 				
-				units[index].sound.setVolume(Math.min(candidate, maxVolume));
+				volume = Math.min(candidate, maxVolume);
 			}
 			
 			if(ignore)
 			{
-				units[index].sound.play();
+				units[index].sound.play(volume);
 				units[index].time = units[index].delay + FRAME_COUNTER;
 			}
 			else if(units[index].allowed)
 			{
 				units[index].allowed = false;
-				units[index].sound.play();
+				units[index].sound.play(volume);
 				units[index].time = units[index].delay + FRAME_COUNTER;
 			}
 		}
@@ -254,6 +259,7 @@ public class SoundBank
 		bank.maxDistance = maxDistance;
 		bank.maxVolume = maxVolume;
 		bank.power = power;
+		bank.emitter = emitter;
 		
 		return bank;
 	}

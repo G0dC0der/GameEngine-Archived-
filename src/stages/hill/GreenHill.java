@@ -162,7 +162,6 @@ public class GreenHill extends Stage
 		final FallingProjectile sproj = new FallingProjectile(0, 0, bird, gm);
 		sproj.setImage(new Frequency<>(1, pooImg));
 		sproj.setDisposable(true);
-		sproj.useSpecialEffect(false);
 		sproj.setImpact(pooImpact);
 		bird.setSpawners(sproj);
 		bird.addEvent(Factory.soundFalloff(pooSplash, bird, gm, 800, 5, 100,1));

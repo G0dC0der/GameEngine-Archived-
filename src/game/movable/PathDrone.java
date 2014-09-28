@@ -51,6 +51,11 @@ public class PathDrone extends Enemy
 			this.event = event;
 		}
 		
+		public PathData(float targetX, float targetY)
+		{
+			this(targetX,targetY,0,false,null);
+		}
+		
 		@Override
 		public String toString()
 		{

@@ -34,7 +34,7 @@ public class TheMainClass
 		cfg.height = 600;
 		cfg.vSyncEnabled = settings.vsync; 
 		cfg.resizable = false;
-		cfg.useGL30 = true; 
+		cfg.useGL30 = false; 
 		cfg.backgroundFPS = settings.fps;
 		cfg.foregroundFPS = settings.fps;
 		cfg.addIcon("res/data/icon128x128.png", FileType.Internal);

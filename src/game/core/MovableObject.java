@@ -104,7 +104,7 @@ public class MovableObject extends GameObject
 	
 	
 	/**
-	 * The facing of a {@code GameObject} is by default set automatically by the engine. It can be switched off here.
+	 * The facing of a {@code MovableObject} is by default set automatically by the engine. It can be switched off here.
 	 * @param manualFacings True if you want to disable automatic facing initiations.
 	 */
 	public void setManualFacing(boolean manualFacings)
@@ -166,12 +166,12 @@ public class MovableObject extends GameObject
 					case NE:
 					case E:
 					case SE:
-						img.setFlip(false, true);
+						flipX = false;
 						break;
 					case SW:
 					case W:
 					case NW:
-						img.setFlip(true, true);
+						flipX = true;
 						break;
 					default:
 						break;
@@ -226,6 +226,8 @@ public class MovableObject extends GameObject
 		dest.multiFacings = multiFacings;
 		dest.manualFacings = manualFacings; 
 		dest.facing = facing;
+		dest.doubleFaced = doubleFaced;
+		dest.flipImage = flipImage;
 	}
 	
 	/**
@@ -601,11 +603,11 @@ public class MovableObject extends GameObject
 		if(collidesWithMultiple(target) == null)
 			return;
 		
-		float centerX = currX + getWidth() / 2;
-		float centerY = currY + getHeight() / 2;
+		float centerX = currX + width() / 2;
+		float centerY = currY + height() / 2;
 		
-        double overX = ((target.getWidth()  + getWidth() ) /  2.0) - Math.abs((target.currX + target.getWidth()  / 2) - centerX);
-        double overY = ((target.getHeight() + getHeight()) /  2.0) - Math.abs((target.currY + target.getHeight() / 2) - centerY);
+        double overX = ((target.width()  + width() ) /  2.0) - Math.abs((target.currX + target.width()  / 2) - centerX);
+        double overY = ((target.height() + height()) /  2.0) - Math.abs((target.currY + target.height() / 2) - centerY);
        
         if(overY > overX)
         {

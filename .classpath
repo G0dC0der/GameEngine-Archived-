@@ -6,10 +6,10 @@
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/gdx-backend-lwjgl.jar"/>
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/gdx-backend-lwjgl-natives.jar"/>
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/gdx-natives.jar"/>
-	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/tinysound-1.1.0 Pojahn.jar" sourcepath="/TinySound"/>
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/jorbis-0.0.17.jar"/>
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/tritonus_share.jar"/>
 	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/vorbisspi1.0.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Pojahns Library"/>
+	<classpathentry kind="lib" path="E:/- Installed -/Eclipse Projects/Game_Engine/libs/tinysound-1.1.0 Pojahn.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

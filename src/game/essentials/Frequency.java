@@ -259,7 +259,7 @@ public class Frequency<T>
 	 */
 	public boolean hasEnded()
 	{
-		return index >= limit;
+		return index >= limit - 1;
 	}
 	
 	/**

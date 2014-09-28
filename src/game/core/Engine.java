@@ -15,7 +15,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import kuusisto.tinysound.TinySound;
@@ -23,7 +22,6 @@ import org.lwjgl.opengl.GL11;
 import pjjava.misc.OtherMath;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -284,7 +282,6 @@ public final class Engine implements Screen
 	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
-	private HashSet<Integer> pressedKeys;
 	private Color currTint;
 	private Event exitEvent;
 	private com.badlogic.gdx.scenes.scene2d.Stage gui;
@@ -303,7 +300,6 @@ public final class Engine implements Screen
 		elapsedTime = 0;
 		globalState = GameState.ONGOING;
 		zoom = 1;
-		pressedKeys = new HashSet<>();
 		currTint = new Color(defaultTint);
 		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
 		justRestarted = true;
@@ -339,7 +335,7 @@ public final class Engine implements Screen
 		{
 			try
 			{
-				boolean escDown = isKeyPressed(Keys.ESCAPE);
+				boolean escDown = Gdx.input.isKeyJustPressed(Keys.ESCAPE);
 				if((globalState == GameState.ONGOING || globalState == GameState.PAUSED) && !playReplay && escDown)
 					globalState = globalState == GameState.PAUSED ? GameState.ONGOING : GameState.PAUSED;
 				
@@ -348,7 +344,6 @@ public final class Engine implements Screen
 				
 				if(globalState == GameState.PAUSED && !playReplay)
 				{
-					pressedKeys.clear();
 					if(stage.music != null  && stage.music.getVolume() != .101f)
 					{
 						if(musicVolume != .1f)
@@ -501,7 +496,6 @@ public final class Engine implements Screen
 		stage.extra();
 
 		SoundBank.FRAME_COUNTER++;
-		pressedKeys.clear();
 	}
 	
 	@Override
@@ -530,16 +524,6 @@ public final class Engine implements Screen
 
 		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
 		ShaderProgram.pedantic = false;
-		
-		Gdx.input.setInputProcessor(new InputAdapter()
-		{			
-			@Override
-			public boolean keyDown(int key) 
-			{
-				pressedKeys.add(key);
-				return true;
-			}
-		});
 	}
 	
 	@Override
@@ -653,16 +637,6 @@ public final class Engine implements Screen
 	public void removeFocusObject(GameObject obj)
 	{
 		focusObjs.remove(obj);
-	}
-	
-	/**
-	 * Checks if the specified key is down. Works only the first frame the key was down.
-	 * @param key The key to check.
-	 * @return True if the specified key was down.
-	 */
-	public boolean isKeyPressed(int key)
-	{
-		return pressedKeys.contains(key);
 	}
 	
 	/**
@@ -785,11 +759,11 @@ public final class Engine implements Screen
 		pb.left 	  = Gdx.input.isKeyPressed(con.left);
 		pb.right 	  = Gdx.input.isKeyPressed(con.right);
 		pb.up 		  = Gdx.input.isKeyPressed(con.up);
-		pb.special1   = isKeyPressed(con.special1);
-		pb.special2   = isKeyPressed(con.special2);
-		pb.special3   = isKeyPressed(con.special3);
-		pb.switchChar = isKeyPressed(con.switchChar);
-		pb.suicide    = isKeyPressed(con.suicide);
+		pb.special1   = Gdx.input.isKeyJustPressed(con.special1);
+		pb.special2   = Gdx.input.isKeyJustPressed(con.special2);
+		pb.special3   = Gdx.input.isKeyJustPressed(con.special3);
+		pb.switchChar = Gdx.input.isKeyJustPressed(con.switchChar);
+		pb.suicide    = Gdx.input.isKeyJustPressed(con.suicide);
 		
 		return pb;
 	}
@@ -837,8 +811,8 @@ public final class Engine implements Screen
 		
 		if(size == 1)
 		{
-			tx = Math.min(stage.size.width  - viewport.width,   Math.max(0, first.getCenterX() - viewport.width  / 2)) + viewport.width  / 2; 
-			ty = Math.min(stage.size.height - viewport.height,  Math.max(0, first.getCenterY() - viewport.height / 2)) + viewport.height / 2;
+			tx = Math.min(stage.size.width  - viewport.width,   Math.max(0, first.centerX() - viewport.width  / 2)) + viewport.width  / 2; 
+			ty = Math.min(stage.size.height - viewport.height,  Math.max(0, first.centerY() - viewport.height / 2)) + viewport.height / 2;
 		}
 		else if(size > 1)
 		{
@@ -847,8 +821,8 @@ public final class Engine implements Screen
 			
 			float boxX	= first.currX;
 			float boxY	= first.currY; 
-			float boxWidth	= boxX + first.getWidth();
-			float boxHeight	= boxY + first.getHeight();
+			float boxWidth	= boxX + first.width();
+			float boxHeight	= boxY + first.height();
 
 			for(int i = 1; i < focusObjs.size(); i++)
 			{
@@ -857,8 +831,8 @@ public final class Engine implements Screen
 				boxX = Math.min( boxX, focus.currX );
 				boxY = Math.min( boxY, focus.currY );
 				
-				boxWidth  = Math.max( boxWidth,  focus.currX + focus.getWidth () );
-				boxHeight = Math.max( boxHeight, focus.currY + focus.getHeight() );
+				boxWidth  = Math.max( boxWidth,  focus.currX + focus.width () );
+				boxHeight = Math.max( boxHeight, focus.currY + focus.height() );
 			}
 			boxWidth = boxWidth - boxX;
 			boxHeight = boxHeight - boxY;
@@ -907,19 +881,6 @@ public final class Engine implements Screen
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
 		focusObjs.clear();
-		
-		if(!playReplay)
-		{
-			Gdx.input.setInputProcessor(new InputAdapter()
-			{			
-				@Override
-				public boolean keyDown(int key) 
-				{
-					pressedKeys.add(key);
-					return true;
-				}
-			});
-		}
 	}
 	
 	private void renderStatusBar()
@@ -953,7 +914,15 @@ public final class Engine implements Screen
 	{
 		Image2D img = go.getFrame();
 		if (img != null)
+		{
+			img.setFlip(go.flipX, !go.flipY);
+			
+			batch.setColor(currTint.r, currTint.g, currTint.b, go.alpha);
 			batch.draw(img, go.currX + go.offsetX, go.currY + go.offsetY, img.getWidth() / 2,img.getHeight() / 2, go.width * go.scale, go.height * go.scale, 1, 1, go.rotation);
+			batch.setColor(currTint.r, currTint.g, currTint.b, currTint.a);
+			
+			img.setFlip(!go.flipX, go.flipY);
+		}
 	}
 	
 	private void saveReplay(String playername)

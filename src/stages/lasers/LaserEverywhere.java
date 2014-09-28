@@ -53,7 +53,7 @@ public class LaserEverywhere extends StageBuilder
 			boom7     = TinySound.loadSound(new File(("res/lasereverywhere/boom.wav")));
 			boom8     = TinySound.loadSound(new File(("res/lasereverywhere/boom.wav")));
 			
-			setStageMusic("res/lasereverywhere/song.ogg", 1.869, 1.0f);
+			setStageMusic("res/lasereverywhere/song.ogg", 15.93, 1.0f);
 			
 		}
 		catch(Exception e)
@@ -158,9 +158,9 @@ public class LaserEverywhere extends StageBuilder
 		Particle impact1 = new Particle();
 		impact1.setImage(3, miniexpImg);
 		impact1.setIntroSound(boom1);
-		impact1.setSoundEmitter(impact1);
-		impact1.useSoundFallOff(true);
-		impact1.emitterProps(550, 1, 30);
+		impact1.getSoundBank().useFallOff(true);
+		impact1.getSoundBank().maxDistance = 550;
+		impact1.getSoundBank().power = 30;
 		
 		Particle impact2 = impact1.getClone(0, 0);
 		impact1.setIntroSound(boom2);

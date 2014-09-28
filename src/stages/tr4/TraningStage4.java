@@ -36,7 +36,8 @@ public class TraningStage4 extends AbstractTraningStage
 	static final String RES = "res/traning4";
 
 	@AutoLoad(path=RES, type=VisualType.IMAGE)
-	private Image2D elevator, hydrolics, redPlatform, head[], moving, cloud[], platform, crystal[], gateImg, enemy[], fan[], wind[], weak[], goal, headgone[], backgroundImg, foregroundImg, friendImg;
+	private Image2D elevator, hydrolics, redPlatform, head[], moving, cloud[], platform, crystal[], gateImg, enemy[], fan[], wind[], weak[], goal, headgone[], friendImg;
+	private Image2D background, foreground;
 	private Sound elevatorStop, elevatorWorking, headMove, reporting, teleport, collect, doorOpen, weakDie/*, talking*/;
 	private Music propeller;
 	private BitmapFont talkingFont;
@@ -50,6 +51,9 @@ public class TraningStage4 extends AbstractTraningStage
 		try
 		{
 			super.init();
+			
+			background = new Image2D(RES + "/backgroundImg.png");
+			foreground = new Image2D(RES + "/foregroundImg.png");
 			
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
 //			talking = TinySound.loadSound(new File(RES + "/talking.wav"));
@@ -89,8 +93,8 @@ public class TraningStage4 extends AbstractTraningStage
 		chaserHunting = false;
 		diamonds = collectedDiamonds = 0;
 		setPeople(gm);
-		background(RenderOption.PORTION, backgroundImg);
-		foreground(RenderOption.PORTION, foregroundImg);
+		background(RenderOption.PORTION, background);
+		foreground(RenderOption.PORTION, foreground);
 		
 		/*
 		 * Main Character

@@ -3,13 +3,11 @@ package game.movable;
 import game.core.Enemy;
 import game.core.EntityStuff;
 import game.core.GameObject;
-import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.objects.Particle;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import kuusisto.tinysound.Sound;
-
 
 /**
  * The {@code Projectile} is scanning for a set of targets, firing at the closest visible one.<br>
@@ -22,7 +20,7 @@ import kuusisto.tinysound.Sound;
 public class Projectile extends Enemy
 {
 	protected float initialX, initialY, targetX, targetY;
-	protected boolean scanAllowed, specEffect;
+	protected boolean scanAllowed;
 	private final GameObject[] targets;
 	private Particle impact;
 	private ArrayList<GameObject> otherTargets;
@@ -42,10 +40,11 @@ public class Projectile extends Enemy
 		this.targets = targets;
 		targetX = -1;
 		targetY = -1;
-		scanAllowed = specEffect = true;
+		scanAllowed = true;
 		reloadCounter = 0;
 		otherTargets = new ArrayList<>();
 		sounds = new SoundBank(1);//0 = firing sounds
+		sounds.setEmitter(this);
 	}
 	
 	@Override
@@ -61,7 +60,6 @@ public class Projectile extends Enemy
 	{
 		super.copyData(dest);
 		dest.scanAllowed = scanAllowed;
-		dest.specEffect = specEffect;
 		dest.impact = impact;
 		dest.otherTargets.addAll(otherTargets);
 		dest.targetX = targetX;
@@ -134,7 +132,8 @@ public class Projectile extends Enemy
 			stage.discard(this);
 		else
 		{
-			targetX = targetY = -1;
+			if(scanAllowed)
+				targetX = targetY = -1;
 			reloadCounter = reload;
 			visible = false;
 			sounds.allowSound(0);
@@ -221,6 +220,16 @@ public class Projectile extends Enemy
 	}
 	
 	/**
+	 * Sets the target from the given point.
+	 * @param target The target to fire at.
+	 */
+	public void setTarget(Point2D.Float target)
+	{
+		targetX = target.x;
+		targetY = target.y;
+	}
+	
+	/**
 	 * Returns the current target, or null if it have no target.
 	 * @return The target.
 	 */
@@ -239,15 +248,6 @@ public class Projectile extends Enemy
 	public void scanningAllowed(boolean scan)
 	{
 		this.scanAllowed = scan;
-	}
-
-	/**
-	 * Using special effect causes the the class to render a bullet instead of using an image.
-	 * @param specEffect True to dispose image and render a bullet instead.
-	 */
-	public void useSpecialEffect(boolean specEffect)
-	{
-		this.specEffect = specEffect;
 	}
 	
 	/**
@@ -275,14 +275,5 @@ public class Projectile extends Enemy
 	public void setImpact(Particle impact)
 	{
 		this.impact = impact;
-	}
-	
-	@Override
-	public Image2D getFrame()
-	{
-		if (!specEffect)
-			return super.getFrame();
-		else
-			return null;
 	}
 }
