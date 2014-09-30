@@ -486,7 +486,7 @@ public class SpiritTemple extends Stage
 						@Override
 						public void eventHandling() 
 						{
-							game.addFocusObject(gm);
+							game.removeFocusObject(quaker);
 							gm.unfreeze();
 							debris.unfreeze();
 							debris2.unfreeze();

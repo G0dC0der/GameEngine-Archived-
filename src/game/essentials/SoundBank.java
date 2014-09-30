@@ -263,4 +263,26 @@ public class SoundBank
 		
 		return bank;
 	}
+	
+	/**
+	 * Returns the volume calculated by the distance between the two given points. 
+	 */
+	public static float getVolume(float emitterX, float emitterY, float listenerX, float listenerY, float maxDistance, float maxVolume, float power)
+	{
+		double distance = EntityStuff.distance(emitterX, emitterY, listenerX, listenerY);
+		double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
+		
+		return (float) Math.min(candidate, maxVolume);
+	}
+	
+	/**
+	 * Returns the volume calculated by the distance between the two {@code GameObjects}. 
+	 */
+	public static float getVolume(GameObject emitter, GameObject listener, float maxDistance, float maxVolume, float power)
+	{
+		double distance = EntityStuff.distance(emitter, listener);
+		double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
+		
+		return (float) Math.min(candidate, maxVolume);
+	}
 }

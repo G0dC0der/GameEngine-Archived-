@@ -1,6 +1,5 @@
 package game.development;
 
-import game.core.GameObject;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Frequency;
@@ -8,15 +7,12 @@ import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
 import game.objects.Particle;
-
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 
@@ -156,19 +152,9 @@ public abstract class StageBuilder extends Stage
 			basicInits();
 			
 			if(backgroundImg != null)
-			{
-				GameObject wrapper = new GameObject();
-				wrapper.setImage(3,backgroundImg);
-				wrapper.zIndex(-100);
-				add(wrapper);
-			}
+				background(RenderOption.PORTION, backgroundImg);
 			if(foregroundImg != null)
-			{
-				GameObject wrapper = new GameObject();
-				wrapper.setImage(3,foregroundImg);
-				wrapper.zIndex(100);
-				add(wrapper);
-			}
+				foreground(RenderOption.PORTION, foregroundImg);
 			
 			/*
 			 * Main Character

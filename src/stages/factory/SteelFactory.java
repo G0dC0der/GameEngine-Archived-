@@ -112,7 +112,8 @@ public class SteelFactory extends StageBuilder
 		
 		game.timeColor = game.deathTextColor = Color.WHITE;
 		collect1 = collect2 = collect3 = collect4 = collect5 = energy1 = energy2 = energy3 = once = false;
-		deathCounter++;
+		if(!game.playingReplay())
+			deathCounter++;
 
 		saws.clear();
 		
@@ -1044,7 +1045,7 @@ public class SteelFactory extends StageBuilder
 	@Override
 	public Serializable getMeta()
 	{
-		return "deathCounter=" + (deathCounter + 1);
+		return "deathCounter=" + deathCounter;
 	}
 	
 	@Override

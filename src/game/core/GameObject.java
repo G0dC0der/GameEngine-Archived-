@@ -514,7 +514,12 @@ public class GameObject
 	{
 		if(!events.isEmpty())
 			for(Event event : events)
-				event.eventHandling();
+			{
+				if(event.done())
+					removeEvent(event);
+				else
+					event.eventHandling();
+			}
 	}
 	
 	/**

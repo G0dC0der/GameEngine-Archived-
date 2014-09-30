@@ -154,6 +154,14 @@ public class PathDrone extends Enemy
 	}
 	
 	/**
+	 * Appends the current position to the waypoint list.
+	 */
+	public void appendPath()
+	{
+		pathData.add(new PathData(currX, currY, 0, false, null));
+	}
+	
+	/**
 	 * Creates a clone of the current waypoint list, reverses the order and appends it to the list.
 	 */
 	public void appendReversed()

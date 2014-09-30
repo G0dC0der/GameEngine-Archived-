@@ -2,15 +2,11 @@ package game.core;
 
 import game.core.Engine.Direction;
 import game.essentials.Image2D;
-
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 /**
  * This class holds a number of static methods for essential calculations such as collision detection etc.
@@ -310,56 +306,48 @@ public class EntityStuff
 	
 	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)
 	{
+		throw new RuntimeException("Method not implemented yet.");
+		/*
 		Image2D image1 = getEntityImage(obj1);
 		Image2D image2 = getEntityImage(obj2);
 		
 		if(image1 == null ||image2 == null)
 			return false;
 		
-		Matrix3 m1 = new Matrix3().setToRotation(new Vector3(obj1.centerX(), obj1.centerY(), 0), obj1.rotation);
-		Matrix3 m2 = new Matrix3().setToRotation(new Vector3(obj2.centerX(), obj2.centerY(), 0), obj2.rotation);
+		Matrix4 m1 = new Matrix4().rotate(obj1.centerX(), obj1.centerY(), 0, obj1.rotation).translate(obj1.currX, obj1.currY, 0);
+		Matrix4 m2 = new Matrix4().rotate(obj2.centerX(), obj2.centerY(), 0, obj2.rotation).translate(obj2.currX, obj2.currY, 0);
 		
-		Matrix3 transformAToB = new Matrix3(m1).mul(new Matrix3(m2).inv());
+		Matrix4 transformAToB = new Matrix4(m1).mul(new Matrix4(m2).inv());
 		
-		return false;
+		Vector3 stepX = new Vector3(Vector3.X).rot(transformAToB).nor();
+		Vector3 stepY = new Vector3(Vector3.Y).rot(transformAToB).nor();
+
+		Vector3 yPosInB = new Vector3(Vector3.Zero).rot(transformAToB);
+		
+		for (int yA = 0; yA < obj1.height; yA++)
+		{
+			Vector3 posInB = new Vector3(yPosInB);
+			
+			for (int xA = 0; xA < obj1.width; xA++)
+			{
+				int xB = Math.round(posInB.x);
+				int yB = Math.round(posInB.y);
+              
+              if (	0 <= xB && xB < obj2.width  &&
+            		0 <= yB && yB < obj2.height &&
+            		image1.getColor(xA,yA) != 0 && image2.getColor(xB,yB) != 0)
+            	  return true;
+              
+              posInB.x += stepX.x;
+              posInB.y += stepX.y;
+			}
+			
+			yPosInB.x += stepY.x;
+			yPosInB.y += stepY.y;
+		}
+		
+		return false;*/
 	}
-	
-//	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)
-//	{
-//		int[][] data1 = ((obj1 instanceof MainCharacter) ? ((MainCharacter)obj1).getRightFrame() : obj1.scontrol.getCurrentObject()).data;
-//		int[][] data2 = ((obj2 instanceof MainCharacter) ? ((MainCharacter)obj2).getRightFrame() : obj2.scontrol.getCurrentObject()).data;
-//
-//		Transform tA = Transform.createRotateTransform((float) Math.toRadians(obj1.rotation), obj1.currX + obj1.width / 2, obj1.currY + obj1.height / 2);
-//		Transform tB = Transform.createRotateTransform((float) Math.toRadians(obj2.rotation), obj2.currX + obj2.width / 2, obj2.currY + obj2.height / 2);	
-//		Transform AToB = Utilities.multiply(tA, Utilities.invert(tB));
-//		
-//		Vector2 stepX = Utilities.transformNormal(new Vector2(1,0), AToB);
-//		Vector2 stepY = Utilities.transformNormal(new Vector2(0,1), AToB);
-//		
-//		Vector2 yPosInB = AToB.transform(new Vector2(0,0));
-//		
-//		for (int yA = 0; yA < obj1.height; yA++)
-//        {
-//			Vector2 posInB = new Vector2(yPosInB);
-//			
-//			for (int xA = 0; xA < obj1.width; xA++)
-//            {
-//				int xB = Math.round(posInB.x);
-//                int yB = Math.round(posInB.y);
-//                
-//                if (0 <= xB && xB < obj2.width && 0 <= yB && yB < obj2.height)
-//                {
-//                	if(data1[xA][yA] != 0 && data2[xB][yB] != 0)
-//                		return true;
-//                }
-//                posInB.x += stepX.x;
-//                posInB.y += stepX.y;
-//            }
-//			yPosInB.x += stepY.x;
-//			yPosInB.y += stepY.y;
-//        }
-//		return false;
-//	}
 	
 	/**
 	 * Check if the two lines are colliding.

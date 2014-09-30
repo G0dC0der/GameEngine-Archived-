@@ -44,7 +44,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=DiamondCave.PATH)
-@Playable(name="Diamond Cave", description="Stage: Diamond Cave\nAuthor: Pojahn Moradi\nAverage time: 140 sec\nProfessional time: 90 sec\nObjective: Grab the gem.")
+@Playable(name="Diamond Cave", description="Stage: Diamond Cave\nAuthor: Pojahn Moradi\nDifficulty: 5\nAverage time: 140 sec\nProfessional time: 90 sec\nObjective: Grab the gem.")
 public class DiamondCave extends StageBuilder
 {
 	final static String PATH = "res/diamondcave";
@@ -57,7 +57,7 @@ public class DiamondCave extends StageBuilder
 	private Music frying;
 	private Image2D weakDie[], background, foreground;
 	private Particle blingbling;
-	private PathData[] data1, data2, data3, data4;
+	private PathData[] data1, data2, data3;
 	private int counter = 0;
 	
 	@Override
@@ -144,20 +144,20 @@ public class DiamondCave extends StageBuilder
 		/*
 		 * Early Spikes
 		 */
-		GameObject sp = new GameObject();
-		sp.moveTo(1403 + 8, 976);
-		sp.setImage(spikes);
-		sp.setHitbox(Hitbox.EXACT);
-		sp.addEvent(Factory.hitMain(sp, gm, -1));
-		sp.alpha = .7f;
-		
-		GameObject sp2 = new GameObject();
-		sp2.moveTo(1403, 976);
-		sp2.setImage(spikes2);
-		sp2.setHitbox(Hitbox.EXACT);
-		sp2.addEvent(Factory.hitMain(sp2, gm, -1));
-		sp2.alpha = .7f;
-		add(sp, sp2);
+//		GameObject sp = new GameObject();
+//		sp.moveTo(1403 + 8, 976);
+//		sp.setImage(spikes);
+//		sp.setHitbox(Hitbox.EXACT);
+//		sp.addEvent(Factory.hitMain(sp, gm, -1));
+//		sp.alpha = .7f;
+//		
+//		GameObject sp2 = new GameObject();
+//		sp2.moveTo(1403, 976);
+//		sp2.setImage(spikes2);
+//		sp2.setHitbox(Hitbox.EXACT);
+//		sp2.addEvent(Factory.hitMain(sp2, gm, -1));
+//		sp2.alpha = .7f;
+//		add(sp, sp2);
 		
 		/*
 		 * Bear
@@ -179,7 +179,6 @@ public class DiamondCave extends StageBuilder
 			data1 = randomWallPoints();
 			data2 = randomWallPoints();
 			data3 = randomWallPoints();
-			data4 = randomWallPoints();
 		}
 		
 		PathDrone ram1 = new PathDrone(2303, 297);
@@ -189,30 +188,24 @@ public class DiamondCave extends StageBuilder
 		ram1.setHitbox(Hitbox.CIRCLE);
 		PathDrone ram2 = ram1.getClone(ram1.currX + ram1.width + 100, ram1.currY);
 		PathDrone ram3 = ram1.getClone(ram1.currX, ram1.currY + ram1.height + 100);
-		PathDrone ram4 = ram1.getClone(ram1.currX + ram1.width + 10, ram1.currY + ram1.height + 10);
 		final int rotationSpeed = 15;
 		
 		ram1.appendPath(data1);
 		ram1.addEvent(Factory.hitMain(ram1, gm, -1));
-		ram1.avoidOverlapping(ram2, ram3, ram4);
+		ram1.avoidOverlapping(ram2, ram3);
 		ram1.addEvent(()->{ram1.rotation += rotationSpeed;});
 		
 		ram2.appendPath(data2);
 		ram2.addEvent(Factory.hitMain(ram2, gm, -1));
-		ram2.avoidOverlapping(ram1, ram3, ram4);
+		ram2.avoidOverlapping(ram1, ram3);
 		ram2.addEvent(()->{ram2.rotation += rotationSpeed;});
 		
 		ram3.appendPath(data3);
 		ram3.addEvent(Factory.hitMain(ram3, gm, -1));
-		ram3.avoidOverlapping(ram1, ram2, ram4);
+		ram3.avoidOverlapping(ram1, ram2);
 		ram3.addEvent(()->{ram3.rotation += rotationSpeed;});
 		
-		ram4.appendPath(data4);
-		ram4.addEvent(Factory.hitMain(ram4, gm, -1));
-		ram4.avoidOverlapping(ram1, ram2, ram3);
-		ram4.addEvent(()->{ram4.rotation += rotationSpeed;});
-		
-		add(ram1,ram2,ram3,ram4);
+		add(ram1,ram2,ram3);
 		
 		/*
 		 * Weak Platforms
@@ -222,7 +215,7 @@ public class DiamondCave extends StageBuilder
 			GameObject w = new GameObject();
 			w.moveTo(x, y);
 			w.setImage(weak);
-			w.addEvent(Factory.weakPlatform(w, new Frequency<>(10, weakDie), 50, null, gm));
+			w.addEvent(Factory.weakPlatform(w, new Frequency<>(10, weakDie), 120, null, gm));
 			add(w);
 		}
 		
@@ -455,7 +448,6 @@ public class DiamondCave extends StageBuilder
 		waypoints.add(data1);
 		waypoints.add(data2);
 		waypoints.add(data3);
-		waypoints.add(data4);
 		
 		return waypoints;
 	}
@@ -468,7 +460,6 @@ public class DiamondCave extends StageBuilder
 		data1 = waypoints.get(0);
 		data2 = waypoints.get(1);
 		data3 = waypoints.get(2);
-		data4 = waypoints.get(3);
 	}
 	
 	PathData[] randomWallPoints()

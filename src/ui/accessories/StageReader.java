@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import stages.demo.DemoStage;
+import stages.demo.DebuggingMap;
 
 public class StageReader 
 {
@@ -102,7 +102,7 @@ public class StageReader
 	private static List<Class<Stage>> readAllStages() throws Exception
 	{
 		List<Class<Stage>> clazzez = new ArrayList<>();
-		String[] packages = getResourceListing(DemoStage.class, "stages/");
+		String[] packages = getResourceListing(DebuggingMap.class, "stages/");
 		
 		for(String packageName : packages)
 		{
