@@ -27,7 +27,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=LightsOut.PATH)
-@Playable(name="Lights Out", description="Stage: Lights Out\nAuthor: Pojahn Moradi\nDifficulty: 4\nAverage time: - sec\nProfessional time: - sec\nObjective: Enter goal.")
+@Playable(name="Lights Out", description="Stage: Lights Out\nAuthor: Pojahn Moradi\nDifficulty: 5\nAverage time: 90 sec\nProfessional time: 70 sec\nObjective: Enter goal.")
 public class LightsOut extends StageBuilder
 {
 	static final String PATH = "res/lightsout";
