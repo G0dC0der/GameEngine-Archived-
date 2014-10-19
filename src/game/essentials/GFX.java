@@ -1,7 +1,7 @@
 package game.essentials;
 
 import static game.essentials.Utilities.*;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.Stage;
 import java.util.Random;
 import com.badlogic.gdx.graphics.Color;
@@ -36,7 +36,7 @@ public class GFX
 	 */
 	public static void drawLightning(SpriteBatch batch, float x1, float y1, float x2, float y2, float displace, float detail, float thickness, float noise, int numberOfBolts, boolean blend, Color... colors) 
 	{
-		Color orgColor = Stage.STAGE.game.defaultTint;
+		Color orgColor = Stage.getCurrentStage().game.defaultTint;
 		if(blend)
 			batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 
@@ -53,7 +53,7 @@ public class GFX
 	
 	private static void drawLine(SpriteBatch batch, float _x1, float _y1, float _x2, float _y2, float thickness) 
 	{
-		float length = (float) EntityStuff.distance(_x1, _y1, _x2, _y2);
+		float length = (float) Fundementals.distance(_x1, _y1, _x2, _y2);
 		float dx = _x1;
 		float dy = _y1;
 		dx = dx - _x2;

@@ -87,6 +87,9 @@ public class OneWay extends GameObject implements Event
 		OneWay ow = new OneWay(x, y, direction, targets);
 		copyData(ow);
 		
+		if(cloneEvent != null)
+			cloneEvent.cloned(ow);
+		
 		return ow;
 	}
 }

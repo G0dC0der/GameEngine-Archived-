@@ -2,17 +2,20 @@ package game.core;
 
 import game.core.Engine.Direction;
 import game.essentials.Image2D;
+
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * This class holds a number of static methods for essential calculations such as collision detection etc.
  * @author Pojahn Moradi
  */
-public class EntityStuff 
+public class Fundementals 
 {
 	/**
 	 * Checks if the two rectangles are colliding.<br>
@@ -304,23 +307,23 @@ public class EntityStuff
 		return false;
 	}
 	
-	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)
+	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)	//TODO: Test
 	{
-		throw new RuntimeException("Method not implemented yet.");
-		/*
+//		throw new RuntimeException("Method not implemented yet.");
+		
 		Image2D image1 = getEntityImage(obj1);
 		Image2D image2 = getEntityImage(obj2);
 		
 		if(image1 == null ||image2 == null)
 			return false;
 		
-		Matrix4 m1 = new Matrix4().rotate(obj1.centerX(), obj1.centerY(), 0, obj1.rotation).translate(obj1.currX, obj1.currY, 0);
-		Matrix4 m2 = new Matrix4().rotate(obj2.centerX(), obj2.centerY(), 0, obj2.rotation).translate(obj2.currX, obj2.currY, 0);
+		Matrix4 m1 = new Matrix4().rotate(obj1.centerX(), obj1.centerY(), 0, obj1.rotation);
+		Matrix4 m2 = new Matrix4().rotate(obj2.centerX(), obj2.centerY(), 0, obj2.rotation);
 		
 		Matrix4 transformAToB = new Matrix4(m1).mul(new Matrix4(m2).inv());
 		
-		Vector3 stepX = new Vector3(Vector3.X).rot(transformAToB).nor();
-		Vector3 stepY = new Vector3(Vector3.Y).rot(transformAToB).nor();
+		Vector3 stepX = new Vector3(Vector3.X).mul(transformAToB).nor();
+		Vector3 stepY = new Vector3(Vector3.Y).mul(transformAToB).nor();
 
 		Vector3 yPosInB = new Vector3(Vector3.Zero).rot(transformAToB);
 		
@@ -333,20 +336,18 @@ public class EntityStuff
 				int xB = Math.round(posInB.x);
 				int yB = Math.round(posInB.y);
               
-              if (	0 <= xB && xB < obj2.width  &&
-            		0 <= yB && yB < obj2.height &&
-            		image1.getColor(xA,yA) != 0 && image2.getColor(xB,yB) != 0)
-            	  return true;
+				if(	0 <= xB && xB < obj2.width  && 0 <= yB && yB < obj2.height && image1.getColor(xA,yA) != 0 && image2.getColor(xB,yB) != 0 )
+					return true;
               
-              posInB.x += stepX.x;
-              posInB.y += stepX.y;
+              	posInB.x += stepX.x;
+              	posInB.y += stepX.y;
 			}
 			
 			yPosInB.x += stepY.x;
 			yPosInB.y += stepY.y;
 		}
 		
-		return false;*/
+		return false;
 	}
 	
 	/**
@@ -420,7 +421,7 @@ public class EntityStuff
 	 * @param y1 The y position of the second point.
 	 * @return The point where solid space was found.
 	 */
-	public static Point2D.Float findWallPoint(int x0, int y0, final int x1, final int y1)	//TODO: Remove this function, use tileSearch instead.
+	public static Vector2 findWallPoint(int x0, int y0, final int x1, final int y1)	//TODO: Remove this function, use tileSearch instead.
 	{
 		final int dx = Math.abs(x1-x0);
 		final int dy = Math.abs(y1-y0); 
@@ -432,7 +433,7 @@ public class EntityStuff
 		while (true)
 		{
 			if (MovableObject.outOfBounds(x0, y0) || b[y0][x0] == Engine.SOLID)
-				return new Point2D.Float(x0, y0);
+				return new Vector2(x0, y0);
 			
 			final int e2 = 2 * err;
 			if (e2 > -dy)
@@ -451,9 +452,9 @@ public class EntityStuff
 	/**
 	 * Reefer to findWallPoint(int, int, int, int)
 	 */
-	public static Point2D.Float findWallPoint(float x0, float y0, float x1, float y1)
+	public static Vector2 findWallPoint(float x0, float y0, float x1, float y1)
 	{
-		return EntityStuff.findWallPoint((int)x0,(int)y0,(int)x1,(int)y1);
+		return Fundementals.findWallPoint((int)x0,(int)y0,(int)x1,(int)y1);
 	}
 	
 	/**
@@ -463,7 +464,7 @@ public class EntityStuff
 	 */
 	public static Rectangle getBoundingBox(GameObject go)
 	{
-		ArrayList<Point2D.Float> points = new ArrayList<>(4);
+		ArrayList<Vector2> points = new ArrayList<>(4);
 		float[] arr = new float[8];
 		
 		for(int i = 0; i < 4; i++)
@@ -499,7 +500,7 @@ public class EntityStuff
 			at.rotate(Math.toRadians(go.rotation), go.centerX(), go.centerY());
 			at.transform(arr, 0, arr, 0, 4);
 			
-			points.add(new Point2D.Float(arr[0], arr[1]));
+			points.add(new Vector2(arr[0], arr[1]));
 		}
 		
 		float minX, maxX, minY, maxY, value1, value2;
@@ -524,15 +525,15 @@ public class EntityStuff
 	}
 	
 	/**
-	 * Rotates {@code x} and {@code y} and return the new coordinates.
-	 * @param x The relative x position we want after a rotation.
-	 * @param y The relative y position we want after a rotation.
-	 * @param cx Center x coordinate of the rectangle.
-	 * @param cy Center y coordinate of the rectangle.
+	 * Rotates {@code x} and {@code y} and return the new coordinate.
+	 * @param x The x coordinate we want after a rotation(absolute).
+	 * @param y The y coordinate we want after a rotation(absolute).
+	 * @param cx Center x coordinate of the rectangle(absolute).
+	 * @param cy Center y coordinate of the rectangle(absolute).
 	 * @param rotation The angle in degrees.
-	 * @return The point that contains the absolute coordinates.
+	 * @return The point that contains the rotated coordinates.
 	 */
-	public static Point2D.Float getRotatedPoint(float x, float y, float cx, float cy, float rotation)
+	public static Vector2 getRotatedPoint(float x, float y, float cx, float cy, float rotation)
 	{
 		final float[] arr = {x, y, 0, 0, 0, 0, 0, 0};
 		
@@ -540,11 +541,11 @@ public class EntityStuff
 		at.rotate(Math.toRadians(rotation), cx, cy);
 		at.transform(arr, 0, arr, 0, 4);
 		
-		return new Point2D.Float(arr[0], arr[1]);
+		return new Vector2(arr[0], arr[1]);
 	}
 	
 	/**
-	 * Iterates through the specified line and searches for the given tile type.<br>
+	 * Iterates through the specified line and continues in the specified path, searching for the given tile type.<br>
 	 * Return a non-null value if the given tile was found between the two points.
 	 * @param x0 The x position of the first point.
 	 * @param y0 The y position of the first point.
@@ -553,7 +554,7 @@ public class EntityStuff
 	 * @param tile The tile to scan for.
 	 * @return The point where the tile was found, or null if the tile was not found.
 	 */
-	public static Point2D.Float searchTile(int x0, int y0, final int x1, final int y1, byte tile)
+	public static Vector2 searchTile(int x0, int y0, final int x1, final int y1, byte tile)
 	{
 		final int dx = Math.abs(x1-x0);
 		final int dy = Math.abs(y1-y0); 
@@ -567,7 +568,7 @@ public class EntityStuff
 			if(MovableObject.outOfBounds(x0, y0))
 				return null;
 			else if(b[y0][x0] == tile)
-				return new Point2D.Float(x0, y0);
+				return new Vector2(x0, y0);
 			
 			final int e2 = 2 * err;
 			if (e2 > -dy)
@@ -583,7 +584,7 @@ public class EntityStuff
 		}
 	}
 	
-	public static Point2D.Float searchTile(float x0, float y0, final float x1, final float y1, byte tile)
+	public static Vector2 searchTile(float x0, float y0, final float x1, final float y1, byte tile)
 	{
 		return searchTile((int)x0, (int)y0, (int)x1, (int)y1, tile);
 	}
@@ -607,7 +608,7 @@ public class EntityStuff
 		
 		for (int i = 0; i < targets.length; i++)
 		{				
-			double distance = EntityStuff.distance(watcher, targets[i]);
+			double distance = Fundementals.distance(watcher, targets[i]);
 			
 			if (closestLength == 0)
 			{
@@ -726,7 +727,7 @@ public class EntityStuff
 	 */
 	public static double distance(GameObject go1, GameObject go2)
 	{
-		return EntityStuff.distance(go1.currX + go1.width() / 2, go1.currY + go1.height() / 2, go2.currX + go2.width() / 2, go2.currY + go2.height() / 2);
+		return Fundementals.distance(go1.currX, go1.currY, go2.currX, go2.currY);
 	}
 	
 	/**
@@ -745,13 +746,13 @@ public class EntityStuff
 	 * @param tarY The targets Y point.
 	 * @return The edge point.
 	 */
-	public static Point2D.Float findEdgePoint(float obsX, float obsY, float tarX, float tarY)
+	public static Vector2 findEdgePoint(float obsX, float obsY, float tarX, float tarY)
 	{
 		int width  = Stage.STAGE.size.width;
 		int height = Stage.STAGE.size.height;
 		
-		Point2D.Float obs = new Point2D.Float(obsX, obsY);
-		Point2D.Float tar = new Point2D.Float(tarX, tarY);
+		Vector2 obs = new Vector2(obsX, obsY);
+		Vector2 tar = new Vector2(tarX, tarY);
 		
 		float vTime = 1.0e20f;
 		if 		(tar.x > obs.x) vTime = (width - obs.x) / (tar.x - obs.x);
@@ -766,14 +767,14 @@ public class EntityStuff
 		float newX = obs.x + time * (tar.x - obs.x);
 		float newY = obs.y + time * (tar.y - obs.y);
 		
-		return new Point2D.Float(newX, newY);
+		return new Vector2(newX, newY);
 	}
 	
 	/**
 	 * Uses the {@code GameObjects} middle point.<br>
 	 * See findEdgePoint(float obsX, float obsY, float tarX, float tarY) for reference.
 	 */
-	public static Point2D.Float findEdgePoint(GameObject observer, GameObject target)
+	public static Vector2 findEdgePoint(GameObject observer, GameObject target)
 	{
 		return findEdgePoint(observer.currX + observer.width / 2,
 							 observer.currY + observer.height / 2,
@@ -831,7 +832,7 @@ public class EntityStuff
 	 * Normalizes the two points.
 	 * @return The normalized point.
 	 */
-	public static Point2D.Float normalize(float x1, float y1, float x2, float y2)
+	public static Vector2 normalize(float x1, float y1, float x2, float y2)
 	{
 		float dx = x1 - x2;
 		float dy = y1 - y2;
@@ -839,7 +840,7 @@ public class EntityStuff
 		dx /= length;
 		dy /= length;
 		
-		return new Point2D.Float(dx,dy);
+		return new Vector2(dx,dy);
 	}
 
 	/**
@@ -848,7 +849,7 @@ public class EntityStuff
 	 * @param go2 The second object.
 	 * @return The normalized point.
 	 */
-	public static Point2D.Float normalize(GameObject go1, GameObject go2)
+	public static Vector2 normalize(GameObject go1, GameObject go2)
 	{
 		return normalize(go1.currX, go1.currY, go2.currX, go2.currY);
 	}
@@ -858,7 +859,7 @@ public class EntityStuff
 	 * @param normalizedPoint A normalized point.
 	 * @return The direction of the point.
 	 */
-	public static Direction getDirection(Point2D.Float normalizedPoint)
+	public static Direction getDirection(Vector2 normalizedPoint)
 	{
 		double x = normalizedPoint.x;
 		double y = normalizedPoint.y;
@@ -892,7 +893,7 @@ public class EntityStuff
 	 * @param dir The direction to move in.
 	 * @return The point.
 	 */
-	public static Point2D.Float getEdgePoint(float x, float y, Direction dir)
+	public static Vector2 getEdgePoint(float x, float y, Direction dir)
 	{
 		float targetX, targetY;
 		
@@ -901,42 +902,42 @@ public class EntityStuff
 			case NW:
 				targetX = x - 1;
 				targetY = y - 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case N:
 				targetX = x;
 				targetY = y - 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case NE:
 				targetX = x + 1;
 				targetY = y - 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case E:
 				targetX = x + 1;
 				targetY = y;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case SE:
 				targetX = x + 1;
 				targetY = y + 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case S:
 				targetX = x;
 				targetY = y + 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case SW:
 				targetX = x - 1;
 				targetY = y + 1;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 			
 			case W:
 				targetX = x - 1;
 				targetY = y;
-				return EntityStuff.findEdgePoint(x, y, targetX, targetY);
+				return Fundementals.findEdgePoint(x, y, targetX, targetY);
 		
 			default:
 				return null;
@@ -949,15 +950,15 @@ public class EntityStuff
 			return null;
 		
 		Image2D img =  null;
-		boolean stopped = go.currImage.isStopped();
-		go.currImage.stop(true);
+		boolean stopped = go.image.isStopped();
+		go.image.stop(true);
 		
 		if(go instanceof MainCharacter)
 			img = ((MainCharacter)go).getFrameByForce();
 		else
 			img = go.getFrame();
 		
-		go.currImage.stop(stopped);
+		go.image.stop(stopped);
 		return img;
 	}
 	

@@ -5,19 +5,16 @@ import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
 import game.development.AutoInstall;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
-import game.essentials.Utilities;
 import game.movable.Gold;
-
 import java.io.File;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 import stages.traning.AbstractTraningStage;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -47,13 +44,13 @@ public class TraningStage2  extends AbstractTraningStage
 			flagImg = Image2D.loadImages(new File("res/climb/flag"));
 			goldImg = Image2D.loadImages(new File("res/traning2/collect"));
 			
-			talk1 = Utilities.loadMusic("res/traning2/talk1.wav");
-			talk2 = Utilities.loadMusic("res/traning2/talk2.wav");
-			talk3 = Utilities.loadMusic("res/traning2/talk3.wav");
-			press = Utilities.loadSound("res/traning2/press.wav");
-			open = Utilities.loadSound("res/traning2/dooropen.wav");
-			shut = Utilities.loadSound("res/traning2/doorshut.wav");
-			collect = Utilities.loadSound("res/general/collect1.wav");
+			talk1 = TinySound.loadMusic(new File("res/traning2/talk1.wav"));
+			talk2 = TinySound.loadMusic(new File("res/traning2/talk2.wav"));
+			talk3 = TinySound.loadMusic(new File("res/traning2/talk3.wav"));
+			press = TinySound.loadSound(new File("res/traning2/press.wav"));
+			open = TinySound.loadSound(new File("res/traning2/dooropen.wav"));
+			shut = TinySound.loadSound(new File("res/traning2/doorshut.wav"));
+			collect = TinySound.loadSound(new File("res/general/collect1.wav"));
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
 			setStageMusic("res/traning2/song.ogg",0f, 1.0f);
 			
@@ -85,7 +82,7 @@ public class TraningStage2  extends AbstractTraningStage
 		/*
 		 * Gold
 		 */
-		Frequency<Image2D> goldImage = new Frequency<>(5, goldImg);
+		Animation<Image2D> goldImage = new Animation<>(5, goldImg);
 		goldImage.pingPong(true);
 		
 		Gold gold = new Gold(435, 261, -1000, gm);

@@ -4,12 +4,10 @@ import game.core.Enemy;
 import game.core.Engine.Direction;
 import game.core.GameObject;
 import game.core.MovableObject;
-import game.core.Stage;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -48,7 +46,7 @@ public final class Thwump extends Enemy
 	private Direction fallingDir;
 	private KillingBox killingbox;
 	private MovableObject[] targets;
-	private Frequency<Image2D> attackImage, sleepImage, returnImage;
+	private Animation<Image2D> attackImage, sleepImage, returnImage;
 	private final GameObject dummy, scanDummy;
 	
 	/**
@@ -71,6 +69,7 @@ public final class Thwump extends Enemy
 		killingbox = KillingBox.NONE;
 		state = State.SLEEP;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 		
 		for(MovableObject mo : targets)
 			mo.avoidOverlapping(this);
@@ -129,7 +128,7 @@ public final class Thwump extends Enemy
 	}
 	
 	@Override
-	public void endUse()
+	public void dismiss()
 	{
 		for(MovableObject mo : targets)
 			mo.allowOverlapping(this);
@@ -191,8 +190,8 @@ public final class Thwump extends Enemy
 		state = State.FALLING;
 		if(attackImage != null)
 		{
-			currImage = attackImage;
-			currImage.reset();
+			image = attackImage;
+			image.reset();
 		}
 	}
 	
@@ -202,16 +201,16 @@ public final class Thwump extends Enemy
 		state = State.RISING;
 		if(returnImage != null)
 		{
-			currImage = returnImage;
-			currImage.reset();
+			image = returnImage;
+			image.reset();
 		}
 	}
 	
 	protected void reset()
 	{
 		state = State.SLEEP;
-		currImage = sleepImage;
-		currImage.reset();
+		image = sleepImage;
+		image.reset();
 	}
 
 	@Override
@@ -297,7 +296,7 @@ public final class Thwump extends Enemy
 	 * The image to use when falling. If not set, the idle image will be used.
 	 * @param attackImage The image.
 	 */
-	public void setAttackImage(Frequency<Image2D> attackImage)
+	public void setAttackImage(Animation<Image2D> attackImage)
 	{
 		this.attackImage = attackImage;
 	}
@@ -306,7 +305,7 @@ public final class Thwump extends Enemy
 	 * The image to use when returning. If not set, the idle image will be used.
 	 * @param returnImage The image.
 	 */
-	public void setReturnImage(Frequency<Image2D> returnImage)
+	public void setReturnImage(Animation<Image2D> returnImage)
 	{
 		this.returnImage = returnImage;
 	}
@@ -315,7 +314,7 @@ public final class Thwump extends Enemy
 	 * The image to use when idle.
 	 */
 	@Override
-	public void setImage(Frequency<Image2D> obj)
+	public void setImage(Animation<Image2D> obj)
 	{
 		super.setImage(obj);
 		sleepImage = obj;
@@ -372,7 +371,7 @@ public final class Thwump extends Enemy
 				scanDummy.currX = x1;
 				scanDummy.currY = currY + height;
 				scanDummy.width = width;
-				scanDummy.height = Stage.STAGE.size.height - currY - height;
+				scanDummy.height = stage.size.height - currY - height;
 				break;
 			case W:
 				scanDummy.currX = 0;
@@ -383,7 +382,7 @@ public final class Thwump extends Enemy
 			case E:
 				scanDummy.currX = currX + width;
 				scanDummy.currY = currY;
-				scanDummy.width = Stage.STAGE.size.width - currX - width;
+				scanDummy.width = stage.size.width - currX - width;
 				scanDummy.height = height;
 				break;
 			default:

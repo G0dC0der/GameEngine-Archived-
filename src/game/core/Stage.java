@@ -4,22 +4,19 @@ import game.core.Engine.Direction;
 import game.core.Engine.GameState;
 import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
+import game.essentials.CameraEffect;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
 import game.essentials.Pair;
-
 import java.awt.Dimension;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -73,14 +70,18 @@ public abstract class Stage
 		/**
 		 * Render the parts of the background/foreground that is visible to the human eye. Possible performance boosts.
 		 */
-		PORTION
+		PORTION,
+		/**
+		 * Repeats the texture vertically and horizontally.
+		 */
+		REPEAT
 	};
 	
 	/**
 	 * This is the stage that currently being played. <br>
 	 * This variable is set automatically when a stage has been launched.
 	 */
-	public static Stage STAGE;
+	static Stage STAGE;
 	
 	/**
 	 * The stage data, which stores all the tile information. The values stored in this matrix are constant found in {@code game.core.Engine}.
@@ -121,10 +122,10 @@ public abstract class Stage
 	List<MainCharacter> mains;
 	List<Event> events;
 	List<Pair<Object, Integer>> delayedObject;
+	List<CameraEffect> cameraEffects;
 	
 	public Stage()
 	{
-		STAGE = this;
 		discardList    = new LinkedList<>();
 		appendList     = new LinkedList<>();
 		stageObjects   = new LinkedList<>();
@@ -132,6 +133,7 @@ public abstract class Stage
 		trash		   = new LinkedList<>();
 		events 		   = new LinkedList<>();
 		delayedObject  = new LinkedList<>();
+		cameraEffects  = new LinkedList<>();
 		startX = startY = -1;
 		size = new Dimension();
 	}
@@ -223,6 +225,8 @@ public abstract class Stage
 						stageObjects.remove(obj);
 					else if(obj instanceof Event)
 						events.remove(obj);
+					else if(obj instanceof CameraEffect)
+						cameraEffects.remove(obj);
 				}
 			
 			if(!appendList.isEmpty())
@@ -235,6 +239,8 @@ public abstract class Stage
 					}
 					else if(obj instanceof Event)
 						events.add((Event)obj);
+					else if(obj instanceof CameraEffect)
+						cameraEffects.add((CameraEffect)obj);
 				}
 			
 			pending = false;
@@ -337,6 +343,9 @@ public abstract class Stage
 				
 				main.removeQueuedEvents();
 				main.runEvents();
+				
+				if(main.getState() == CharacterState.DEAD)
+					main.deathAction();
 			}
 			else
 				main.goBack();
@@ -400,7 +409,7 @@ public abstract class Stage
 			if(obj instanceof GameObject)
 			{
 				GameObject go = (GameObject) obj;
-				go.endUse();
+				go.dismiss();
 			}
 			if(obj != null)
 				discardList.add(obj);
@@ -442,7 +451,7 @@ public abstract class Stage
 	public void build()
 	{
 		for(GameObject go : stageObjects)
-			go.endUse();
+			go.dismiss();
 		
 		trash.clear();
 		stageObjects.clear();
@@ -591,6 +600,15 @@ public abstract class Stage
 		}
 	}
 	
+	/**
+	 * Returns the stage that is currently being played.
+	 * @return The active stage.
+	 */
+	public static Stage getCurrentStage()
+	{
+		return STAGE;
+	}
+	
 	public static GameObject readTMX(final String path)
 	{
 		return new GameObject()
@@ -624,7 +642,7 @@ public abstract class Stage
 	{
 		if(!mo.manualFacings)
 		{
-			Direction dir = EntityStuff.getDirection(EntityStuff.normalize(mo.prevX, mo.prevY, mo.currX, mo.currY));
+			Direction dir = Fundementals.getDirection(Fundementals.normalize(mo.prevX, mo.prevY, mo.currX, mo.currY));
 			if(dir != null)
 			{
 				if(mo.doubleFaced)
@@ -644,62 +662,5 @@ public abstract class Stage
 		
 	    for (int i = 0; i < stageData.length; i++) 
 	        System.arraycopy(stageData[i], 0, stageClone[i], 0, stageData[i].length);
-	}
-	
-	private static class SceneImage extends GameObject
-	{
-		RenderOption type;
-		
-		SceneImage(RenderOption type)
-		{
-			this.type = type;
-			setVisible(true);
-		}
-		
-		@Override
-		public Image2D getFrame()
-		{
-			return null;
-		}
-		
-		@Override
-		public void drawSpecial(SpriteBatch batch)
-		{
-			switch(type)
-			{
-				case FULL:
-					batch.draw(super.getFrame(), 0, 0);
-					break;
-				case FIXED:
-					STAGE.game.clearTransformation();
-					batch.draw(super.getFrame(), 0, 0);
-					STAGE.game.restoreTransformation();
-					break;
-				case PORTION:
-					OrthographicCamera camera = STAGE.game.getCamera();
-					Engine e = STAGE.game;
-					int vw = Stage.STAGE.game.getScreenWidth();
-					int vh = Stage.STAGE.game.getScreenHeight();
-					
-					camera.up.set(0, 1, 0);
-					camera.direction.set(0, 0, -1);
-					camera.update();
-					batch.setProjectionMatrix(camera.combined);
-					
-					batch.draw(super.getFrame().getTexture(),
-								e.tx - vw / 2,
-								e.ty - vh / 2,
-								(int)(e.tx - vw / 2),
-								(int)(e.ty - vh / 2),
-								vw,
-								vh);
-					
-					camera.up.set(0, -1, 0);
-					camera.direction.set(0, 0, 1);
-					camera.update();
-					batch.setProjectionMatrix(STAGE.game.getCamera().combined);
-					break;
-			}
-		}
 	}
 }

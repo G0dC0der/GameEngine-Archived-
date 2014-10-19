@@ -1,8 +1,6 @@
 package game.essentials;
 
 import static game.core.Engine.*;
-import game.core.Stage;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,11 +11,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import kuusisto.tinysound.Music;
-import kuusisto.tinysound.Sound;
-import kuusisto.tinysound.TinySound;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -95,32 +88,6 @@ public class Utilities
 				c1.r == c2.r && 
 				c1.g == c2.g &&
 				c1.b == c2.b;
-	}
-	
-	/**
-	 * Loads the sound from the given path.
-	 * @param path The sounds path.
-	 * @return The sound at the given path.
-	 */
-	public static Sound loadSound(String path)
-	{
-		return TinySound.loadSound(new File(path),Stage.STAGE.game.streamSounds);
-	}
-	
-	/**
-	 * Loads the sound from the given path.
-	 * @param path The sounds path.
-	 * @return The sound at the given path.
-	 */
-	public static Music loadMusic(String path)
-	{
-		return TinySound.loadMusic(new File(path),Stage.STAGE.game.streamSounds);
-	}
-	
-	public static void unloadBatch(Sound... sounds)
-	{
-		for(Sound sound : sounds)
-			sound.unload();
 	}
 	
 	/**

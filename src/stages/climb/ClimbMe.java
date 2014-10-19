@@ -2,13 +2,13 @@ package stages.climb;
 
 import game.core.Engine;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -106,7 +106,7 @@ public class ClimbMe extends Stage
 		 * Main Character
 		 */
 		gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(2);
@@ -121,10 +121,10 @@ public class ClimbMe extends Stage
 		/*
 		 * Lower Weak Platforms
 		 */
-		Frequency<Image2D> destroyImage = new Frequency<>(1, weakdImg);
+		Animation<Image2D> destroyImage = new Animation<>(1, weakdImg);
 		
 		GameObject weak1 = new GameObject();
-		weak1.setImage(new Frequency<>(1, weakImg));
+		weak1.setImage(new Animation<>(1, weakImg));
 		weak1.currX = 270;
 		weak1.currY = 4162;
 		weak1.addEvent(Factory.weakPlatform(weak1, destroyImage, 70, collapse, gm));
@@ -159,7 +159,7 @@ public class ClimbMe extends Stage
 		y2 = 4003;
 		
 		sol1 = new SolidPlatform(x1, y1, gm);
-		sol1.setImage(new Frequency<>(1, movapImg));
+		sol1.setImage(new Animation<>(1, movapImg));
 		sol1.setMoveSpeed(moveSpeed);
 		sol1.appendPath(x2, y2, 5, false, null);
 		sol1.appendPath(x1, y1, 5, false, null);
@@ -269,40 +269,40 @@ public class ClimbMe extends Stage
 		 * Propeller and Winds
 		 */
 		GameObject prop1 = new GameObject();
-		prop1.setImage(new Frequency<>(2, propImg));
+		prop1.setImage(new Animation<>(2, propImg));
 		prop1.currX = 54;
 		prop1.currY = 2043;
 		prop1.setHitbox(Hitbox.EXACT);
 		prop1.addEvent(Factory.hitMain(prop1, gm, -1));
 		
 		Wind wind1 = new Wind(54, 2083 - windImg[0].getHeight(), Direction.N, 20, 350, gm);
-		wind1.setImage(new Frequency<>(3, windImg));
+		wind1.setImage(new Animation<>(3, windImg));
 		wind1.zIndex(50);
 		
 		add(prop1, wind1);
 		
 		GameObject prop2 = new GameObject();
-		prop2.setImage(new Frequency<>(2, prop2Img));
+		prop2.setImage(new Animation<>(2, prop2Img));
 		prop2.currX = 453;
 		prop2.currY = 1180;
 		prop2.setHitbox(Hitbox.EXACT);
 		prop2.addEvent(Factory.hitMain(prop2, gm, -1));
 		
 		Wind wind2 = new Wind(453, 1200, Direction.S, 20, 350, gm);
-		wind2.setImage(new Frequency<>(3, wind2Img));
+		wind2.setImage(new Animation<>(3, wind2Img));
 		wind2.zIndex(50);
 		
 		add(prop2, wind2);
 		
 		GameObject prop3 = new GameObject();
-		prop3.setImage(new Frequency<>(2, prop3Img));
+		prop3.setImage(new Animation<>(2, prop3Img));
 		prop3.currX = 577;
 		prop3.currY = 1262;
 		prop3.setHitbox(Hitbox.EXACT);
 		prop3.addEvent(Factory.hitMain(prop3, gm, -1));
 		
 		Wind wind3 = new Wind(587, 1262, Direction.E, 20, 350, gm);
-		wind3.setImage(new Frequency<>(3, wind3Img));
+		wind3.setImage(new Animation<>(3, wind3Img));
 		wind3.zIndex(50);
 		
 		add(prop3, wind3);
@@ -347,7 +347,7 @@ public class ClimbMe extends Stage
 		topb.appendPath(100, 206);
 		
 		GameObject flag = new GameObject();
-		flag.setImage(new Frequency<>(3, flagImg));
+		flag.setImage(new Animation<>(3, flagImg));
 		flag.currX = 1102;
 		flag.currY = 164;
 		
@@ -362,12 +362,12 @@ public class ClimbMe extends Stage
 	@Override
 	public void extra()
 	{
-		if(moveSpeed > EntityStuff.distance(sol1.currX, sol1.currY, x1, y1) && moveSpeed < EntityStuff.distance(sol2.currX, sol2.currY, x3, y3))
+		if(moveSpeed > Fundementals.distance(sol1.currX, sol1.currY, x1, y1) && moveSpeed < Fundementals.distance(sol2.currX, sol2.currY, x3, y3))
 			sol1.setMoveSpeed(0);
 		else
 			sol1.setMoveSpeed(moveSpeed);
 		
-		if(!reloading && EntityStuff.checkLine(1011, 2840, 0, 2840, gm))
+		if(!reloading && Fundementals.checkLine(1011, 2840, 0, 2840, gm))
 		{
 			Projectile clone = arrow.getClone(1011, 2830);
 			clone.setTarget(0, 2830);

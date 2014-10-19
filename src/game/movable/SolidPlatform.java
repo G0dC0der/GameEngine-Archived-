@@ -4,7 +4,7 @@ import game.core.Engine;
 import game.core.GameObject;
 import game.core.MovableObject;
 import game.core.Stage;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
@@ -22,7 +22,7 @@ public class SolidPlatform extends PathDrone
 	private boolean weak, tileDeformer, transformBack, strict, harsh;
 	private int destroyFrames;
 	private byte transformTo;
-	private Frequency<Image2D> destroyImage;
+	private Animation<Image2D> destroyImage;
 	private GameObject target;
 	private float targetOffsetX, targetOffsetY;
 	private int counter = 0;
@@ -42,6 +42,7 @@ public class SolidPlatform extends PathDrone
 		transformTo = Engine.SOLID;
 		harsh = true;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 		
 		for(MovableObject mo : subjects)
 			mo.avoidOverlapping(this);
@@ -52,6 +53,9 @@ public class SolidPlatform extends PathDrone
 	{
 		SolidPlatform p = new SolidPlatform(x, y, subjects);
 		copyData(p);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(p);
 		
 		return p;
 	}
@@ -94,8 +98,7 @@ public class SolidPlatform extends PathDrone
 		
 		if(collapsing && counter++ > destroyFrames)
 		{
-			endUse();
-			Stage.STAGE.discard(this);
+			Stage.getCurrentStage().discard(this);
 			return;
 		}
 		
@@ -112,7 +115,7 @@ public class SolidPlatform extends PathDrone
 					
 					sounds.trySound(0, false);
 					if(destroyImage != null)
-						currImage = destroyImage;
+						image = destroyImage;
 				}
 				
 				adjust(mo, harsh);
@@ -121,7 +124,7 @@ public class SolidPlatform extends PathDrone
 	}
 	
 	@Override
-	public void endUse()
+	public void dismiss()
 	{
 		for(MovableObject mo : subjects)
 			mo.allowOverlapping(this);
@@ -172,7 +175,7 @@ public class SolidPlatform extends PathDrone
 	 * The image to use when the weak platform have interacted with a subject.
 	 * @param destroyImage The image.
 	 */
-	public void setDestroyImage(Frequency<Image2D> destroyImage)
+	public void setDestroyImage(Animation<Image2D> destroyImage)
 	{
 		this.destroyImage = destroyImage;
 	}
@@ -214,7 +217,7 @@ public class SolidPlatform extends PathDrone
 		collapsing = true;
 		sounds.trySound(0, true);
 		if(destroyImage != null)
-			currImage = destroyImage;
+			image = destroyImage;
 	}
 	
 	/**
@@ -232,14 +235,14 @@ public class SolidPlatform extends PathDrone
 	 */
 	protected void deformBack()
 	{
-		byte[][] d = Stage.STAGE.stageData;
+		byte[][] d = stage.stageData;
 		for(int x = 1; x < width - 2; x++)
 			for(int y = 1; y < height - 2; y++)
 			{
 				int posX = (int) (x + getPrevX());
 				int posY = (int) (y + getPrevY());
 
-				d[posY][posX] = Stage.STAGE.getCloneData(posX, posY); 
+				d[posY][posX] = stage.getCloneData(posX, posY); 
 			}
 	}
 	
@@ -248,7 +251,7 @@ public class SolidPlatform extends PathDrone
 	 */
 	protected void deform()
 	{
-		byte[][] d = Stage.STAGE.stageData;
+		byte[][] d = Stage.getCurrentStage().stageData;
 		
 		for(int x = 1; x < width - 2; x++)
 			for(int y = 1; y < height - 2; y++)

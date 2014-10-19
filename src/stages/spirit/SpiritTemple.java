@@ -2,7 +2,7 @@ package stages.spirit;
 
 import game.core.Engine;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.GameObject.Hitbox;
@@ -12,7 +12,7 @@ import game.core.MovableObject.TileEvent;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
@@ -140,7 +140,7 @@ public class SpiritTemple extends Stage
 		 *******************************************
 		 */
 		gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(3);
@@ -163,7 +163,7 @@ public class SpiritTemple extends Stage
 		HorizontalDrone spike1 = new HorizontalDrone(2142, 1020);
 		spike1.setMoveSpeed(2);
 		spike1.setHitbox(Hitbox.EXACT);
-		spike1.setImage(new Frequency<>(1, spikeImg));
+		spike1.setImage(new Animation<>(1, spikeImg));
 		spike1.addEvent(Factory.hitMain(spike1, gm, -1));
 		spike1.addEvent(Factory.soundFalloff(steel, spike1, gm, 700, 3, 10,1));
 		
@@ -220,7 +220,7 @@ public class SpiritTemple extends Stage
 		 * Blocky
 		 *******************************************
 		 */
-		Frequency<Image2D> blockyImage = new Frequency<>(6, blockyImg);
+		Animation<Image2D> blockyImage = new Animation<>(6, blockyImg);
 		blockyImage.setMultiFaced(true);
 		
 		SolidPlatform blocky1 = new SolidPlatform(1589, 257, gm);
@@ -250,11 +250,11 @@ public class SpiritTemple extends Stage
 		final MovableObject board = new MovableObject();
 		board.currX = 106;
 		board.currY = 853;
-		board.setImage(new Frequency<>(1, boardImg));
+		board.setImage(new Animation<>(1, boardImg));
 		gm.avoidOverlapping(board);
 		
 		SolidPlatform carpet = new SolidPlatform(-100, 821, gm);
-		carpet.setImage(new Frequency<>(5, carpetImg));
+		carpet.setImage(new Animation<>(5, carpetImg));
 		carpet.setStrictGlueMode(true);
 		carpet.setHarshResponse(false);
 		carpet.offsetY = -10;
@@ -262,7 +262,7 @@ public class SpiritTemple extends Stage
 		carpet.appendPath(412, 120, 50, false, null);
 		
 		ghost = new Ghost(1728, 1996, gm, carpet);
-		ghost.setImage(new Frequency<>(7, ghostImg));
+		ghost.setImage(new Animation<>(7, ghostImg));
 		ghost.facing = Direction.E;
 		ghost.setMultiFaced(true);
 		ghost.appendPath(1118, 1996, 0, false, null);
@@ -307,11 +307,11 @@ public class SpiritTemple extends Stage
 		final MovableObject board2 = new MovableObject();
 		board2.currX = 236;
 		board2.currY = 1272;
-		board2.setImage(new Frequency<>(1, board2Img));
+		board2.setImage(new Animation<>(1, board2Img));
 		gm.avoidOverlapping(board2);
 		
 		final PushableObject silver1 = new PushableObject(988, 741, gm);
-		silver1.setImage(new Frequency<>(1, silverbImg));
+		silver1.setImage(new Animation<>(1, silverbImg));
 		silver1.setPushLength(0);
 		silver1.mustStand(true);
 		silver1.avoidOverlapping(board);
@@ -323,7 +323,7 @@ public class SpiritTemple extends Stage
 		silver2.resetPrevs();
 		
 		final GameObject silverGlove = new GameObject();
-		silverGlove.setImage(new Frequency<>(1, sgloveImg));
+		silverGlove.setImage(new Animation<>(1, sgloveImg));
 		silverGlove.currX = 554;
 		silverGlove.currY = 122;
 		silverGlove.addEvent(new Event()
@@ -341,8 +341,8 @@ public class SpiritTemple extends Stage
 			}
 		});
 		
-		final Frequency<Image2D> nb = new Frequency<>(1, bsImage);
-		final Frequency<Image2D> pb = new Frequency<>(1, bspImage);
+		final Animation<Image2D> nb = new Animation<>(1, bsImage);
+		final Animation<Image2D> pb = new Animation<>(1, bspImage);
 		
 		final GameObject button = new GameObject();
 		button.currX = 1784;
@@ -369,7 +369,7 @@ public class SpiritTemple extends Stage
 		 *******************************************
 		 */
 		final PushableObject goldStone = new PushableObject(2851, 33, gm);
-		goldStone.setImage(new Frequency<>(1, gstoneImg));
+		goldStone.setImage(new Animation<>(1, gstoneImg));
 		goldStone.setPushLength(0);
 		goldStone.mustStand(true);
 		goldStone.width--;
@@ -378,7 +378,7 @@ public class SpiritTemple extends Stage
 		goldStone.resetPrevs();
 		
 		final GameObject gglove = new GameObject();
-		gglove.setImage(new Frequency<>(1, ggloveImg));
+		gglove.setImage(new Animation<>(1, ggloveImg));
 		gglove.currX = 1706;
 		gglove.currY = 1342;
 		gglove.addEvent(()->
@@ -415,7 +415,7 @@ public class SpiritTemple extends Stage
 		final PathDrone debris = new PathDrone(529, 1098);
 		debris.useFastCollisionCheck(true);
 		debris.setHitbox(Hitbox.CIRCLE);
-		debris.setImage(new Frequency<>(1, rockImg));
+		debris.setImage(new Animation<>(1, rockImg));
 		debris.freeze();
 		debris.setMoveSpeed(6);
 		debris.addEvent(()->debris.rotation += 6);
@@ -468,15 +468,15 @@ public class SpiritTemple extends Stage
 		final GameObject quaker = new GameObject();
 		quaker.currX = 847;
 		quaker.currY = 1162;
-		quaker.setImage(new Frequency<>(1, quImg));
+		quaker.setImage(new Animation<>(1, quImg));
 		quaker.addEvent(new Event() 
 		{
 			@Override
 			public void eventHandling() 
 			{
-				if(!angry && EntityStuff.checkLine(quaker.currX, quaker.currY, quaker.currX, 1640, gm))
+				if(!angry && Fundementals.checkLine(quaker.currX, quaker.currY, quaker.currX, 1640, gm))
 				{
-					quaker.setImage(new Frequency<>(1, quaImg));
+					quaker.setImage(new Animation<>(1, quaImg));
 					game.addFocusObject(quaker);
 					gm.freeze();
 					
@@ -510,7 +510,7 @@ public class SpiritTemple extends Stage
 		 *******************************************
 		 */
 		GameObject coin = new GameObject();
-		coin.setImage(new Frequency<>(7, coinImg));
+		coin.setImage(new Animation<>(7, coinImg));
 		coin.currX = 2993;
 		coin.currY = 1520;
 		add(coin);
@@ -557,7 +557,7 @@ public class SpiritTemple extends Stage
 	@Override
 	public void extra() 
 	{
-		boolean close = EntityStuff.distance(gm.currX, gm.currY, 2142, 1695) < 1550;
+		boolean close = Fundementals.distance(gm.currX, gm.currY, 2142, 1695) < 1550;
 		
 		if(muted && close)
 		{
@@ -589,24 +589,24 @@ public class SpiritTemple extends Stage
 			offsetX = -36;
 			offsetY = 17;
 			fist.setFallingDirection(Direction.E);
-			fist.setImage(new  Frequency<>(1, efist1));
-			arm.setImage(new Frequency<>(1, efist2));
+			fist.setImage(new  Animation<>(1, efist1));
+			arm.setImage(new Animation<>(1, efist2));
 			break;
 		case N:
 			offsetX = 17;
 			offsetY = 74;
 			fist.setFallingDirection(Direction.N);
 			fist.addEvent(Factory.tileDeformer(fist, Engine.AREA_TRIGGER_9, true));
-			fist.setImage(new  Frequency<>(1, nfist1));
-			arm.setImage(new Frequency<>(1, nfist2));
+			fist.setImage(new  Animation<>(1, nfist1));
+			arm.setImage(new Animation<>(1, nfist2));
 			break;
 		case S:
 			offsetX = 17;
 			offsetY = -35;
 			fist.setAttackSpeed(4);
 			fist.setFallingDirection(Direction.S);
-			fist.setImage(new  Frequency<>(1, sfist1));
-			arm.setImage(new Frequency<>(1, sfist2));
+			fist.setImage(new  Animation<>(1, sfist1));
+			arm.setImage(new Animation<>(1, sfist2));
 			break;
 		default:
 			throw new IllegalStateException("Fist can either N,S or E");

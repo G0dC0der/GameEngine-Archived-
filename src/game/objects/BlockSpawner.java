@@ -4,7 +4,7 @@ import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.MovableObject;
 import game.core.Stage;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
@@ -21,11 +21,11 @@ public class BlockSpawner extends GameObject implements Event
 	private int spawnDelay, removeDelay;
 	private MovableObject[] users;
 	private GameObject[] blocks;
-	private Frequency<Image2D> actionImage, orgImage;
+	private Animation<Image2D> actionImage, orgImage;
 	private Particle removePart;
 	private int spawnCounter, removeCounter, index;
 	private boolean cleared;
-	private final Stage s = Stage.STAGE;
+	private final Stage s = Stage.getCurrentStage();
 	
 	/**
 	 * Construct a {@code BlockSpawner} at the given point with the given users.
@@ -39,6 +39,7 @@ public class BlockSpawner extends GameObject implements Event
 		currY = y;
 		this.users = users;
 		sounds = new SoundBank(2);//0 = Spawn sound, 1 = remove sound
+		sounds.setEmitter(this);
 		cleared = true;
 		spawnDelay = removeDelay = 10;
 		
@@ -101,10 +102,10 @@ public class BlockSpawner extends GameObject implements Event
 	 * The image to use when the button is being pressed down or when pressed down manually.
 	 * @param image The image.
 	 */
-	public void setActionImage(Frequency<Image2D> image)
+	public void setActionImage(Animation<Image2D> image)
 	{
 		actionImage = image;
-		orgImage = currImage;
+		orgImage = this.image;
 	}
 	
 	/**
@@ -161,7 +162,7 @@ public class BlockSpawner extends GameObject implements Event
 		if(trigger || collidesWithMultiple(users)  != null)
 		{
 			if(actionImage != null)
-				currImage = actionImage;
+				image = actionImage;
 			
 			if(index + 1 <= blocks.length - 1 && ++spawnCounter % spawnDelay == 0)
 			{
@@ -184,7 +185,7 @@ public class BlockSpawner extends GameObject implements Event
 		else
 		{
 			if(actionImage != null)
-				currImage = orgImage;
+				image = orgImage;
 			
 			if(!cleared && !permanent && ++removeCounter % removeDelay == 0)
 			{

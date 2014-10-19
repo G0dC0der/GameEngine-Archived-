@@ -1,11 +1,9 @@
 package stages.spirit;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
-import game.core.Stage;
 import game.essentials.Factory;
 import game.movable.PathDrone;
-
 import com.badlogic.gdx.graphics.Color;
 
 class Ghost extends PathDrone
@@ -29,12 +27,12 @@ class Ghost extends PathDrone
 	{
 		super.moveEnemy();
 		
-		if(!stop && EntityStuff.distance(this, follower) < distanceCheck)
+		if(!stop && Fundementals.distance(this, follower) < distanceCheck)
 		{
 			if(firstEncounter)
 			{
 				firstEncounter = false;
-				stage.add(Factory.printText("Stay close to the top and I will give you a present.", new Color(255,0,255,255), Stage.STAGE.game.fpsFont, 200, this, -150,0, new Event()
+				stage.add(Factory.printText("Stay close to the top and I will give you a present.", new Color(255,0,255,255), stage.game.fpsFont, 200, this, -150,0, new Event()
 				{
 					@Override
 					public void eventHandling() 
@@ -59,10 +57,10 @@ class Ghost extends PathDrone
 			stop = true;
 		}
 		
-		if(stop && !firstEncounter && !used && reachedDest && EntityStuff.distance(this, follower) < 150)
+		if(stop && !firstEncounter && !used && reachedDest && Fundementals.distance(this, follower) < 150)
 		{
 			used = true;
-			stage.add(Factory.printText("You didnt stay close enough...", new Color(255,0,255,255), Stage.STAGE.game.fpsFont, 200, this,-220,-20, null));
+			stage.add(Factory.printText("You didnt stay close enough...", new Color(255,0,255,255), stage.game.fpsFont, 200, this,-220,-20, null));
 		}
 	}
 }

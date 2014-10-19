@@ -1,19 +1,16 @@
 package game.core;
 
-import static game.core.EntityStuff.*;
+import static game.core.Fundementals.*;
 import game.core.Engine.Direction;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
-
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * A {@code GameObject} is the primary entity used by Pojahns Game Engine. <br>
@@ -23,6 +20,21 @@ import com.badlogic.gdx.math.Rectangle;
  */
 public class GameObject
 {	
+	/**
+	 * Cloning {@code GameObject} comes with limitations such as {@code Events} not being cloned. Those problems can be addressed in a {@code CloneEvent}.<br>
+	 * These events are executed when a clone is made, with the clone sent as the argument.
+	 * @author Pojahn Moradi
+	 */
+	@FunctionalInterface
+	public interface CloneEvent
+	{
+		/**
+		 * The cloned instance can be accessed here to add an {@code Event} for example.
+		 * @param clone The cloned object.
+		 */
+		void cloned(GameObject clone);
+	};
+	
 	/**
 	 * An {@code Event} can be used in various situations.
 	 */
@@ -99,6 +111,11 @@ public class GameObject
 	public float width;
 	
 	/**
+	 * The units height. Should be equal to the image height.
+	 */
+	public float height;
+
+	/**
 	 * The alpha value used when rendering.
 	 */
 	public float alpha;
@@ -112,11 +129,6 @@ public class GameObject
 	 * Whether or not to flip the entity´s image vertically when rendering.
 	 */
 	public boolean flipY;
-	
-	/**
-	 * The units height. Should be equal to the image height.
-	 */
-	public float height;
 	
 	/**
 	 * The relative X offset of the objects image.<br>
@@ -133,15 +145,15 @@ public class GameObject
 	 */
 	public String name;
 	
-	protected ArrayList<Event> events;
-	protected Frequency<Image2D> currImage;
+	protected CloneEvent cloneEvent;
+	protected Animation<Image2D> image;
 	protected boolean visible, fast;
 	protected Hitbox hitbox;
 	protected SoundBank sounds;
 	protected HitEvent hitEvent;
 	private int id, zIndex;
 	boolean drawSpecialBehind;
-	LinkedList<Event> removeQueue;
+	LinkedList<Event> removeQueue, events;
 	
 	/**
 	 * Constructs a {@code GameObject} with with, height and scale set to 1 and visibility set to true.
@@ -152,8 +164,8 @@ public class GameObject
 		visible = true;
 		hitbox = Hitbox.RECTANGLE;
 		width = height = scale = 1;
-		currImage = new Frequency<>(1,null, null);
-		events 	  = new ArrayList<>();
+		image = new Animation<>(1,null, null);
+		events 	  = new LinkedList<>();
 		removeQueue = new LinkedList<>();
 		sounds = new SoundBank(0);
 		id = new Random().nextInt();
@@ -200,7 +212,7 @@ public class GameObject
 	 */
 	public float halfWidth()
 	{
-		return width / 2;
+		return width() / 2;
 	}
 	
 	/**
@@ -208,7 +220,7 @@ public class GameObject
 	 */
 	public float halfHeight()
 	{
-		return height / 2;
+		return height() / 2;
 	}
 	
 	/**
@@ -229,7 +241,7 @@ public class GameObject
 	 */
 	public void setImage(Image2D img)
 	{
-		setImage(new Frequency<>(1, new Image2D[]{img}));
+		setImage(new Animation<>(1, new Image2D[]{img}));
 	}
 	
 	/**
@@ -239,7 +251,7 @@ public class GameObject
 	 */
 	public void setImage(int speed, Image2D[] imgs)
 	{
-		setImage(new Frequency<>(speed, imgs));
+		setImage(new Animation<>(speed, imgs));
 	}
 	
 	/**
@@ -247,9 +259,9 @@ public class GameObject
 	 * This method also set {@code width} and {@code height}.
 	 * @param imgs The image/animation to use.
 	 */
-	public void setImage(Frequency<Image2D> obj)
+	public void setImage(Animation<Image2D> obj)
 	{
-		currImage = obj;
+		image = obj;
 		Image2D[] imgs = obj.getArray();
 		width  = imgs[0].getWidth();
 		height = imgs[0].getHeight();
@@ -259,9 +271,9 @@ public class GameObject
 	 * Returns the object's image.
 	 * @return The image of the {@code GameObject}.
 	 */
-	public Frequency<Image2D> getImage()
+	public Animation<Image2D> getImage()
 	{
-		return currImage;
+		return image;
 	}
 	
 	/**
@@ -292,7 +304,7 @@ public class GameObject
 			if(straight2)
 				return circleVsRectangle(this, obj);
 			else
-				return rotatedRectangleVsCircle(this, obj);
+				return rotatedRectangleVsCircle(obj, this);
 		}
 		else if (obj.hitbox == Hitbox.CIRCLE && hitbox == Hitbox.CIRCLE)
 		{
@@ -340,6 +352,16 @@ public class GameObject
 		return null;
 	}
 	
+	public boolean at(float x, float y)
+	{
+		return currX == x && currY == y;
+	}
+	
+	public boolean at(float x, float y, double tolerance)
+	{
+		return tolerance >= Fundementals.distance(currX, currY, x, y);
+	}
+	
 	/**
 	 * Checks which direction the given {@code GameObject} is in relation to this unit.
 	 * @param go The object.
@@ -372,12 +394,24 @@ public class GameObject
 		go.currY = y;
 		copyData(go);
 		
+		if(cloneEvent != null)
+			cloneEvent.cloned(go);
+		
 		return go;
+	}
+	
+	/**
+	 * Sets the clone event for this unit.
+	 * @param cloneEvent The event to be executed when this {@code GameObject} gets cloned.
+	 */
+	public void setCloneEvent(CloneEvent cloneEvent)
+	{
+		this.cloneEvent = cloneEvent;
 	}
 	
 	protected void copyData(GameObject dest)
 	{
-		dest.currImage = currImage.getClone();
+		dest.image = image.getClone();
 		dest.width = width;
 		dest.height = height;
 		dest.scale = scale;
@@ -408,11 +442,11 @@ public class GameObject
 	
 	/**
 	 * Checks if this entity is visible.
-	 * @return True if this unit have an image and {@code setVisible} set to {@code true}.
+	 * @return True if this unit have an image, {@code setVisible} set to {@code true} and an alpha value higher than 0.0.
 	 */
 	public boolean isVisible()
 	{
-		return visible && currImage != null;
+		return visible && image != null && alpha > 0.0f;
 	}
 	
 	/**
@@ -443,7 +477,7 @@ public class GameObject
 	 */
 	public void setAnimationSpeed(int speed)
 	{
-		currImage.setSpeed(speed);
+		image.setSpeed(speed);
 	}
 	
 	/**
@@ -451,7 +485,7 @@ public class GameObject
 	 */
 	public void resetImage()
 	{
-		currImage.reset();
+		image.reset();
 	}
 	
 	/**
@@ -460,7 +494,7 @@ public class GameObject
 	 */
 	public Image2D getFrame()
 	{
-		return (!visible || currImage == null) ? null : currImage.getObject();
+		return (!visible || image == null) ? null : image.getObject();
 	}
 	
 	/**
@@ -583,14 +617,14 @@ public class GameObject
 	 */
 	public int getAnimationSpeed()
 	{
-		return currImage.getSpeed();
+		return image.getSpeed();
 	}
 	
 	/**
 	 * Returns the front position of this unit, rotated or not.<br>
 	 * @return The front position.
 	 */
-	public Point2D.Float getFrontPosition()
+	public Vector2 getFrontPosition()
 	{
 		float locX = currX + width() / 2;
 		float locY = currY + height() / 2;
@@ -598,14 +632,14 @@ public class GameObject
 		locX += Math.cos(Math.toRadians(rotation)) * (width() / 2);
 		locY += Math.sin(Math.toRadians(rotation)) * (height() / 2);
 		
-		return new Point2D.Float(locX,locY);
+		return new Vector2(locX,locY);
 	}
 	
 	/**
 	 * Returns the rare position of this unit, rotated or not.<br>
 	 * @return The rare position.
 	 */
-	public Point2D.Float getRarePosition()
+	public Vector2 getRarePosition()
 	{
 		float locX = currX + width() / 2;
 		float locY = currY + height() / 2;
@@ -613,7 +647,7 @@ public class GameObject
 		locX -= Math.cos(Math.toRadians(rotation)) * (width() / 2);
 		locY -= Math.sin(Math.toRadians(rotation)) * (height() / 2);
 		
-		return new Point2D.Float(locX,locY);
+		return new Vector2(locX,locY);
 	}
 	
 	/**
@@ -628,7 +662,7 @@ public class GameObject
 	 * Called when the object is discarded from the game via the {@code discard} method.<br>
 	 * Cleanup work should be done here by overriding it.
 	 */
-	public void endUse() {}
+	public void dismiss() {}
 
 	/**
 	 * Collision detection on rotated object is an expensive operation and can be disabled if not needed.<br>
@@ -691,17 +725,17 @@ public class GameObject
 		switch (accuracy)
 		{
 		case MID:
-			return EntityStuff.solidSpace(midX1, midY1, midX2, midY2);			
+			return Fundementals.solidSpace(midX1, midY1, midX2, midY2);			
 		case MID_CORNERS:
-			return EntityStuff.solidSpace(midX1, midY1, left2, top2)    ||
-				   EntityStuff.solidSpace(midX1, midY1, right2, top2)   ||
-				   EntityStuff.solidSpace(midX1, midY1, left2, bottom2) ||
-				   EntityStuff.solidSpace(midX1, midY1, right2, bottom2);
+			return Fundementals.solidSpace(midX1, midY1, left2, top2)    ||
+				   Fundementals.solidSpace(midX1, midY1, right2, top2)   ||
+				   Fundementals.solidSpace(midX1, midY1, left2, bottom2) ||
+				   Fundementals.solidSpace(midX1, midY1, right2, bottom2);
 		case REC_CORNERS:
-			return EntityStuff.solidSpace(left1, top1, left2, top2) 	    ||
-				   EntityStuff.solidSpace(right1, top1, right2, top2)     ||
-				   EntityStuff.solidSpace(left1, bottom1, left2, bottom2) ||
-				   EntityStuff.solidSpace(right1, bottom1, right2, bottom2);
+			return Fundementals.solidSpace(left1, top1, left2, top2) 	    ||
+				   Fundementals.solidSpace(right1, top1, right2, top2)     ||
+				   Fundementals.solidSpace(left1, bottom1, left2, bottom2) ||
+				   Fundementals.solidSpace(right1, bottom1, right2, bottom2);
 		default:
 			throw new RuntimeException("The specified accuracy is not implemented yet");
 		}

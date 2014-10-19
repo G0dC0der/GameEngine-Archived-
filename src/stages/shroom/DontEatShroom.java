@@ -6,8 +6,9 @@ import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.development.AutoInstall;
 import game.development.StageBuilder;
+import game.essentials.CameraEffect;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.Missile;
 import game.movable.Missile.MissileProperties;
@@ -15,11 +16,14 @@ import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.movable.Weapon;
 import game.objects.Particle;
+
 import java.io.File;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -30,7 +34,8 @@ public class DontEatShroom extends StageBuilder
 	private Image2D platformImg, shredderImg[], barsImg, goalImg, keyImg, shroomImg, dotsImg, drugEffectImg[], gunfireImg[], explosionImg[], cannonImg, missileImg, trailerImg[];
 	private Sound collect, eat, jumpdruged, boom, cannonfire;
 	private Music drugedSong;
-	private int counter = 0;
+	private CameraEffect eff1, eff2, eff3, eff4, heff1, heff2, heff3, heff4, zeff;
+	private int counter = 0, drugStrength;
 	
 	@Override
 	public void init() 
@@ -78,13 +83,23 @@ public class DontEatShroom extends StageBuilder
 		 */ 
 		super.build();
 		
+		drugStrength = 0;
 		counter++;
 		gm.zIndex(50);
 		game.timeColor = Color.WHITE;
 		
-		game.drugVertical(0, 0);
-		game.drugHorizontal(0, 0);
-		game.drugScale(1, 1, 0);
+		eff1 = CameraEffect.verticalMovement(1, 1, -1);
+		eff2 = CameraEffect.verticalMovement(2, 2, -1);
+		eff3 = CameraEffect.verticalMovement(3, 3, -1);
+		eff4 = CameraEffect.verticalMovement(5, 5, -1);
+		
+		heff1 = CameraEffect.horizontalMovement(1, 1, -1);
+		heff2 = CameraEffect.horizontalMovement(2, 2, -1);
+		heff3 = CameraEffect.horizontalMovement(3, 3, -1);
+		heff4 = CameraEffect.horizontalMovement(5, 5, -1);
+		
+		zeff = CameraEffect.zoomEffect(0.5f, 1.0f, .0025f, -1);
+
 		game.zoom = 1;
 		game.angle = 0;
 		
@@ -247,7 +262,7 @@ public class DontEatShroom extends StageBuilder
 		
 		final GameObject drug = new GameObject()
 		{
-			Frequency<Image2D> drugAnim = new Frequency<>(5, drugEffectImg);
+			Animation<Image2D> drugAnim = new Animation<>(5, drugEffectImg);
 			Color alpha = new Color(game.defaultTint);
 			
 			{
@@ -294,8 +309,7 @@ public class DontEatShroom extends StageBuilder
 					discard(m);
 					add(Factory.fade(1, 0.005f, 10, null, drugEffectImg));
 					add(drug);
-					game.drugVertical(1, 1);
-					game.drugHorizontal(1, 1);
+					drugStrength++;
 					
 					new Thread()
 					{
@@ -311,9 +325,7 @@ public class DontEatShroom extends StageBuilder
 							{
 								drugedSong.play(true,0);
 								add(Factory.soundFade(drugedSong, 0.7f, 12000, false));
-								
-								game.drugVertical(2, 2);
-								game.drugHorizontal(2, 2);
+								drugStrength++;
 							}
 						}
 					}.start();
@@ -331,8 +343,7 @@ public class DontEatShroom extends StageBuilder
 							if(value == counter)
 							{
 								gm.setJumpingSound(jumpdruged);
-								game.drugVertical(3, 3);
-								game.drugHorizontal(3, 3);
+								drugStrength++;
 							}
 						}
 					}.start();
@@ -350,9 +361,7 @@ public class DontEatShroom extends StageBuilder
 							if(value == counter)
 							{
 								add(dots);
-								game.drugVertical(5, 5);
-								game.drugHorizontal(5, 5);
-								game.drugScale(0.5f, 1.0f, .0025f);
+								drugStrength++;
 							}
 						}
 					}.start();
@@ -361,6 +370,32 @@ public class DontEatShroom extends StageBuilder
 		});
 		
 		return m;
+	}
+	
+	@Override
+	public void extra() 
+	{
+		if(drugStrength == 1)
+		{
+			eff1.update();
+			heff1.update();
+		}
+		else if(drugStrength == 2)
+		{
+			eff2.update();
+			heff2.update();
+		}
+		else if(drugStrength == 3)
+		{
+			eff3.update();
+			heff3.update();
+		}
+		else if(drugStrength == 4)
+		{
+			eff4.update();
+			heff4.update();
+			zeff.update();
+		}
 	}
 	
 	@Override

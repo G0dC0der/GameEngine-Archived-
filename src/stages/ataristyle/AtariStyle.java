@@ -8,7 +8,7 @@ import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.Projectile;
 import game.movable.SimpleWeapon;
@@ -226,7 +226,7 @@ public class AtariStyle extends StageBuilder
 		GameObject w = new GameObject();
 		w.moveTo(x * 30, y * 30);
 		w.setImage(weak[0]);
-		w.addEvent(Factory.weakPlatform(w, new Frequency<>(2, weak), 80, null, gm));
+		w.addEvent(Factory.weakPlatform(w, new Animation<>(2, weak), 80, null, gm));
 		add(w);
 	}
 }

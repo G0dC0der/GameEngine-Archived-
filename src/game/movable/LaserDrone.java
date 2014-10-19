@@ -1,19 +1,16 @@
 package game.movable;
 
 import game.core.Engine;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.essentials.Factory;
 import game.essentials.LaserBeam;
 import game.essentials.SoundBank;
 import game.objects.Particle;
-
-import java.awt.geom.Point2D;
-
 import kuusisto.tinysound.Sound;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * This unit fire laser at the closest seeable(customizable) target. Any target intersecting with the laser beam will have its {@code HitEvent} fired with the laser drone as argument.<br>
@@ -51,6 +48,7 @@ public class LaserDrone extends PathDrone
 		targetX = targetY = -1;
 		sucounter = ducounter = reloadCounter = 0;
 		sounds = new SoundBank(2);	//0 = startup, 1 = firing
+		sounds.setEmitter(this);
 		stopTile = Engine.SOLID;
 		laserTint = Color.valueOf("CC0000FF");
 		firingBeam = Factory.defaultLaser();
@@ -181,9 +179,9 @@ public class LaserDrone extends PathDrone
 		{
 			GameObject target = null;
 			if(scan)
-				target = EntityStuff.findClosestSeeable(this, targets);
+				target = Fundementals.findClosestSeeable(this, targets);
 			else
-				target = EntityStuff.findClosest(this, targets);
+				target = Fundementals.findClosest(this, targets);
 			
 			if(target != null)
 			{
@@ -192,9 +190,9 @@ public class LaserDrone extends PathDrone
 					x2 = (int) (target.currX + target.width  / 2),
 					y2 = (int) (target.currY + target.height / 2);
 				
-				Point2D.Float wallp = EntityStuff.searchTile(x1,y1, x2,y2, stopTile);
+				Vector2 wallp = Fundementals.searchTile(x1,y1, x2,y2, stopTile);
 				if(wallp == null)
-					wallp = EntityStuff.findEdgePoint(x1, y1, x2, y2);
+					wallp = Fundementals.findEdgePoint(x1, y1, x2, y2);
 				
 				targetX = wallp.x;
 				targetY = wallp.y;
@@ -223,7 +221,7 @@ public class LaserDrone extends PathDrone
 				sounds.trySound(1, false);
 				
 				for(GameObject go : targets)
-					if(EntityStuff.checkLine((int)currX, (int) currY, (int)targetX, (int)targetY, go))
+					if(Fundementals.checkLine((int)currX, (int) currY, (int)targetX, (int)targetY, go))
 						go.runHitEvent(this);
 				
 				if(++ducounter % laserDuration == 0)

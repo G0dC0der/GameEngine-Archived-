@@ -2,7 +2,7 @@ package game.core;
 
 import static game.core.Engine.*;
 import game.core.Engine.Direction;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class MovableObject extends GameObject
 			throw new IllegalStateException("Cannot enable multi facing while double facing is enabled.");
 		
 		if((this.multiFacings = multiFacings))
-			currImage.setLimit(currImage.getArray().length / 8);
+			image.setLimit(image.getArray().length / 8);
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class MovableObject extends GameObject
 		this.flipImage = flipImage;
 		
 		if(doubleFaced && !flipImage)
-			currImage.setLimit(currImage.getArray().length / 2);
+			image.setLimit(image.getArray().length / 2);
 	}
 	
 	
@@ -113,7 +113,7 @@ public class MovableObject extends GameObject
 	}
 	
 	@Override
-	public void setImage(Frequency<Image2D> obj)
+	public void setImage(Animation<Image2D> obj)
 	{
 		super.setImage(obj);
 		
@@ -124,15 +124,15 @@ public class MovableObject extends GameObject
 	@Override
 	public Image2D getFrame()
 	{
-		if (!visible || currImage == null)
+		if (!visible || image == null)
 			return null;
 		
-		currImage.getObject();
+		image.getObject();
 		
 		if(multiFacings)
 		{
-			Image2D[] objImage = currImage.getArray();
-			int animationCounter = currImage.getIndex(),
+			Image2D[] objImage = image.getArray();
+			int animationCounter = image.getIndex(),
 				framesPerAngle = objImage.length / 8;
 
 			switch (facing)
@@ -160,7 +160,7 @@ public class MovableObject extends GameObject
 		{
 			if(flipImage)
 			{
-				Image2D img = currImage.getCurrentObject();
+				Image2D img = image.getCurrentObject();
 				switch (facing)
 				{
 					case NE:
@@ -180,8 +180,8 @@ public class MovableObject extends GameObject
 			}
 			else
 			{
-				Image2D[] objImage = currImage.getArray();
-				int animationCounter = currImage.getIndex(),
+				Image2D[] objImage = image.getArray();
+				int animationCounter = image.getIndex(),
 					framesPerAngle = objImage.length / 2;
 
 				switch (facing)
@@ -200,7 +200,7 @@ public class MovableObject extends GameObject
 			}
 		}
 		
-		return currImage.getCurrentObject();
+		return image.getCurrentObject();
 	}
 	
 	@Override
@@ -530,41 +530,16 @@ public class MovableObject extends GameObject
 	 */
 	public void moveToward(float targetX, float targetY, float steps)
 	{
-		if (!canMove)
-			return;
-		
-	    float fX = targetX - currX;
-	    float fY = targetY - currY;
-	    double dist = Math.sqrt( fX*fX + fY*fY );
-	    double step = steps / dist;
-	    currX += fX * step;
-	    currY += fY * step;
-	}
-	
-	/**
-	 * "Walks" towards the specified point, deaccelerating when it gets close to the target.
-	 * @param targetX The X target coordinate to walk to.
-	 * @param targetY The Y target coordinate to walk to.
-	 * @param spec1 Acceleration property.
-	 * @param spec2 Acceleration property.
-	 * @param spec3 Acceleration property.
-	 */
-	public void specialMoveToward(float targetX, float targetY, float spec1, float spec2, float spec3)
-	{
-		if (!canMove)
-			return;
-		
-		float dx = targetX - currX;
-		float dy = targetY - currY;
-		
-		float accX = spec1 * dx - spec2 * moveSpeed;
-		float accY = spec1 * dy - spec2 * moveSpeed;
-		
-		float velocityX = moveSpeed + spec3 * accX;
-		float velocityY = moveSpeed + spec3 * accY;
-		
-		currX += spec3 * velocityX;
-		currY += spec3 * velocityY;
+		if (canMove)
+		{
+		    float fX = targetX - currX;
+		    float fY = targetY - currY;
+		    double dist = Math.sqrt( fX*fX + fY*fY );
+		    double step = steps / dist;
+
+		    currX += fX * step;
+		    currY += fY * step;
+		}
 	}
 	
 	/**
@@ -730,17 +705,17 @@ public class MovableObject extends GameObject
 	 * {@code canGoTo} for example would return false if the given target is occupied by a solid object.
 	 * @param mo
 	 */
-	public void avoidOverlapping(GameObject mo)
+	public void avoidOverlapping(GameObject go)
 	{
-		solidObjects.add(mo);
+		solidObjects.add(go);
 	}
 	
 	/**
 	 * Reefer to {@code avoidOverlapping(GameObject)} for usage.
 	 */
-	public void avoidOverlapping(GameObject... mo)
+	public void avoidOverlapping(GameObject... gos)
 	{
-		for(GameObject go : mo)
+		for(GameObject go : gos)
 			solidObjects.add(go);
 	}
 	

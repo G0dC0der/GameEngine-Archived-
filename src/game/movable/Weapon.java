@@ -1,12 +1,12 @@
 package game.movable;
 
-import game.core.EntityStuff;
+import com.badlogic.gdx.math.Vector2;
+
+import game.core.Fundementals;
 import game.core.GameObject;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.objects.Particle;
-
-import java.awt.geom.Point2D;
 
 /**
  * The {@code Weapon} can act as a machine gun or rocker launcher. It is a turret, rotating towards the target(if enabled), spawning clones of the given projectile.
@@ -21,7 +21,7 @@ public class Weapon extends PathDrone
 	private GameObject targets[], currTarget;
 	private Projectile proj;
 	private Particle firingParticle;
-	private Frequency<Image2D> firingImage, orgImage;
+	private Animation<Image2D> firingImage, orgImage;
 	private boolean usingTemp;
 	
 	/**
@@ -52,12 +52,12 @@ public class Weapon extends PathDrone
 		if(proj == null)
 			throw new IllegalStateException("The projectile must be set before usage.");
 		
-		if(usingTemp && currImage.hasEnded())
+		if(usingTemp && image.hasEnded())
 		{
 			usingTemp = false;
-			firingImage = currImage;
+			firingImage = image;
 			firingImage.reset();
-			currImage = orgImage;
+			image = orgImage;
 		}
 		
 		super.moveEnemy();
@@ -79,8 +79,8 @@ public class Weapon extends PathDrone
 			{
 				if(firingImage != null)
 				{
-					orgImage = currImage;
-					currImage = firingImage;
+					orgImage = image;
+					image = firingImage;
 					usingTemp = true;
 				}
 				rotationAllowed = false;
@@ -91,7 +91,7 @@ public class Weapon extends PathDrone
 				Particle partClone = null;
 				if(frontFire)
 				{
-					Point2D.Float front = getFrontPosition();
+					Vector2 front = getFrontPosition();
 					projClone = proj.getClone(front.x - proj.width / 2 + firingOffsetX, front.y - proj.height / 2 + firingOffsetY);
 					if(firingParticle != null)
 						partClone = firingParticle.getClone(front.x - firingParticle.width / 2 + firingOffsetX, front.y - firingParticle.height / 2 + firingOffsetY);
@@ -192,7 +192,7 @@ public class Weapon extends PathDrone
 	 * The image the use for the turret when firing. The turrets image will change back to its initial image when the last frame of the firing image have been rendered, meaning no support for looping firing image.
 	 * @param firingImage The firing image.
 	 */
-	public void setFiringImage(Frequency<Image2D> firingImage)
+	public void setFiringImage(Animation<Image2D> firingImage)
 	{
 		this.firingImage = firingImage;
 	}
@@ -211,7 +211,7 @@ public class Weapon extends PathDrone
 	 */
 	protected void findTarget()
 	{
-		currTarget = EntityStuff.findClosestSeeable(this, targets);
+		currTarget = Fundementals.findClosestSeeable(this, targets);
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public class Weapon extends PathDrone
 				  y2 = currTarget.currY + currTarget.height / 2;
 			
 			if(alwaysRotate || currTarget.canSee(this, Accuracy.MID))
-				rotation = EntityStuff.rotateTowardsPoint(x1,y1,x2,y2, rotation, rotationSpeed);
+				rotation = Fundementals.rotateTowardsPoint(x1,y1,x2,y2, rotation, rotationSpeed);
 		}
 	}
 	
@@ -249,7 +249,7 @@ public class Weapon extends PathDrone
 	{
 		if(rotationSpeed == 0.0f)
 		{
-			Point2D.Float position = EntityStuff.findEdgePoint(this, currTarget);
+			Vector2 position = Fundementals.findEdgePoint(this, currTarget);
 			targetX = position.x;
 			targetY = position.y;
 			return canSee(currTarget, Accuracy.MID);
@@ -258,17 +258,17 @@ public class Weapon extends PathDrone
 		float centerX = currX + width / 2;
 		float centerY = currY + height / 2;
 		
-		Point2D.Float front = getFrontPosition();
-		Point2D.Float edge = EntityStuff.findEdgePoint(centerX, centerY, front.x, front.y);
-		Point2D.Float wall = EntityStuff.findWallPoint(centerX, centerY, edge.x, edge.y);
+		Vector2 front = getFrontPosition();
+		Vector2 edge = Fundementals.findEdgePoint(centerX, centerY, front.x, front.y);
+		Vector2 wall = Fundementals.findWallPoint(centerX, centerY, edge.x, edge.y);
 		
 		GameObject dummy = new GameObject();
 		dummy.currX = currTarget.currX + currTarget.width / 2;
 		dummy.currY = currTarget.currY + currTarget.height / 2;
-		boolean targeting = EntityStuff.checkLine((int)centerX, (int)centerY, (int)wall.x, (int)wall.y, dummy);
+		boolean targeting = Fundementals.checkLine((int)centerX, (int)centerY, (int)wall.x, (int)wall.y, dummy);
 		if(targeting)
 		{
-			Point2D.Float edge2 = EntityStuff.findEdgePoint(this, dummy);
+			Vector2 edge2 = Fundementals.findEdgePoint(this, dummy);
 			targetX = edge2.x;
 			targetY = edge2.y;
 		}

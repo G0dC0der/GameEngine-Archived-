@@ -10,16 +10,16 @@ import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
+import game.essentials.Animation;
 import game.essentials.Factory;
-import game.essentials.Frequency;
 import game.essentials.Image2D;
-import game.essentials.Utilities;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.OneWay;
 import java.io.File;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
 import com.badlogic.gdx.graphics.Color;
 
@@ -50,10 +50,10 @@ public class SquareTown extends StageBuilder
 			
 			flagImg = Image2D.loadImages(new File("res/climb/flag"), false);
 			
-			collect1 = Utilities.loadSound("res/general/collect1.wav");
-			collect2 = Utilities.loadSound("res/general/collect2.wav");
-			crabMove1 = Utilities.loadMusic("res/blocks/crabMoveLoop.wav");
-			crabMove2 = Utilities.loadMusic("res/blocks/crabMoveLoop.wav");
+			collect1  = TinySound.loadSound(new File("res/general/collect1.wav"));
+			collect2  = TinySound.loadSound(new File("res/general/collect2.wav"));
+			crabMove1 = TinySound.loadMusic(new File("res/blocks/crabMoveLoop.wav"));
+			crabMove2 = TinySound.loadMusic(new File("res/blocks/crabMoveLoop.wav"));
 			
 			game.timeColor = Color.WHITE;
 			lethalDamage = -5;
@@ -497,7 +497,7 @@ public class SquareTown extends StageBuilder
 	
 	SolidPlatform getBlock(float x, float y, Color color)
 	{
-		final Frequency<Image2D> eyes = new Frequency<>(6, eyeImg);
+		final Animation<Image2D> eyes = new Animation<>(6, eyeImg);
 		eyes.stop(true);
 		eyes.setLoop(false);
 		
@@ -513,7 +513,7 @@ public class SquareTown extends StageBuilder
 			}
 			
 			@Override
-			public void endUse() 
+			public void dismiss() 
 			{
 				discard(eyeObj);
 			}
@@ -556,7 +556,7 @@ public class SquareTown extends StageBuilder
 	{
 		gems2++;
 		
-		Frequency<Image2D> gemImage = new Frequency<>(4, gem2Img);
+		Animation<Image2D> gemImage = new Animation<>(4, gem2Img);
 		gemImage.pingPong(true);
 		
 		final GameObject gem = new GameObject();

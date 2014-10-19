@@ -3,7 +3,7 @@ package game.essentials;
 import static game.core.Engine.*;
 import game.core.Engine;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.MainCharacter;
@@ -108,9 +108,9 @@ public class Factory
 						for(Image2D img : animation)
 							img.setAlpha(targetAlpha);
 						
-						Stage.STAGE.discard(this);
+						Stage.getCurrentStage().discard(this);
 						if(endEvent != null)
-							Stage.STAGE.add(endEvent);
+							Stage.getCurrentStage().add(endEvent);
 					}
 					else
 					{
@@ -148,7 +148,7 @@ public class Factory
 					fadeTime = 0;
 					if (stopWhenDone)
 						sound.stop();
-					Stage.STAGE.discard(this);
+					Stage.getCurrentStage().discard(this);
 				}
 				else
 				{
@@ -182,7 +182,7 @@ public class Factory
 			{
 				if(freq == 0 || ++counter % freq == 0)
 				{
-					double distance = EntityStuff.distance(go1, go2);
+					double distance = Fundementals.distance(go1, go2);
 					float candidate = (float) (power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0));
 					
 					sound.setVolume(Math.min(candidate, max));
@@ -217,7 +217,7 @@ public class Factory
 			{
 				if(freq == 0 || ++counter % freq == 0)
 				{
-					double distance = EntityStuff.distance(go1, go2);
+					double distance = Fundementals.distance(go1, go2);
 					float candidate = (float) (power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0));
 					
 					sound.setVolume(Math.min(candidate, max));
@@ -252,8 +252,8 @@ public class Factory
 		{
 			if(target.getPrevX() != target.currX || target.getPrevY() != target.currY)
 			{
-				byte[][] data  = Stage.STAGE.stageData;
-				Frequency<Image2D> img = target.getImage();
+				byte[][] data  = Stage.getCurrentStage().stageData;
+				Animation<Image2D> img = target.getImage();
 				boolean stopped = img.isStopped();
 				img.stop(true);
 				Image2D image = target.getFrame();
@@ -268,7 +268,7 @@ public class Factory
 					for(int y1 = prevY, y2 = currY; y1 < prevY + target.height - 1; y1++, y2++)
 					{
 						if(transformBack)
-							data[y1][x1] = Stage.STAGE.getCloneData(x1, y1);
+							data[y1][x1] = Stage.getCurrentStage().getCloneData(x1, y1);
 						
 						int color = image.getColor(x2 - currX, y2 - currY);
 						if(color != 0)
@@ -302,7 +302,7 @@ public class Factory
 				if(font != null)
 					theFont = font;
 				else
-					theFont = Stage.STAGE.game.timeFont;
+					theFont = Stage.getCurrentStage().game.timeFont;
 			}
 			
 			@Override
@@ -408,7 +408,7 @@ public class Factory
 	 * @param users The {@code GameObject} capable of interacting with this weak platform.
 	 * @return The event.
 	 */
-	public static Event weakPlatform(final GameObject target, final Frequency<Image2D> destroyAnim, final int destroyTime, final Sound removeSound, final MovableObject... users)
+	public static Event weakPlatform(final GameObject target, final Animation<Image2D> destroyAnim, final int destroyTime, final Sound removeSound, final MovableObject... users)
 	{
 		return new Event()
 		{
@@ -440,7 +440,7 @@ public class Factory
 					for(MovableObject mo : users)
 						mo.allowOverlapping(target);
 					
-					Stage.STAGE.discard(target);
+					Stage.getCurrentStage().discard(target);
 					if(removeSound != null)
 						removeSound.play();
 				}
@@ -597,7 +597,7 @@ public class Factory
 			{
 				if(counter-- > 0)
 				{
-					BitmapFont f = (font == null) ? Stage.STAGE.game.timeFont : font;
+					BitmapFont f = (font == null) ? Stage.getCurrentStage().game.timeFont : font;
 					
 					if(textColor != null)
 						f.setColor(textColor);
@@ -701,7 +701,7 @@ public class Factory
 	 * @param laserImpact The animation to render at the destination point.
 	 * @return The beam.
 	 */
-	public static LaserBeam threeStageLaser(final Frequency<Image2D> laserBegin, final Frequency<Image2D> laserBeam, final Frequency<Image2D> laserImpact)
+	public static LaserBeam threeStageLaser(final Animation<Image2D> laserBegin, final Animation<Image2D> laserBeam, final Animation<Image2D> laserImpact)
 	{
 		return new LaserBeam()
 		{
@@ -735,14 +735,14 @@ public class Factory
 				for(int i = 0; i < size; i++)
 				{
 					final Task t = tasks.get(i);
-					final float angle = (float)EntityStuff.getAngle(t.srcX, t.srcY, t.destX, t.destY);
+					final float angle = (float)Fundementals.getAngle(t.srcX, t.srcY, t.destX, t.destY);
 					
 					if(laserBeam != null)
 					{
 						Image2D beam = laserBeam.getObject();
 						float dx = (float) (beam.getHeight() / 2 * Math.cos(Math.toRadians(angle - 90)));
 						float dy = (float) (beam.getHeight() / 2 * Math.sin(Math.toRadians(angle - 90)));
-						b.draw(beam, t.srcX + dx, t.srcY + dy, 0, 0, (float)EntityStuff.distance(t.srcX + dx, t.srcY + dy, t.destX, t.destY), beam.getHeight(), 1, 1, angle);
+						b.draw(beam, t.srcX + dx, t.srcY + dy, 0, 0, (float)Fundementals.distance(t.srcX + dx, t.srcY + dy, t.destX, t.destY), beam.getHeight(), 1, 1, angle);
 					}
 					
 					if(laserImpact != null)
@@ -780,9 +780,9 @@ public class Factory
 		if(LASER_BEGIN == null || LASER_BEAM == null || LASER_IMPACT == null)
 			throw new NullPointerException("The laser resources is null. Check if they still exist.");
 		
-		Frequency<Image2D> laserBegin = new Frequency<>(3, LASER_BEGIN);
-		Frequency<Image2D> laserImage = new Frequency<>(3, LASER_BEAM);
-		Frequency<Image2D> laserImpact = new Frequency<>(3, LASER_IMPACT);
+		Animation<Image2D> laserBegin = new Animation<>(3, LASER_BEGIN);
+		Animation<Image2D> laserImage = new Animation<>(3, LASER_BEAM);
+		Animation<Image2D> laserImpact = new Animation<>(3, LASER_IMPACT);
 		laserImage.pingPong(true);
 		laserImpact.pingPong(true);
 		
@@ -798,7 +798,7 @@ public class Factory
 		if(LASER_CHARGE == null)
 			throw new NullPointerException("The laser resources is null. Check if they still exist.");
 		
-		Frequency<Image2D> charge = new Frequency<>(2, LASER_CHARGE);
+		Animation<Image2D> charge = new Animation<>(2, LASER_CHARGE);
 		charge.pingPong(true);
 		
 		return threeStageLaser(null, charge, null);
@@ -834,16 +834,31 @@ public class Factory
 	 */
 	public static PathData[] randomWaypoints()
 	{
-		return randomWaypoints(0, 0, Stage.STAGE.size.width, Stage.STAGE.size.height, new Random().nextInt(100) + 100);
+		return randomWaypoints(0, 0, Stage.getCurrentStage().size.width, Stage.getCurrentStage().size.height, new Random().nextInt(100) + 100);
 	}
 	
 	/**
-	 * Return an array of random waypoints, where the coordinate simulates a bouncing effect.<br>
-	 * For example, the first coordinate can be a the left most, and the second coordinate can be either right most, up most or down most.
-	 * @param go The object that will use these waypoints.
-	 * @return The data.
+	 * Return an array of random waypoints, where the coordinate simulates a bouncing effect.<br> 
+	 * The offset is the entire stage.
+	 */
+	public static PathData[] randomWallPoints()
+	{
+		return randomWallPoints(0, 0, Stage.getCurrentStage().size.width, Stage.getCurrentStage().size.height);
+	}
+
+	/**
+	 * Return an array of random waypoints, where the coordinate simulates a bouncing effect.<br> 
+	 * The offset is the entire stage with the given {@code GameObject's} width and height taken into consideration.
 	 */
 	public static PathData[] randomWallPoints(GameObject go)
+	{
+		return randomWallPoints(0, 0, (int)(Stage.getCurrentStage().size.width - go.width()), (int)(Stage.getCurrentStage().size.width - go.height()));
+	}
+	
+	/**
+	 * Return an array of random waypoints, where the coordinate simulates a bouncing effect.
+	 */
+	public static PathData[] randomWallPoints(int minX, int maxX, int minY, int maxY)
 	{
 		int last = -1;
 		int quantity = new Random().nextInt(100) + 100;
@@ -857,7 +872,7 @@ public class Factory
 			{
 				last = dir;
 				
-				Point2D.Float point = getDirection(dir, go);
+				Point2D.Float point = getDirection(dir, minX, maxX, minY, maxY);
 				pdlist.add(new PathData(point.x, point.y, 0, false, null));
 			}
 			else
@@ -867,32 +882,65 @@ public class Factory
 		return pdlist.toArray(new PathData[pdlist.size()]);
 	}
 	
-	static Point2D.Float getDirection(int dir, GameObject go)
+	
+	static Point2D.Float getDirection(int dir, int minX, int maxX, int minY, int maxY)
 	{
 		Point2D.Float point = new Point2D.Float();
 		final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
+		
 		Random r = new Random();
 		
 		switch(dir)
 		{
 		case UP:
-			point.x = r.nextInt(Stage.STAGE.size.width);
-			point.y = 0;
+			point.x = r.nextInt(maxX - minX) + minX;
+			point.y = minY;
 			break;
 		case DOWN:
-			point.x = r.nextInt(Stage.STAGE.size.width);
-			point.y = Stage.STAGE.size.height - go.height;			
+			point.x = r.nextInt(maxX - minX) + minX;
+			point.y = maxY;			
 			break;
 		case LEFT:
-			point.x = 0;
-			point.y = r.nextInt(Stage.STAGE.size.height);
+			point.x = minX;
+			point.y = r.nextInt(maxY - minY) + minY;
 			break;
 		case RIGHT:
-			point.x = Stage.STAGE.size.width - go.width;
-			point.y = r.nextInt(Stage.STAGE.size.height);
+			point.x = maxX;
+			point.y = r.nextInt(maxY - minY) + minY;
 			break;
 		}
 		
 		return point;
 	}
+	
+//	static Point2D.Float getDirection(int dir, GameObject go)
+//	{
+//		Point2D.Float point = new Point2D.Float();
+//		final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
+//		float w = go == null ? 0 : go.width();
+//		float h = go == null ? 0 : go.height();
+//		Random r = new Random();
+//		
+//		switch(dir)
+//		{
+//		case UP:
+//			point.x = r.nextInt(Stage.getCurrentStage().size.width);
+//			point.y = 0;
+//			break;
+//		case DOWN:
+//			point.x = r.nextInt(Stage.getCurrentStage().size.width);
+//			point.y = Stage.getCurrentStage().size.height - h;			
+//			break;
+//		case LEFT:
+//			point.x = 0;
+//			point.y = r.nextInt(Stage.getCurrentStage().size.height);
+//			break;
+//		case RIGHT:
+//			point.x = Stage.getCurrentStage().size.width - w;
+//			point.y = r.nextInt(Stage.getCurrentStage().size.height);
+//			break;
+//		}
+//		
+//		return point;
+//	}
 }

@@ -1,7 +1,6 @@
 package game.movable;
 
 import game.core.MovableObject;
-import game.core.Stage;
 
 /**
  * This class offers an easy way to temporary change the move speed of a {@code MovableObject}.<br>
@@ -40,7 +39,7 @@ public class Speed extends PathDrone
 		{
 			if(active++ > counter)
 			{
-				Stage.STAGE.discard(this);
+				stage.discard(this);
 				hit.setMoveSpeed(ogSpeed);
 			}
 		}

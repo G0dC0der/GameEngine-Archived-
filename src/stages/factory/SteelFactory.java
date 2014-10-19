@@ -2,7 +2,7 @@ package stages.factory;
 
 import game.core.Engine;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.GameObject.HitEvent;
@@ -14,8 +14,9 @@ import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
+import game.essentials.CameraEffect;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.Dummy;
 import game.movable.HorizontalDrone;
@@ -27,13 +28,16 @@ import game.movable.SolidPlatform;
 import game.movable.Weapon;
 import game.objects.Particle;
 import game.objects.Shrapnel;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.graphics.Color;
 
 @AutoDispose
@@ -57,8 +61,9 @@ public class SteelFactory extends StageBuilder
 	private SolidPlatform crusherLeft, crusherDown, crusherUp, solp, stalk;
 	private Dummy magnetDown, magnetLeft, magnetUp;
 	private Event moveMU, moveML, moveMD;
+	private CameraEffect vShake, hShake;
 	private ArrayList<GameObject> saws = new ArrayList<>();
-	private boolean collect1, collect2, collect3, collect4, collect5, energy1, energy2, energy3, once;
+	private boolean collect1, collect2, collect3, collect4, collect5, energy1, energy2, energy3, once, drugEffect;
 	private int deathCounter = -1;
 	
 	@Override
@@ -117,14 +122,16 @@ public class SteelFactory extends StageBuilder
 
 		saws.clear();
 		
-		game.drugVertical(0, 0);
-		game.drugHorizontal(0, 0);
+		drugEffect = false;
 		
 		collapsing.stop();
 		elevator.stop();
 		bandmove.stop();
 		sawssound.stop();
 		laserloop.play(true, 0);
+		
+		hShake = CameraEffect.horizontalMovement(2, 2, -1);
+		vShake = CameraEffect.verticalMovement(2, 2, -1);
 
 		/*
 		 * Clockers
@@ -181,7 +188,7 @@ public class SteelFactory extends StageBuilder
 		magic.setImpact(part); 
 		
 		final Weapon ld = new Weapon(4000, 1362, 1, 1, 100, gm);
-		Frequency<Image2D> laserImage = new Frequency<>(5, laser);
+		Animation<Image2D> laserImage = new Animation<>(5, laser);
 		laserImage.pingPong(true);
 		ld.setImage(laserImage);
 		ld.setProjectile(magic);
@@ -284,7 +291,7 @@ public class SteelFactory extends StageBuilder
 		elRU.currX = 4805;
 		elRU.currY = 2421;
 		elRU.setHitbox(Hitbox.EXACT);
-		Frequency<Image2D> elRUImg = new Frequency<>(2, electric);
+		Animation<Image2D> elRUImg = new Animation<>(2, electric);
 		elRUImg.addEvent(()->buzz1.play(), 28);
 		elRU.setImage(elRUImg);
 		elRU.addEvent(Factory.hitMain(elRU, gm, -1));
@@ -292,7 +299,7 @@ public class SteelFactory extends StageBuilder
 		
 		GameObject elRD = elRU.getClone(4805, 2761);
 		elRD.addEvent(Factory.hitMain(elRD, gm, -1));
-		Frequency<Image2D> elRDImg = new Frequency<>(2, electric);
+		Animation<Image2D> elRDImg = new Animation<>(2, electric);
 		elRDImg.setIndex(15);
 		elRDImg.addEvent(()->buzz2.play(), 28);
 		elRD.setImage(elRDImg);
@@ -302,7 +309,7 @@ public class SteelFactory extends StageBuilder
 		elLU.currX = 4134;
 		elLU.currY = 2421;
 		elLU.setHitbox(Hitbox.EXACT);
-		Frequency<Image2D> elLUImg = new Frequency<>(2, electric2);
+		Animation<Image2D> elLUImg = new Animation<>(2, electric2);
 		elLUImg.setIndex(14);
 		elLUImg.addEvent(()->buzz3.play(), 28);
 		elLU.setImage(elLUImg);
@@ -313,7 +320,7 @@ public class SteelFactory extends StageBuilder
 		elLD.currX = 4134;
 		elLD.currY = 2761;
 		elLD.setHitbox(Hitbox.EXACT);
-		Frequency<Image2D> elLDImg = new Frequency<>(2, electric2);
+		Animation<Image2D> elLDImg = new Animation<>(2, electric2);
 		elLDImg.addEvent(()->buzz4.play(),28);
 		elLD.setImage(elLDImg);
 		elLD.addEvent(Factory.hitMain(elLD, gm, -1));
@@ -635,8 +642,7 @@ public class SteelFactory extends StageBuilder
 		stalk.appendPath(785, 435,0,false,()->{
 			shut.play();
 			collapsing.stop();
-			game.drugVertical(0, 0);
-			game.drugHorizontal(0, 0);
+			drugEffect = false;
 		});
 		gm.allowOverlapping(stalk);
 		
@@ -826,8 +832,7 @@ public class SteelFactory extends StageBuilder
 						if(!event6)
 						{
 							event6 = true;
-							game.drugVertical(2, 2);
-							game.drugHorizontal(2, 2);
+							drugEffect = true;
 							add(stalk,met1,met2,met3,met4,met5,met6,met7,met8,met10,met11);
 							collapsing.play(true);
 							gm.avoidOverlapping(stalk);
@@ -881,7 +886,7 @@ public class SteelFactory extends StageBuilder
 			@Override
 			public void eventHandling() 
 			{
-				if(EntityStuff.distance(gm, solp) > 270) //Dont move the magnets if gm is not on the band
+				if(Fundementals.distance(gm, solp) > 270) //Dont move the magnets if gm is not on the band
 					return;
 				
 				switch(number)
@@ -1040,6 +1045,12 @@ public class SteelFactory extends StageBuilder
 			for(GameObject go : saws)
 				if(go.collidesWith(gm))
 					gm.hit(-99);
+		
+		if(drugEffect)
+		{
+			hShake.update();
+			vShake.update();
+		}
 	}
 	
 	@Override

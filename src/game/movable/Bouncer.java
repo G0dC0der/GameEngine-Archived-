@@ -1,7 +1,7 @@
 package game.movable;
 
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.MovableObject;
 import game.essentials.SoundBank;
 import game.mains.GravityMan;
@@ -45,6 +45,7 @@ public class Bouncer extends PathDrone
 		pushCounter = new int[victims.length];
 		shakeCounter = 0;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 		r = new Random();
 	}
 	
@@ -53,6 +54,9 @@ public class Bouncer extends PathDrone
 	{
 		Bouncer b = new Bouncer(x, y, bounceStrength, times, explicitDir, victims);
 		copyData(b);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(b);
 		
 		return b;
 	}
@@ -113,7 +117,7 @@ public class Bouncer extends PathDrone
 		{
 			MovableObject mo = victims[i];
 			if (!collidesWith(mo))
-				victimDirrections[i] = EntityStuff.getDirection(EntityStuff.normalize(middleX, middleY, mo.getPrevX() + mo.width / 2, mo.getPrevY() + mo.height / 2));
+				victimDirrections[i] = Fundementals.getDirection(Fundementals.normalize(middleX, middleY, mo.getPrevX() + mo.width / 2, mo.getPrevY() + mo.height / 2));
 			else
 			{
 				pushCounter[i] = times;

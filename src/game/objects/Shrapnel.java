@@ -1,12 +1,13 @@
 package game.objects;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.Stage;
 import game.movable.Projectile;
 
-import java.awt.geom.Point2D;
 import java.util.Random;
+
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * A {@code Shrapnel} is a special type of {@code Particle} that spawns a bunch of projectiles(splits), flying in all directions.
@@ -45,13 +46,13 @@ public class Shrapnel extends Particle
 		if(!once)
 		{
 			once = true;
-			Stage s = Stage.STAGE;
+			Stage s = Stage.getCurrentStage();
 			float middleX = currX + width  / 2,
 				  middleY = currY + height / 2;
 			
 			if(expType == ExplosionType.SPLIT)
 			{
-				Point2D.Float[] edgePoints = getEightDirection();
+				Vector2[] edgePoints = getEightDirection();
 				
 				for(int i = 0; i < edgePoints.length; i++)
 				{
@@ -64,12 +65,12 @@ public class Shrapnel extends Particle
 			else
 			{
 				int splits = r.nextInt(max - min) + min,
-					width  = Stage.STAGE.size.width,
-					height = Stage.STAGE.size.height;
+					width  = Stage.getCurrentStage().size.width,
+					height = Stage.getCurrentStage().size.height;
 				
 				for(int i = 0; i < splits; i++)
 				{
-					Point2D.Float edgePoints = EntityStuff.findEdgePoint(middleX, middleY, r.nextInt(width), r.nextInt(height));
+					Vector2 edgePoints = Fundementals.findEdgePoint(middleX, middleY, r.nextInt(width), r.nextInt(height));
 					Projectile proj = split.getClone(currX, currY);
 					proj.setDisposable(true);
 					proj.setTarget(edgePoints.x, edgePoints.y);
@@ -113,7 +114,7 @@ public class Shrapnel extends Particle
 		expType = ExplosionType.SPLIT;
 	}
 	
-	Point2D.Float[] getEightDirection()
+	Vector2[] getEightDirection()
 	{
 		float middleX = currX + width  / 2,
 			  middleY = currY + height / 2,
@@ -122,50 +123,53 @@ public class Shrapnel extends Particle
 		//NW Point
 		x = middleX - 1;
 		y = middleY - 1;
-		Point2D.Float p1 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p1 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//N Point
 		x = middleX;
 		y = middleY - 1;
-		Point2D.Float p2 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p2 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//NE Point
 		x = middleX + 1;
 		y = middleY - 1;
-		Point2D.Float p3 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p3 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//E Point
 		x = middleX + 1;
 		y = middleY;
-		Point2D.Float p4 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p4 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//SE Point
 		x = middleX + 1;
 		y = middleY + 1;
-		Point2D.Float p5 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p5 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//S Point
 		x = middleX;
 		y = middleY + 1;
-		Point2D.Float p6 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p6 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//SW Point
 		x = middleX - 1;
 		y = middleY + 1;
-		Point2D.Float p7 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p7 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
 		//W Point
 		x = middleX - 1;
 		y = middleY;
-		Point2D.Float p8 = EntityStuff.findEdgePoint(middleX, middleY, x, y);
+		Vector2 p8 = Fundementals.findEdgePoint(middleX, middleY, x, y);
 		
-		return new Point2D.Float[]{p1,p2,p3,p4,p5,p6,p7,p8};
+		return new Vector2[]{p1,p2,p3,p4,p5,p6,p7,p8};
 	}
 	
 	public Shrapnel getClone(float x, float y)
 	{
 		Shrapnel s = new Shrapnel(x, y, split, victims);
 		copyData(s);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(s);
 		
 		return s;
 	}

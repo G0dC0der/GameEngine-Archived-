@@ -1,8 +1,11 @@
 package stages.sand;
 
+import static game.core.Engine.*;
+import game.core.Enemy;
 import game.core.Engine;
+import game.core.Stage;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.GameObject.HitEvent;
@@ -13,7 +16,7 @@ import game.core.MovableObject.TileEvent;
 import game.development.AutoInstall;
 import game.development.StageBuilder;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.Dummy;
 import game.movable.LaserDrone;
@@ -25,7 +28,9 @@ import game.movable.PushableObject;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
 import game.objects.Wind;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
@@ -36,14 +41,13 @@ public class Sandopolis extends StageBuilder
 {
 	private Image2D flamerImg[], flamer2Img[], blockImg, spikeballImg, smallSpikeImg, sunImg, sunAngryImg[], sunPissedImg, sunEyeImg, cannonImg, missileImg, impactImg[], trailerImg[], gunfireImg[], blowingImg, chillingImg, windImg[], itemImg[], smallMain[], stoneImg, powerupImg, bossexpImg[], projImg, expImg[];
 	private Sound explodesound, firesound, collect, pushed, bossdie, lasercharge, laserattack, weap2fire, weap2exp;
-	private PathDrone spikeBall, smallSpike;
 	private MovableObject sun, eye1, eye2;
 	private GameObject blower;
 	private Event followEvent, followEvent2;
 	private Missile antiSunMissile, antiBlow;
 	private LaserDrone weapon1;
 	private Projectile proj;
-	private boolean falling, falling2, haveFired1, haveFired2, haveFired3, antiBlowDone, won, pissed;
+	private boolean haveFired1, haveFired2, haveFired3, antiBlowDone, won, pissed;
 	private int wonCounter, projCounter;
 	
 	public void init() 
@@ -105,7 +109,7 @@ public class Sandopolis extends StageBuilder
 		 */
 		super.build();
 		lethalDamage = -5;
-		falling = falling2 = haveFired1 = haveFired2 = haveFired3 = antiBlowDone = won = pissed = false;
+		haveFired1 = haveFired2 = haveFired3 = antiBlowDone = won = pissed = false;
 
 		/*
 		 * Main Character
@@ -214,70 +218,18 @@ public class Sandopolis extends StageBuilder
 		/*
 		 * Falling spike balls
 		 */
-		spikeBall = new PathDrone(4300, 425);
-		spikeBall.setImage(spikeballImg);
-		spikeBall.setHitbox(Hitbox.CIRCLE);
-		spikeBall.addEvent(Factory.hitMain(spikeBall, gm, -1));
-		spikeBall.appendPath(4070, 425, 0, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				spikeBall.enableGravity(true);
-			}
-		});
-		spikeBall.appendPath(3114, size.height - spikeBall.height, 0, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				spikeBall.enableGravity(false);
-				falling = true;
-			}
-		});
-		spikeBall.appendPath(3114, size.height, 0, false, null);
-		spikeBall.appendPath(4300, 425, 0, true, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				falling = false;
-			}
-		});
+		//TODO
+		SpikeBall bigSpike = new SpikeBall(4, 4);
+		bigSpike.setImage(spikeballImg);
+		bigSpike.addEvent(Factory.hitMain(bigSpike, gm, -1));
+		bigSpike.setHitbox(Hitbox.CIRCLE);
+		add(bigSpike);
 		
-		smallSpike = new PathDrone(4300, 456);
+		SpikeBall smallSpike = new SpikeBall(6, 8);
 		smallSpike.setImage(smallSpikeImg);
-		smallSpike.setHitbox(Hitbox.CIRCLE);
 		smallSpike.addEvent(Factory.hitMain(smallSpike, gm, -1));
-		smallSpike.setMoveSpeed(4.5f);
-		smallSpike.appendPath(4070, 456, 0, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				smallSpike.enableGravity(true);
-			}
-		});
-		smallSpike.appendPath(3114, size.height - smallSpike.height, 0, false, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				smallSpike.enableGravity(false);
-				falling2 = true;
-			}
-		});
-		smallSpike.appendPath(3114, size.height, 0, false, null);
-		smallSpike.appendPath(4300, 456, 0, true, new Event()
-		{	
-			@Override
-			public void eventHandling() 
-			{
-				falling2 = false;
-			}
-		});
-		
-		add(spikeBall, smallSpike);
+		smallSpike.setHitbox(Hitbox.CIRCLE);
+		add(smallSpike);
 		
 		/*
 		 * Ugly Sun
@@ -301,13 +253,13 @@ public class Sandopolis extends StageBuilder
 		 * Cannons, anti sun projectile and animations
 		 */
 		final Particle trailer = new Particle();
-		trailer.setImage(new Frequency<>(2, trailerImg));
+		trailer.setImage(new Animation<>(2, trailerImg));
 		
 		Particle gunfire = new Particle();
-		gunfire.setImage(new Frequency<>(4, gunfireImg));
+		gunfire.setImage(new Animation<>(4, gunfireImg));
 		
 		final Particle impact = new Particle();
-		impact.setImage(new Frequency<>(4, impactImg));
+		impact.setImage(new Animation<>(4, impactImg));
 		impact.setIntroSound(explodesound);
 		
 		antiSunMissile = new Missile(0, 0, sun);
@@ -537,22 +489,16 @@ public class Sandopolis extends StageBuilder
 			return;
 		}
 		
-		if(!falling)
-			spikeBall.rotation -= 4;
-		
-		if(!falling2)
-			smallSpike.rotation -= 8;
-		
-		if(10 < EntityStuff.distance(sun.currX, 1, gm.currX, 1))
+		if(10 < Fundementals.distance(sun.currX, 1, gm.currX, 1))
 			sun.moveToward(gm.currX, gm.currY - 300, 3);
 		
 		followEvent.eventHandling();
-		eye1.rotation = EntityStuff.rotateTowardsPoint(eye1.currX, eye1.currY, gm.currX, gm.currY, eye1.rotation, 0.11f);
+		eye1.rotation = Fundementals.rotateTowardsPoint(eye1.currX, eye1.currY, gm.currX, gm.currY, eye1.rotation, 0.11f);
 		
 		followEvent2.eventHandling();
-		eye2.rotation = EntityStuff.rotateTowardsPoint(eye2.currX, eye2.currY, gm.currX, gm.currY, eye2.rotation, 0.11f);
+		eye2.rotation = Fundementals.rotateTowardsPoint(eye2.currX, eye2.currY, gm.currX, gm.currY, eye2.rotation, 0.11f);
 	
-		if(!antiBlowDone && 100 > EntityStuff.distance(antiBlow.currX, antiBlow.currY, 2844, 108))
+		if(!antiBlowDone && 100 > Fundementals.distance(antiBlow.currX, antiBlow.currY, 2844, 108))
 		{
 			antiBlow.setTarget(1393, 760);
 			antiBlowDone = true;
@@ -567,5 +513,57 @@ public class Sandopolis extends StageBuilder
 	{
 		super.dispose();
 		disposeBatch(flamerImg, flamer2Img, blockImg, spikeballImg, smallSpikeImg, sunImg, sunAngryImg, sunPissedImg, sunEyeImg, cannonImg, missileImg, impactImg, trailerImg, gunfireImg, blowingImg, chillingImg, windImg, itemImg, smallMain, stoneImg, powerupImg, bossexpImg, projImg, expImg, explodesound, firesound, collect, pushed, bossdie, lasercharge, laserattack, weap2fire, weap2exp);
+	}
+
+	static class SpikeBall extends Enemy
+	{
+		float mass, gravity, damping, vy, rotationSpeed;
+		boolean fallingDown;
+		
+		SpikeBall(float moveSpeed, float rotationSpeed)
+		{
+			mass = 1.0f;
+			gravity = -900;
+			damping = 0.0001f;
+			
+			this.rotationSpeed = rotationSpeed;
+			setMoveSpeed(moveSpeed);
+			moveTo(Stage.getCurrentStage().size.width, 425);
+			tryDown(33);
+		}
+		
+		@Override
+		public void moveEnemy() 
+		{
+			if(canGoDown() || (fallingDown && currY < Stage.getCurrentStage().size.height))
+			{
+				vy *= 1.0 - (damping * DELTA);
+			    float force = mass * gravity;
+			    vy += (force / mass) * DELTA;
+			    
+			    currY -= vy * DELTA;
+			}
+			else
+				vy = 0;
+			
+			if(!fallingDown)
+			{
+				if(currX < 3114)
+					fallingDown = true;
+				else
+				{
+					moveToward(0, currY);
+					rotation -= rotationSpeed;
+				}
+				
+			}
+			else if(currY > Stage.getCurrentStage().size.height)
+			{
+				fallingDown = false;
+				currX = Stage.getCurrentStage().size.width;
+				currY = 425;
+				tryDown(33);
+			}
+		}
 	}
 }

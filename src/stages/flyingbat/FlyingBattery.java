@@ -9,7 +9,7 @@ import game.core.MainCharacter.CharacterState;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -97,7 +97,7 @@ public class FlyingBattery extends Stage
 		background(RenderOption.FULL, backgroundImg);
 
 		final GravityMan gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(1);
@@ -112,18 +112,18 @@ public class FlyingBattery extends Stage
 		add(gm);
 		
 		GameObject dummyElectric = new GameObject();
-		dummyElectric.setImage(new Frequency<>(4, electricImg));
+		dummyElectric.setImage(new Animation<>(4, electricImg));
 		dummyElectric.currX = 430;
 		dummyElectric.currY = 606;
 		
 		final MovableObject door = new MovableObject();
-		door.setImage(new Frequency<>(1, doorImg));
+		door.setImage(new Animation<>(1, doorImg));
 		door.currX = 1498;
 		door.currY = 351;
 		gm.avoidOverlapping(door);
 		
 		final PathDrone button = new PathDrone(46, 455);
-		button.setImage(new Frequency<>(1, buttonImg));
+		button.setImage(new Animation<>(1, buttonImg));
 		button.setMoveSpeed(1);
 		gm.addTileEvent((tileType)->
 		{
@@ -141,7 +141,7 @@ public class FlyingBattery extends Stage
 		});
 		
 		final PushableObject push = new PushableObject(2037, 380, gm);
-		push.setImage(new Frequency<>(1, pushImg));
+		push.setImage(new Animation<>(1, pushImg));
 		push.setPushingSound(pushed, 10);
 		push.setTriggerable(true);
 		push.addTileEvent((tileType)-> {if(tileType == Engine.LETHAL) discard(push);});
@@ -155,18 +155,18 @@ public class FlyingBattery extends Stage
 		});
 		
 		Blob blob = new Blob(0,0,new MovableObject[]{gm}, gm);
-		blob.setImage(new Frequency<>(1, blobImg));
+		blob.setImage(new Animation<>(1, blobImg));
 		blob.useFastCollisionCheck(true);
 		blob.setFiringSound(pipefire);
 		blob.setProperties(MissileProperties.FAST_VERY_FLOATY);
 		
 		Particle gunfire = new Particle();
-		gunfire.setImage(new Frequency<>(4, firingImg));
+		gunfire.setImage(new Animation<>(4, firingImg));
 		gunfire.offsetX = -65;
 		gunfire.offsetY = -70;
 		
 		Weapon weap = new Weapon(1105, 227, 1, 1, 100, gm);
-		weap.setImage(new Frequency<>(1, dummyImg));
+		weap.setImage(new Animation<>(1, dummyImg));
 		weap.setVisible(false);
 		weap.setProjectile(blob);
 		weap.setFrontFire(false);
@@ -174,51 +174,51 @@ public class FlyingBattery extends Stage
 		weap.setFiringParticle(gunfire);
 		
 		final PathDrone chain1 = new PathDrone(595, -30);
-		chain1.setImage(new Frequency<>(1, vchainImg));
+		chain1.setImage(new Animation<>(1, vchainImg));
 		chain1.appendPath(595, 100, 50, false, ()-> chain1.setMoveSpeed(1));
 		chain1.appendPath(595, -30, 20, false, ()-> chain1.setMoveSpeed(4));
 		
 		GameObject ball1 = new GameObject();
 		ball1.setHitbox(Hitbox.EXACT);
-		ball1.setImage(new Frequency<>(1, ballImg));
+		ball1.setImage(new Animation<>(1, ballImg));
 		ball1.addEvent(Factory.follow(chain1, ball1, -(ball1.width / 2) + 3, chain1.height));
 		ball1.addEvent(Factory.hitMain(ball1, gm, -1));
 		
 		final PathDrone chain2 = new PathDrone(739, -30);
-		chain2.setImage(new Frequency<>(1, vchainImg));
+		chain2.setImage(new Animation<>(1, vchainImg));
 		chain2.appendPath(739, 100, 100, false, ()-> chain2.setMoveSpeed(0.5f));
 		chain2.appendPath(739, -30, 60, false, ()-> chain2.setMoveSpeed(3));
 		
 		GameObject ball2 = new GameObject();
 		ball2.setHitbox(Hitbox.EXACT);
-		ball2.setImage(new Frequency<>(1, ballImg));
+		ball2.setImage(new Animation<>(1, ballImg));
 		ball2.addEvent(Factory.follow(chain2, ball2, -(ball1.width / 2) + 3, chain1.height));
 		ball2.addEvent(Factory.hitMain(ball2, gm, -1));
 		
 		final PathDrone chain3 = new PathDrone(-640, 268);
-		chain3.setImage(new Frequency<>(1, hchainImg));
+		chain3.setImage(new Animation<>(1, hchainImg));
 		chain3.appendPath(-40, 268, 10, false, ()-> chain3.setMoveSpeed(3));
 		chain3.appendPath(-640, 268, 10, false, ()-> chain3.setMoveSpeed(3.5f));
 		
 		GameObject ball3 = new GameObject();
 		ball3.setHitbox(Hitbox.EXACT);
-		ball3.setImage(new Frequency<>(1, ballImg));
+		ball3.setImage(new Animation<>(1, ballImg));
 		ball3.addEvent(Factory.follow(chain3, ball3, chain3.width - 6,-21));
 		ball3.addEvent(Factory.hitMain(ball3, gm, -1));
 		
 		final PathDrone chain4 = new PathDrone(-640, 315);
-		chain4.setImage(new Frequency<>(1, hchainImg));
+		chain4.setImage(new Animation<>(1, hchainImg));
 		chain4.appendPath(-40, 315, 10, false, ()-> chain4.setMoveSpeed(3));
 		chain4.appendPath(-640, 315, 10, false, ()-> chain4.setMoveSpeed(3.5f));
 		
 		GameObject ball4 = new GameObject();
 		ball4.setHitbox(Hitbox.EXACT);
-		ball4.setImage(new Frequency<>(1, ballImg));
+		ball4.setImage(new Animation<>(1, ballImg));
 		ball4.addEvent(Factory.follow(chain4, ball4, chain3.width - 6,-21));
 		ball4.addEvent(Factory.hitMain(ball4, gm, -1));
 		
 		SolidPlatform p1 = new SolidPlatform(2430, 154, gm);
-		p1.setImage(new Frequency<>(1, platformImg));
+		p1.setImage(new Animation<>(1, platformImg));
 		p1.setStrictGlueMode(false);
 		p1.setMoveSpeed(2);
 		p1.appendPath(2720, 154, 10, false, null);
@@ -239,7 +239,7 @@ public class FlyingBattery extends Stage
 		p3.appendPath(2880, 800, 10, false, null);
 		
 		GameObject prop1 = new GameObject();
-		prop1.setImage(new Frequency<>(1, propellerImg));
+		prop1.setImage(new Animation<>(1, propellerImg));
 		prop1.setHitbox(Hitbox.EXACT);
 		prop1.addEvent(Factory.follow(p1, prop1, 0, 10));
 		prop1.addEvent(Factory.hitMain(prop1, gm, -1));
@@ -253,22 +253,22 @@ public class FlyingBattery extends Stage
 		prop3.addEvent(Factory.hitMain(prop3, gm, -1));
 		
 		GameObject coin = new GameObject();
-		coin.setImage(new Frequency<>(7, coinImg));
+		coin.setImage(new Animation<>(7, coinImg));
 		coin.currX = 3414;
 		coin.currY = 95;
 		
 		GameObject wind = new GameObject();
-		wind.setImage(new Frequency<>(2, windImg));
+		wind.setImage(new Animation<>(2, windImg));
 		wind.currX = 2074;
 		wind.currY = 0;
 		
 		final Missile mi = new Missile(0,0, gm);
-		mi.setImage(new Frequency<>(1, shellImg));
+		mi.setImage(new Animation<>(1, shellImg));
 		mi.useFastCollisionCheck(true);
 		mi.setFiringSound(tankfire);
 
 		Weapon tank = new Weapon(134, 435, 2, 20, 320, gm);
-		tank.setImage(new Frequency<>(1, tankImg));
+		tank.setImage(new Animation<>(1, tankImg));
 		tank.setProjectile(mi);
 		tank.setRotationSpeed(0);
 		tank.setFiringParticle(gunfire);
@@ -290,20 +290,20 @@ public class FlyingBattery extends Stage
 		PathDrone ball5 = new PathDrone(313,757);
 		ball5.appendPath(430, 644, 0, false, null);
 		ball5.appendPath(313, 757, 0, false, null);
-		ball5.setImage(new Frequency<>(1, ball2Img));
+		ball5.setImage(new Animation<>(1, ball2Img));
 		ball5.addEvent(Factory.hitMain(ball5, gm, -1));
 
 		PathDrone ball6 = new PathDrone(463,719);
 		ball6.appendPath(463, 644, 0, false, null);
 		ball6.appendPath(463,719, 0, false, null);
-		ball6.setImage(new Frequency<>(1, ball2Img));
+		ball6.setImage(new Animation<>(1, ball2Img));
 		ball6.addEvent(Factory.hitMain(ball6, gm, -1));
 		ball6.setMoveSpeed(1.4f);
 		
 		PathDrone ball7 = new PathDrone(635,676);
 		ball7.appendPath(495, 644, 0, false, null);
 		ball7.appendPath(635,676, 0, false, null);
-		ball7.setImage(new Frequency<>(1, ball2Img));
+		ball7.setImage(new Animation<>(1, ball2Img));
 		ball7.addEvent(Factory.hitMain(ball7, gm, -1));
 		ball7.setMoveSpeed(2.7f);
 		

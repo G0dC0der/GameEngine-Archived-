@@ -1,13 +1,12 @@
 package game.movable;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.essentials.Image2D;
 import game.objects.Particle;
 
-import java.awt.geom.Point2D;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * The {@code Missile} class represent a heat seeking missile, moving in a "curve". The missile will be launched at the closest seeable target and respawn on its initial position upon impact.<br><br>
@@ -60,6 +59,9 @@ public class Missile extends Projectile
 	{
 		Missile m = new Missile(x, y, getTargets());
 		copyData(m);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(m);
 		
 		return m;
 	}
@@ -202,7 +204,7 @@ public class Missile extends Projectile
 		if(!visible)
 			return null;
 		else
-			return currImage.getObject();
+			return image.getObject();
 	}
 		
 	@Override
@@ -212,7 +214,7 @@ public class Missile extends Projectile
 		float centerY = currY + height / 2;
 		
 			if(faceTarget)
-				rotation = (float) EntityStuff.getAngle(centerX, centerY, targetX, targetY);
+				rotation = (float) Fundementals.getAngle(centerX, centerY, targetX, targetY);
 			else if (pointAtDirection)
 				rotation = (float) Math.toDegrees(Math.atan2(vy, vx));
 		
@@ -220,7 +222,7 @@ public class Missile extends Projectile
 		{
 			if(pointAtDirection)
 			{
-				Point2D.Float loc = getRarePosition();
+				Vector2 loc = getRarePosition();
 				stage.add(trailer.getClone(loc.x - trailer.width / 2, loc.y - trailer.height / 2));
 			}
 			else

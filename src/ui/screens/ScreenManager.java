@@ -64,10 +64,9 @@ public class ScreenManager extends Game
 		if(replay != null)
 			stage.setMeta(replay.meta);
 		
-		Engine engine = new Engine(stage, replay == null ? null : replay.replays);
+		Engine engine = Engine.constructEngine(stage, replay == null ? null : replay.replays);
 		engine.clearEachFrame = settings.clearEachFrame;
 		engine.showFps(settings.showFps);
-		engine.streamSounds = settings.streamSounds;
 		engine.saveReplays = settings.saveReplays;
 		engine.masterVolume = settings.masterVolume;
 		engine.setExitEvent(new Event()
@@ -76,7 +75,6 @@ public class ScreenManager extends Game
 			public void eventHandling() 
 			{
 				setScreen(menu);
-				Stage.STAGE = null;
 				System.gc();
 			}
 		});

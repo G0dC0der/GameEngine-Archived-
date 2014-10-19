@@ -1,7 +1,6 @@
 package game.movable;
 
 import game.core.Enemy;
-import game.core.Stage;
 
 /**
  * An {@code Enemy} that exist a given amount of frames.<br>
@@ -18,7 +17,7 @@ public abstract class TimedEnemy extends Enemy
 	{
 		if(counter++ > time)
 		{
-			Stage.STAGE.discard(this);
+			stage.discard(this);
 		}
 	}
 }

@@ -54,7 +54,7 @@ public class GravityMan extends MainCharacter
 		sounds = new SoundBank(1); //Jump sound
 		sounds.setEmitter(this);
 		
-		d = Stage.STAGE.stageData;
+		d = Stage.getCurrentStage().stageData;
 	}
 
 	@Override
@@ -62,17 +62,17 @@ public class GravityMan extends MainCharacter
 	{
 		if(flySpeed != 0)
 		{
-			if(pb.up && canGoUp(currY - flySpeed))
-				currY-=flySpeed;
+			if(pb.up)
+				tryUp(flySpeed);
 			
-			if(pb.down && canGoDown(currY + flySpeed))
-				currY+=flySpeed;
+			if(pb.down)
+				tryDown(flySpeed);
 			
-			if(pb.left && canGoLeft(currX - flySpeed))
-				currX-=flySpeed;
+			if(pb.left)
+				tryLeft(flySpeed);
 			
-			if(pb.right && canGoRight(currX + flySpeed))
-				currX+=flySpeed;
+			if(pb.right)
+				tryRight(flySpeed);
 			
 			return;
 		}
@@ -82,7 +82,7 @@ public class GravityMan extends MainCharacter
 		 */
 		boolean leftInput  = !blockInput && pb.left, rightInput = !blockInput && pb.right, upInput = !blockInput && pb.up;
 		boolean checkAllowed = true;
-		d = Stage.STAGE.stageData;
+		d = Stage.getCurrentStage().stageData;
 
 		/*
 		 * Steep slopes checks
@@ -310,12 +310,12 @@ public class GravityMan extends MainCharacter
 	@Override
 	public Image2D getFrame() 
 	{
-		boolean stopped = currImage.isStopped();
+		boolean stopped = image.isStopped();
 		if(!moving)
-			currImage.stop(true);
+			image.stop(true);
 			
 		Image2D img =  super.getFrame();
-		currImage.stop(stopped);
+		image.stop(stopped);
 		
 		return img;
 	}

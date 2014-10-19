@@ -27,6 +27,7 @@ public class Gold extends PathDrone
 		this.grabers = grabers;
 		this.value = value;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 	
 	@Override
@@ -50,6 +51,9 @@ public class Gold extends PathDrone
 	{
 		Gold g = new Gold(x, y, value, grabers);
 		copyData(g);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(g);
 		
 		return g;
 	}

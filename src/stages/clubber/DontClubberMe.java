@@ -7,7 +7,7 @@ import game.core.MainCharacter.CharacterState;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -92,7 +92,7 @@ public class DontClubberMe extends Stage
 		foreground(RenderOption.PORTION,foregroundImg);
 
 		gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(3);
@@ -104,8 +104,8 @@ public class DontClubberMe extends Stage
 		gm.currY = startY;
 		add(gm);
 		
-		Frequency<Image2D> pressureV = new Frequency<>(1, pressure1);
-		Frequency<Image2D> pressureH = new Frequency<>(1, pressure2);
+		Animation<Image2D> pressureV = new Animation<>(1, pressure1);
+		Animation<Image2D> pressureH = new Animation<>(1, pressure2);
 		
 		SolidPlatform p1 = new SolidPlatform(900, 589, gm);
 		p1.setImage(pressureV);
@@ -153,7 +153,7 @@ public class DontClubberMe extends Stage
 		gm.avoidOverlapping(door);
 
 		final GameObject key = new GameObject();
-		key.setImage(new Frequency<>(1, keyimg));
+		key.setImage(new Animation<>(1, keyimg));
 		key.currX = 1598;
 		key.currY = 150;
 		key.addEvent(()->{
@@ -165,37 +165,37 @@ public class DontClubberMe extends Stage
 		});
 
 		saw1 = new RectangleDrone(1500, 60, 195, 158, true);
-		saw1.setImage(new Frequency<>(1, sawimg));
+		saw1.setImage(new Animation<>(1, sawimg));
 		saw1.useFastCollisionCheck(true);
 		saw1.addEvent(Factory.hitMain(saw1, gm, -1));
 		
 		saw2 = new RectangleDrone(1500, 60, 195, 158, true);
-		saw2.setImage(new Frequency<>(1, sawimg));
+		saw2.setImage(new Animation<>(1, sawimg));
 		saw2.useFastCollisionCheck(true);
 		saw2.addEvent(Factory.hitMain(saw2, gm, -1));
 		
 		saw3 = new RectangleDrone(1500, 60, 195, 158, true);
-		saw3.setImage(new Frequency<>(1, sawimg));
+		saw3.setImage(new Animation<>(1, sawimg));
 		saw3.useFastCollisionCheck(true);
 		saw3.addEvent(Factory.hitMain(saw3, gm, -1));
 		
 		saw4 = new RectangleDrone(1500, 60, 195, 158, true);
-		saw4.setImage(new Frequency<>(1, sawimg));
+		saw4.setImage(new Animation<>(1, sawimg));
 		saw4.useFastCollisionCheck(true);
 		saw4.addEvent(Factory.hitMain(saw4, gm, -1));
 		
 		Particle trailer = new Particle();
-		trailer.setImage(new Frequency<>(2, trailerimg));
+		trailer.setImage(new Animation<>(2, trailerimg));
 		
 		Particle gunfire = new Particle();
-		gunfire.setImage(new Frequency<>(4, gunfireimg));
+		gunfire.setImage(new Animation<>(4, gunfireimg));
 		
 		final Particle impact = new Particle();
-		impact.setImage(new Frequency<>(4, impactimg));
+		impact.setImage(new Animation<>(4, impactimg));
 		impact.setIntroSound(explodesound);
 		
 		final Missile m = new Missile(1240, 527, gm);
-		m.setImage(new Frequency<>(1, missileimg));
+		m.setImage(new Animation<>(1, missileimg));
 		m.useFastCollisionCheck(true);
 		m.setTrailer(trailer);
 		m.setTrailerDelay(7);
@@ -203,7 +203,7 @@ public class DontClubberMe extends Stage
 		m.setImpact(impact);
 		
 		Weapon weap = new Weapon(1195, 510, 1, 1, 120, gm);
-		weap.setImage(new Frequency<>(1, weaponimg));
+		weap.setImage(new Animation<>(1, weaponimg));
 		weap.setProjectile(m);
 		weap.setFrontFire(true);
 		weap.setRotationSpeed(1.2f);
@@ -218,21 +218,21 @@ public class DontClubberMe extends Stage
 		weakp.currX = 300;
 		weakp.currY = 300;
 		weakp.setImage(owImage[0]);
-		weakp.addEvent(Factory.weakPlatform(weakp, new Frequency<>(6, owImage), 20, null, gm));
+		weakp.addEvent(Factory.weakPlatform(weakp, new Animation<>(6, owImage), 20, null, gm));
 		
 		GameObject weakp2 = weakp.getClone(500, 500);
-		weakp2.addEvent(Factory.weakPlatform(weakp2, new Frequency<>(6, owImage), 20, null, gm));
+		weakp2.addEvent(Factory.weakPlatform(weakp2, new Animation<>(6, owImage), 20, null, gm));
 		
 		GameObject weakp3 = weakp.getClone(160, 600);
-		weakp3.addEvent(Factory.weakPlatform(weakp3, new Frequency<>(6, owImage), 20, null, gm));
+		weakp3.addEvent(Factory.weakPlatform(weakp3, new Animation<>(6, owImage), 20, null, gm));
 		
 		GameObject weakp4 = weakp.getClone(400, 800);
-		weakp4.addEvent(Factory.weakPlatform(weakp4, new Frequency<>(6, owImage), 20, null, gm));
+		weakp4.addEvent(Factory.weakPlatform(weakp4, new Animation<>(6, owImage), 20, null, gm));
 		
 		final GameObject dia1 = new GameObject();
 		dia1.currX = 303;
 		dia1.currY = 270;
-		dia1.setImage(new Frequency<>(6, diamond));
+		dia1.setImage(new Animation<>(6, diamond));
 		dia1.addEvent(new Event() 
 		{
 			@Override

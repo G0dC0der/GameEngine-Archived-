@@ -8,7 +8,7 @@ import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
@@ -37,7 +37,6 @@ public class TraningStage4 extends AbstractTraningStage
 
 	@AutoLoad(path=RES, type=VisualType.IMAGE)
 	private Image2D elevator, hydrolics, redPlatform, head[], moving, cloud[], platform, crystal[], gateImg, enemy[], fan[], wind[], weak[], goal, headgone[], friendImg;
-	private Image2D background, foreground;
 	private Sound elevatorStop, elevatorWorking, headMove, reporting, teleport, collect, doorOpen, weakDie/*, talking*/;
 	private Music propeller;
 	private BitmapFont talkingFont;
@@ -51,9 +50,6 @@ public class TraningStage4 extends AbstractTraningStage
 		try
 		{
 			super.init();
-			
-			background = new Image2D(RES + "/backgroundImg.png");
-			foreground = new Image2D(RES + "/foregroundImg.png");
 			
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
 //			talking = TinySound.loadSound(new File(RES + "/talking.wav"));
@@ -93,8 +89,6 @@ public class TraningStage4 extends AbstractTraningStage
 		chaserHunting = false;
 		diamonds = collectedDiamonds = 0;
 		setPeople(gm);
-		background(RenderOption.PORTION, background);
-		foreground(RenderOption.PORTION, foreground);
 		
 		/*
 		 * Main Character
@@ -156,7 +150,7 @@ public class TraningStage4 extends AbstractTraningStage
 		final Particle teleAnim = new Particle();
 		teleAnim.setImage(1, headgone);
 		
-		Frequency<Image2D> headImage = new Frequency<>(7, head);
+		Animation<Image2D> headImage = new Animation<>(7, head);
 		headImage.pingPong(true);
 		
 		SolidPlatform theHead = new SolidPlatform(3176, 2728, gm);
@@ -199,7 +193,7 @@ public class TraningStage4 extends AbstractTraningStage
 		/*
 		 * Chaser
 		 */
-		Frequency<Image2D> chaserImage = new Frequency<>(6, cloud);
+		Animation<Image2D> chaserImage = new Animation<>(6, cloud);
 		chaserImage.pingPong(true);
 		
 		final float startX = 90 * 16;
@@ -367,6 +361,7 @@ public class TraningStage4 extends AbstractTraningStage
 		GameObject door = new GameObject();
 		door.moveTo(248, 1552);
 		door.setImage(goal);
+		door.zIndex(-1);
 		door.addEvent(()->{
 			if(door.collidesWith(gm))
 				gm.setState(CharacterState.FINISH);
@@ -383,7 +378,7 @@ public class TraningStage4 extends AbstractTraningStage
 	
 	void addWeak(int x, int y)
 	{
-		Frequency<Image2D> destroyAnim = new Frequency<>(6, weak);
+		Animation<Image2D> destroyAnim = new Animation<>(6, weak);
 		destroyAnim.setLoop(false);
 		
 		GameObject weakP = new GameObject();

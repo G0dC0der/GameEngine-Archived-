@@ -39,6 +39,7 @@ public class Goomba extends PathDrone
 		hitSubjects = new int[enemies.length];
 		hitFrames = 100;
 		sounds = new SoundBank(2);//1 = Walking Sound, 2 = Hit Sound
+		sounds.setEmitter(this);
 	}
 	
 	@Override
@@ -57,9 +58,9 @@ public class Goomba extends PathDrone
 			{
 				if(hitSubjects[i] <= 0 && isAttacking(mo))
 				{
-					Stage.STAGE.discard(this);
+					Stage.getCurrentStage().discard(this);
 					if(deathImg != null)
-						Stage.STAGE.add(deathImg.getClone(currX, currX));
+						Stage.getCurrentStage().add(deathImg.getClone(currX, currX));
 					
 					sounds.stop(0);
 					sounds.playSound(1);		

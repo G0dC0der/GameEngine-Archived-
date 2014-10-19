@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class GameSettings 
 {
-	public boolean vsync, showFps, streamSounds, clearEachFrame, saveReplays;
+	public boolean vsync, showFps, clearEachFrame, saveReplays;
 	public int fps;
 	public double masterVolume;
 
@@ -51,9 +51,6 @@ public class GameSettings
 								break;
 							case "volume":
 								masterVolume = Double.parseDouble(value);
-								break;
-							case "streamsounds":
-								streamSounds = Boolean.parseBoolean(value);
 								break;
 							case "cleareachframe":
 								clearEachFrame = Boolean.parseBoolean(value);

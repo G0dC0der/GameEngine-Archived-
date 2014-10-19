@@ -7,7 +7,7 @@ import game.core.MainCharacter.CharacterState;
 import game.core.Stage;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -88,7 +88,7 @@ public class GreenHill extends Stage
 		 * Main Character
 		 */
 		gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(1);
@@ -106,7 +106,7 @@ public class GreenHill extends Stage
 		 */
 		
 		SolidPlatform sp = new SolidPlatform(451, 740, gm);
-		sp.setImage(new Frequency<>(1, platformImg));
+		sp.setImage(new Animation<>(1, platformImg));
 		sp.setMoveSpeed(2);
 		sp.setStrictGlueMode(true);
 		sp.appendPath(451, 740, 20, false, null);
@@ -131,7 +131,7 @@ public class GreenHill extends Stage
 		add(sp, sp2, sp3, sp4);
 		
 		PathDrone enemy1 = new PathDrone(1367, 755);
-		enemy1.setImage(new Frequency<>(7, en1Img));
+		enemy1.setImage(new Animation<>(7, en1Img));
 		enemy1.setMoveSpeed(0.8f);
 		enemy1.setMultiFaced(true);
 		enemy1.setHitbox(Hitbox.EXACT);
@@ -148,7 +148,7 @@ public class GreenHill extends Stage
 		add(enemy1, enemy2);
 		
 		Trailer bird = new Trailer(910, 10);
-		bird.setImage(new Frequency<>(5, en2Img));
+		bird.setImage(new Animation<>(5, en2Img));
 		bird.setMultiFaced(true);
 		bird.setMoveSpeed(2);
 		bird.setFrequency(60);
@@ -156,11 +156,11 @@ public class GreenHill extends Stage
 		bird.appendPath(1375, 100, 2, false, null);
 		
 		Particle pooImpact = new Particle();
-		pooImpact.setImage(new Frequency<>(4, poospImg));
+		pooImpact.setImage(new Animation<>(4, poospImg));
 		pooImpact.setIntroSound(pooSplash);
 		
 		final FallingProjectile sproj = new FallingProjectile(0, 0, bird, gm);
-		sproj.setImage(new Frequency<>(1, pooImg));
+		sproj.setImage(new Animation<>(1, pooImg));
 		sproj.setDisposable(true);
 		sproj.setImpact(pooImpact);
 		bird.setSpawners(sproj);
@@ -172,7 +172,7 @@ public class GreenHill extends Stage
 		 * Rings
 		 */
 		GameObject ring = new GameObject();
-		ring.setImage(new Frequency<>(5, ringImg));
+		ring.setImage(new Animation<>(5, ringImg));
 		ring.setHitbox(Hitbox.EXACT);
 		
 		rings = new GameObject[]
@@ -212,7 +212,7 @@ public class GreenHill extends Stage
 	private void addEvents(GameObject[] gos)
 	{
 		final Particle collect = new Particle();
-		collect.setImage(new Frequency<>(4, collImg));
+		collect.setImage(new Animation<>(4, collImg));
 		
 		for(final GameObject go : gos)
 		{
@@ -245,7 +245,7 @@ public class GreenHill extends Stage
 			this.initialX = parent.currX;
 			this.initialY = parent.currY;
 			this.targetX = parent.currX;
-			this.targetY = Stage.STAGE.size.height;
+			this.targetY = Stage.getCurrentStage().size.height;
 			this.targets = targets;
 		}
 		

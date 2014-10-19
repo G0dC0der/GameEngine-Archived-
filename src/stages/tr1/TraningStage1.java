@@ -5,16 +5,13 @@ import game.core.MainCharacter.CharacterState;
 import game.development.AutoInstall;
 import game.essentials.Factory;
 import game.essentials.Image2D;
-import game.essentials.Utilities;
 import game.movable.SolidPlatform;
-
 import java.io.File;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 import stages.traning.AbstractTraningStage;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -39,8 +36,8 @@ public class TraningStage1 extends AbstractTraningStage
 			friendImg = new Image2D("res/traning1/friendImg.png");
 			platformImg = new Image2D("res/traning1/platformImg.png");
 			crystalImg = Image2D.loadImages(new File("res/clubber/diamond"));
-			talking = Utilities.loadSound("res/traning1/talking.wav");
-			collect = Utilities.loadSound("res/general/collect1.wav");
+			talking = TinySound.loadSound(new File("res/traning1/talking.wav"));
+			collect = TinySound.loadSound(new File("res/general/collect1.wav"));
 			talkingFont = new BitmapFont(Gdx.files.internal("res/traning1/talking.fnt"), true);
 			setStageMusic("res/traning1/song.wav",7.80f, .6f);
 			

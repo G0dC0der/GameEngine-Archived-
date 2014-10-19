@@ -11,12 +11,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public interface LaserBeam 
 {
 	/**
-	 * Register a laser beam(but not rendering it).
+	 * Registers that a laser beam should be rendered.
 	 * @param srcX The lasers starting x position.
 	 * @param srcY The lasers starting y position.
 	 * @param destX The lasers end x position.
 	 * @param destY The lasers end x position.
-	 * @param active The amount of frames the laser should stay active.
+	 * @param active The amount of frames the laser should stay active(optional).
 	 */
 	void fireAt(float srcX, float srcY, float destX, float destY, int active);
 	

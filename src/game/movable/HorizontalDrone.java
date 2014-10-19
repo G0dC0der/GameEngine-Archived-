@@ -28,6 +28,7 @@ public class HorizontalDrone extends Enemy
 		currY = y;
 		this.startLeft = moveLeft = startLeft;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 	
 	public HorizontalDrone(float x, float y)

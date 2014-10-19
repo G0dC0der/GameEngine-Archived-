@@ -2,13 +2,13 @@ package stages.diamondcave;
 
 import game.core.Enemy;
 import game.core.GameObject;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import kuusisto.tinysound.Sound;
 
 class Bear extends Enemy
 {
-	private Frequency<Image2D> attackImage, orgImage;
+	private Animation<Image2D> attackImage, orgImage;
 	private GameObject targets[], scanBox;
 	private Sound attack;
 	private int recovery;
@@ -30,16 +30,16 @@ class Bear extends Enemy
 		this.attack = attack;
 	}
 
-	public void setAttackImage(Frequency<Image2D> attackImage)
+	public void setAttackImage(Animation<Image2D> attackImage)
 	{
 		this.attackImage = attackImage;
 	}
 	
 	@Override
-	public void setImage(Frequency<Image2D> obj) 
+	public void setImage(Animation<Image2D> obj) 
 	{
 		super.setImage(obj);
-		orgImage = currImage;
+		orgImage = image;
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ class Bear extends Enemy
 			if(!attacking && scanBox.collidesWithMultiple(targets) != null)
 			{
 				attacking = true;
-				currImage = attackImage;
+				image = attackImage;
 				currX -= 15;
 				attack.play();
 //				rotation = -7.5f;
@@ -59,7 +59,7 @@ class Bear extends Enemy
 			if(attacking && attackImage.hasEnded())
 			{
 				attackImage.reset();
-				currImage = orgImage;
+				image = orgImage;
 				attacking = false;
 				recovery = 120;
 				rotation = 0;

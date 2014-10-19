@@ -1,6 +1,6 @@
 package stages.demo;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.development.AutoDispose;
@@ -31,7 +31,7 @@ public class DebuggingMap extends StageBuilder
 		go.moveTo(150, 400);
 		go.addEvent(()->{
 //			go.rotation+=1;
-			if(EntityStuff.pixelPerfectRotation(go, gm))
+			if(Fundementals.pixelPerfectRotation(go, gm))
 				System.out.println(Math.random());
 		});
 		add(go);

@@ -1,11 +1,8 @@
 package game.movable;
 
-import static game.core.Engine.*;
 import game.core.Enemy;
-import game.core.EntityStuff;
-
+import game.core.Fundementals;
 import java.util.LinkedList;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -64,10 +61,9 @@ public class PathDrone extends Enemy
 	}
 	
 	private LinkedList<PathData> pathData;
-	private boolean rock, skip, acc;
-	private float v1,v2,v3, mass, gravity, damping, vy;
+	private boolean rock, skip;
 	private int dataCounter, stillCounter;
-	private boolean playEvent, useGravity;
+	private boolean playEvent;
 
 	/**
 	 * Constructs a {@code PathDrone} with no waypoints.
@@ -80,9 +76,6 @@ public class PathDrone extends Enemy
 		currY = y;
 		pathData = new LinkedList<>();
 		dataCounter = stillCounter = 0;
-		mass = 1.0f;
-		gravity = -500;
-		damping = 0.0001f;
 	}
 
 	@Override
@@ -90,6 +83,9 @@ public class PathDrone extends Enemy
 	{
 		PathDrone p = new PathDrone(x, y);
 		copyData(p);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(p);
 		
 		return p;
 	}
@@ -100,14 +96,6 @@ public class PathDrone extends Enemy
 		dest.pathData.addAll(pathData);
 		dest.skip = skip;
 		dest.rock = rock;
-		dest.acc = acc;
-		dest.v1 = v1;
-		dest.v2 = v2;
-		dest.v3 = v3;
-		dest.useGravity = useGravity;
-		dest.mass = mass;
-		dest.gravity = gravity;
-		dest.damping = damping;
 	}
 	
 	/**
@@ -191,16 +179,6 @@ public class PathDrone extends Enemy
 		dataCounter = stillCounter = 0;
 	}
 	
-	/**
-	 * Whether or not to use gravity. If used, the Y-coordinate in the waypoint list will be discarded.
-	 * <b>This feature is buggy and will be fixed later on.</b>
-	 * @param useGravity
-	 */
-	public void enableGravity(boolean useGravity)
-	{
-		this.useGravity = useGravity;
-	}
-	
 	@Override
 	public void moveEnemy()
 	{
@@ -215,30 +193,29 @@ public class PathDrone extends Enemy
 			{
 				if(++stillCounter > pd.frames)
 					dataCounter++;
+				
 				resetPrevs();
+				
+				currX = pd.targetX;
+				currY = pd.targetY;
+				
 				if(playEvent && pd.event != null)
 				{
 					pd.event.eventHandling();
 					playEvent = false;
 				}
-				drag();
-				return;
 			}
-			
-			playEvent = true;
-			stillCounter = 0;
-			
-			if(pd.jump)
-				moveTo(pd.targetX, pd.targetY);
-			else if(!acc)
-				moveToward(pd.targetX, pd.targetY, moveSpeed);
 			else
-				specialMoveToward(pd.targetX, pd.targetY, v1,v2,v3);
-			
-			drag();
+			{
+				playEvent = true;
+				stillCounter = 0;
+				
+				if(pd.jump)
+					moveTo(pd.targetX, pd.targetY);
+				else
+					moveToward(pd.targetX, pd.targetY);
+			}
 		}
-		else
-			drag();
 	}
 	
 	@Override
@@ -259,66 +236,14 @@ public class PathDrone extends Enemy
 	    {
 	    	boolean canNext = canGoTo(tx, ty) && !isOverlapping(tx, ty);	    	
 	    	if(canNext)
-	    	{
-	    		if(!useGravity)
-	    			moveTo(tx,ty);
-	    		else
-	    			currX = tx;
-	    	}
+	    		moveTo(tx,ty);
 	    	else if(!canNext && skip)
 	    		dataCounter++;
 	    	else if(!canNext && !skip)
 	    		resetPrevs();
 	    }
 	    else
-	    {
-	    	if(!useGravity)
-	    		moveTo(tx, ty);
-	    	else
-	    		currX = tx;
-	    }
-	}
-	
-	@Override
-	public void specialMoveToward(float targetX, float targetY, float spec1, float spec2, float spec3)
-	{
-		if (!canMove)
-			return;
-		
-		float dx = targetX - currX;
-		float dy = targetY - currY;
-		
-		float accX = spec1 * dx - spec2 * moveSpeed;
-		float accY = spec1 * dy - spec2 * moveSpeed;
-		
-		float velocityX = moveSpeed + spec3 * accX;
-		float velocityY = moveSpeed + spec3 * accY;
-		
-		float tx = currX + spec3 * velocityX;
-		float ty = currY + spec3 * velocityY;
-		
-		if(rock)
-		{	
-	    	boolean canNext = canGoTo(tx, ty) && !isOverlapping(tx, ty);	    	
-	    	if(canNext)
-	    	{
-	    		if(!useGravity)
-	    			moveTo(tx,ty);
-	    		else
-	    			currX = tx;
-	    	}
-	    	else if(!canNext && skip)
-	    		dataCounter++;
-	    	else if(!canNext && !skip)
-	    		resetPrevs();
-		}
-		else
-	    {
-	    	if(!useGravity)
-	    		moveTo(tx, ty);
-	    	else
-	    		currX = tx;
-	    }
+	    	moveTo(tx, ty);
 	}
 	
 	/**
@@ -332,44 +257,9 @@ public class PathDrone extends Enemy
 		this.skip = skip;
 	}
 	
-	/**
-	 * This function allow you to specify acceleration settings.<br>
-	 * Note that that the acceleration algorithm is a special one, where it starts at max speed and slows down when getting closer to its target.
-	 * @param acc Whether or not to accelerate.
-	 * @param v1 Setting 1
-	 * @param v2 Setting 2
-	 * @param v3 The delta.
-	 */
-	public void setAccelerate(boolean acc, float v1, float v2, float v3)
-	{
-		this.acc = acc;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
-	}
-	
 	protected boolean reached(PathData pd)
 	{
-		if(!useGravity)
-			return moveSpeed > EntityStuff.distance(pd.targetX, pd.targetY, currX, currY);
-		else
-			return moveSpeed > EntityStuff.distance(pd.targetX, 1, currX, 1);
-	}
-	
-	protected void drag()
-	{
-		if(useGravity)
-		{
-		    vy *= 1.0 - (damping * DELTA);
-		    float force = mass * gravity;
-		    vy += (force / mass) * DELTA;
-		    float nextY = currY - vy * DELTA;
-		    
-		    if(canGoTo(currX,nextY))
-		    	currY = nextY;
-		    else
-		    	vy = 0;
-		}
+		return moveSpeed > Fundementals.distance(pd.targetX, pd.targetY, currX, currY);
 	}
 
 	@Override

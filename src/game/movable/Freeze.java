@@ -30,6 +30,7 @@ public class Freeze extends PathDrone
 		this.freezeTime = freezeTime;
 		this.victims = victims;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 	
 	@Override

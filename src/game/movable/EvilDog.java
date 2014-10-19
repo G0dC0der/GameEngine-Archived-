@@ -2,16 +2,14 @@ package game.movable;
 
 import game.core.Enemy;
 import game.core.Engine;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.Stage;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.objects.Particle;
-
-import java.awt.geom.Point2D;
-
+import com.badlogic.gdx.math.Vector2;
 import kuusisto.tinysound.Sound;
 
 /**
@@ -25,7 +23,7 @@ public class EvilDog extends Enemy
 	private float vx, vy, maxDistance;
 	private GameObject[] targets;
 	private Particle impact;
-	private Frequency<Image2D> idleImg, huntImg;
+	private Animation<Image2D> idleImg, huntImg;
 	
 	/**
 	 * Constructs an {@code EvilDog} at the given point with {@code thrust, drag} and {@code delta} set to move very fast.
@@ -45,6 +43,7 @@ public class EvilDog extends Enemy
 		delta = Engine.DELTA;
 		
 		sounds = new SoundBank(1); //Collision
+		sounds.setEmitter(this);
 		sounds.setDelay(0, 60);
 	}
 	
@@ -70,21 +69,31 @@ public class EvilDog extends Enemy
 	 * The image to use when all targets are out of range.
 	 * @param idleImg The image.
 	 */
-	public void idleImage(Frequency<Image2D> idleImg)
+	public void idleImage(Animation<Image2D> idleImg)
 	{
 		this.idleImg = idleImg;
+	}
+	
+	@Override
+	public void setImage(Animation<Image2D> obj) 
+	{
+		huntImg = obj;
+		super.setImage(obj);
 	}
 
 	@Override
 	public void moveEnemy() 
 	{
-		GameObject closest = EntityStuff.findClosest(this, targets);
+		if(isFrozen())
+			return;
+		
+		GameObject closest = Fundementals.findClosest(this, targets);
 
-		if(closest != null && maxDistance > EntityStuff.distance(this, closest))
+		if(closest != null && maxDistance > Fundementals.distance(this, closest))
 		{
-			currImage = huntImg;
+			image = huntImg;
 			
-			Point2D.Float norP = EntityStuff.normalize(closest, this);
+			Vector2 norP = Fundementals.normalize(closest, this);
 				 
 			float accelx = thrust * norP.x - drag * vx;
 			float accely = thrust * norP.y - drag * vy;
@@ -98,18 +107,13 @@ public class EvilDog extends Enemy
 			if(collidesWith(closest))
 			{
 				if(impact != null)
-					Stage.STAGE.add(impact.getClone(currX, currY));
+					Stage.getCurrentStage().add(impact.getClone(currX, currY));
 				
 				closest.runHitEvent(this);
 				sounds.trySound(0, true);
 			}
 		}
 		else if(idleImg != null)
-		{
-			if(huntImg != currImage)
-				huntImg = currImage;
-			
-			currImage = idleImg;
-		}
+			image = idleImg;
 	}
 }

@@ -1,6 +1,6 @@
 package game.movable;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
@@ -30,12 +30,13 @@ public class Guard extends PathDrone
 		this.targets = targets;
 		this.huntSpeed = huntSpeed;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 
 	@Override
 	public void moveEnemy()
 	{
-		currTarget = EntityStuff.findClosestSeeable(this, targets);
+		currTarget = Fundementals.findClosestSeeable(this, targets);
 		if(currTarget != null)
 		{
 			sounds.trySound(0, false);

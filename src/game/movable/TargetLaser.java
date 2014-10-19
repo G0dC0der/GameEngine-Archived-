@@ -1,17 +1,15 @@
 package game.movable;
 
 import game.core.Engine;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.MovableObject;
 import game.essentials.Factory;
 import game.essentials.LaserBeam;
 import game.objects.Particle;
-
-import java.awt.geom.Point2D;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * This a an enemy that keep firing laser at the specified target. The laser never stop firing. A subjects {@code HitEvent} will be fired upon contact with the laser.<br>
@@ -22,13 +20,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public class TargetLaser extends PathDrone
 {		
-	private boolean stop, specEffect, eye;
+	private boolean stop, specEffect, infBeam;
 	private int delay, delayCounter;
 	private byte stopTile;
 	private GameObject targets[], laserTarget;
 	private MovableObject dummy;
 	private Particle impact;
-	private Point2D.Float wallTarget;
 	private LaserBeam beam;
 	private Color laserTint;
 	
@@ -45,9 +42,9 @@ public class TargetLaser extends PathDrone
 
 		this.targets = targets;
 		this.laserTarget = laserTarget;
-		stop = eye = false;
 		delay = 1;
 		stopTile = Engine.SOLID;
+		infBeam = true;
 		setBeam(Factory.defaultLaser());
 		laserTint = Color.valueOf("CC0000FF");
 		
@@ -72,43 +69,32 @@ public class TargetLaser extends PathDrone
 		if(stop)
 			return;
 		
-		float centerX = currX + width / 2;
-		float centerY = currY + height / 2;
-		float tcx = laserTarget.currX + laserTarget.width / 2;  // Target Center X
-		float tcy = laserTarget.currY + laserTarget.height / 2; // Target Center Y
+		float centerX = centerX();
+		float centerY = centerY();
+		float tcx = laserTarget.centerX(); // Target Center X
+		float tcy = laserTarget.centerX(); // Target Center Y
+		Vector2 finalTarget;
 		
-		if(eye)
+		if(infBeam)
 		{
-			dummy.specialMoveToward(laserTarget.currX, tcx, 100, 3, Engine.DELTA);
-			wallTarget = EntityStuff.searchTile(centerX, centerY, dummy.currX, dummy.currY, stopTile);
-			if(wallTarget == null)
-				wallTarget = EntityStuff.searchTile(centerY, centerY, dummy.currX, dummy.currY, stopTile);
+			finalTarget = Fundementals.searchTile(centerX, centerY, tcx, tcy, stopTile);
+			if(finalTarget == null)
+				finalTarget = Fundementals.findEdgePoint(centerY, centerY, tcx, tcy);
 		}
 		else
-		{
-			wallTarget = EntityStuff.searchTile(centerX, centerY, tcx, tcy, stopTile);
-			if(wallTarget == null)
-				wallTarget = EntityStuff.findEdgePoint(centerY, centerY, tcx, tcy);
-		}
+			finalTarget = new Vector2(tcx, tcy);
 		
 		if(impact != null && ++delayCounter % delay == 0)
-			stage.add(impact.getClone(wallTarget.x - impact.width / 2, wallTarget.y - impact.height / 2));
+			stage.add(impact.getClone(finalTarget.x - impact.width / 2, finalTarget.y - impact.height / 2));
 		
 		for(GameObject go : targets)
-		{
-			if(go.haveHitEvent() && EntityStuff.checkLine((int)centerX, (int)centerY, (int)wallTarget.x, (int)wallTarget.y, go))
+			if(go.haveHitEvent() && Fundementals.checkLine((int)centerX, (int)centerY, (int)finalTarget.x, (int)finalTarget.y, go))
 				go.runHitEvent(this);
-		}
 		
 		if(specEffect)
-		{
-			if(!eye) 
-				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, tcx, tcy);
-			else
-				rotation = (float) EntityStuff.getAngle(currX + width / 2, currY + height / 2, wallTarget.x, wallTarget.y);
-		}
+			rotation = (float) Fundementals.getAngle(centerX, centerY, finalTarget.x, finalTarget.y);
 		
-		beam.fireAt(centerX, centerY, wallTarget.x, wallTarget.y, 1);
+		beam.fireAt(centerX, centerY, finalTarget.x, finalTarget.y, 1);
 	}
 	
 	/**
@@ -119,16 +105,7 @@ public class TargetLaser extends PathDrone
 	{
 		this.stopTile = stopTile;
 	}
-	
-	/**
-	 * In case this flag is enabled, the laser beam will rotate towards its target rather than instantly targeting it.
-	 * @param eye True to enable the effect.
-	 */
-	public void enableEyeLaser(boolean eye)
-	{
-		this.eye = eye;
-	}
-	
+
 	/**
 	 * The animation to render at the laser beams edge.
 	 * @param impact The particle.
@@ -136,6 +113,15 @@ public class TargetLaser extends PathDrone
 	public void setExplosion(Particle impact)
 	{
 		this.impact = impact;
+	}
+	
+	/**
+	 * Allow you to specify whether or not the target should stop when reached the {@code stopTile} or at the target object.
+	 * @param infBeam False to limit the beam length to the target.
+	 */
+	public void infiniteBeam(boolean infBeam)
+	{
+		this.infBeam = infBeam;
 	}
 	
 	/**
@@ -151,7 +137,7 @@ public class TargetLaser extends PathDrone
 	}
 	
 	/**
-	 * Whether or not to rotate the objects image so it is always facing the lasers target.
+	 * Whether or not to rotate the object's image so it is always face the lasers target.
 	 * @param specEffet True to enable rotating.
 	 */
 	public void useSpecialEffect(boolean specEffect)

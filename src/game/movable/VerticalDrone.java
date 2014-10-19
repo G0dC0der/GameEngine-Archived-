@@ -26,6 +26,7 @@ public class VerticalDrone extends Enemy
 		currY = y;
 		moveUp = true;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 	
 	@Override

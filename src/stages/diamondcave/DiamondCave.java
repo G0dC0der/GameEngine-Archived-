@@ -3,6 +3,7 @@ package stages.diamondcave;
 import game.core.Engine;
 import game.core.Engine.Direction;
 import game.core.Engine.GameState;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
@@ -12,7 +13,7 @@ import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.essentials.Pair;
@@ -55,7 +56,7 @@ public class DiamondCave extends StageBuilder
 	private Sound roar, cannonfire, zapp, bum;
 	@AutoLoad(path=PATH, type=VisualType.MUSIC)
 	private Music frying;
-	private Image2D weakDie[], background, foreground;
+	private Image2D weakDie[];
 	private Particle blingbling;
 	private PathData[] data1, data2, data3;
 	private int counter = 0;
@@ -64,9 +65,6 @@ public class DiamondCave extends StageBuilder
 	public void init()
 	{
 		super.init();
-		
-		background = new Image2D(PATH + "/backgroundImg.png");
-		foreground = new Image2D(PATH + "/foregroundImg.png");
 		
 		weakDie = new Image2D[10];
 		for(int i = 0; i < weakDie.length; i++)
@@ -87,11 +85,7 @@ public class DiamondCave extends StageBuilder
 		 * Basic Stuff
 		 */
 		super.build();
-		lethalDamage = -3;
 		game.timeColor = Color.WHITE;
-		
-		background(RenderOption.PORTION, background);
-		foreground(RenderOption.PORTION, foreground);
 		
 		/*
 		 * Main Character
@@ -140,31 +134,13 @@ public class DiamondCave extends StageBuilder
 					drawBolt = true;
 			}
 		});
-				
-		/*
-		 * Early Spikes
-		 */
-//		GameObject sp = new GameObject();
-//		sp.moveTo(1403 + 8, 976);
-//		sp.setImage(spikes);
-//		sp.setHitbox(Hitbox.EXACT);
-//		sp.addEvent(Factory.hitMain(sp, gm, -1));
-//		sp.alpha = .7f;
-//		
-//		GameObject sp2 = new GameObject();
-//		sp2.moveTo(1403, 976);
-//		sp2.setImage(spikes2);
-//		sp2.setHitbox(Hitbox.EXACT);
-//		sp2.addEvent(Factory.hitMain(sp2, gm, -1));
-//		sp2.alpha = .7f;
-//		add(sp, sp2);
 		
 		/*
 		 * Bear
 		 */
 		Bear b = new Bear(1544, 227, gm);
 		b.setImage(7, bear);
-		b.setAttackImage(new Frequency<>(6, bearAttack));
+		b.setAttackImage(new Animation<>(6, bearAttack));
 		b.zIndex(200);
 		b.setHitbox(Hitbox.EXACT);
 		b.setAttackSound(roar);
@@ -215,7 +191,7 @@ public class DiamondCave extends StageBuilder
 			GameObject w = new GameObject();
 			w.moveTo(x, y);
 			w.setImage(weak);
-			w.addEvent(Factory.weakPlatform(w, new Frequency<>(10, weakDie), 120, null, gm));
+			w.addEvent(Factory.weakPlatform(w, new Animation<>(10, weakDie), 120, null, gm));
 			add(w);
 		}
 		
@@ -252,6 +228,11 @@ public class DiamondCave extends StageBuilder
 		proj.useFastCollisionCheck(true);
 		proj.setHitbox(Hitbox.CIRCLE);
 		proj.setImpact(explosion);
+		proj.setCloneEvent(cloned ->{
+			cloned.addEvent(()->{
+				cloned.rotation += 10;
+			});
+		});
 		
 		for(int i = 0, reloadTime = 250, x = 3032, y = 480; i < 9; i++, y += cannon.getHeight() + 15)
 		{
@@ -262,9 +243,6 @@ public class DiamondCave extends StageBuilder
 			w.setFiringSound(cannonfire);
 			w.setFiringAnimation(fireAnim);
 			w.getSoundBank().useFallOff(true);
-			w.setCloneEvent((cloned)->{
-				cloned.addEvent(()->{cloned.rotation += 10;});
-			});
 			gm.avoidOverlapping(w);
 			
 			if(i % 2 == 0)
@@ -411,6 +389,9 @@ public class DiamondCave extends StageBuilder
 		
 		if(++counter % 10 == 0)
 			add(blingbling.getClone(MathUtils.random(game.tx - game.getScreenWidth() / 2, game.tx + game.getScreenWidth() / 2), MathUtils.random(game.ty - game.getScreenHeight() / 2, game.ty + game.getScreenHeight() / 2)));
+		
+		if(Fundementals.rectangleVsRectangle(gm.currX, gm.currY, gm.width(), gm.height(), 0, size.height - 1, size.width, 1))
+			gm.setState(CharacterState.DEAD);
 	}
 	
 	PathDrone getBacteria(float x, float y)

@@ -1,12 +1,16 @@
 package game.movable;
 
 import game.core.Enemy;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.essentials.SoundBank;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
+import com.badlogic.gdx.math.Vector2;
+
 import kuusisto.tinysound.Sound;
 
 /**
@@ -53,6 +57,9 @@ public class Projectile extends Enemy
 		Projectile p = new Projectile(x, y, targets);
 		copyData(p);
 		
+		if(cloneEvent != null)
+			cloneEvent.cloned(p);
+		
 		return p;
 	}
 	
@@ -87,10 +94,10 @@ public class Projectile extends Enemy
 		
 		if (scanAllowed && !haveTarget())
 		{
-			GameObject target = EntityStuff.findClosestSeeable(this, targets);
+			GameObject target = Fundementals.findClosestSeeable(this, targets);
 			if(target != null)
 			{
-				Point2D.Float edge = EntityStuff.findEdgePoint(this, target);
+				Vector2 edge = Fundementals.findEdgePoint(this, target);
 				targetX = edge.x;
 				targetY = edge.y;
 			}
@@ -187,7 +194,7 @@ public class Projectile extends Enemy
 	 */
 	protected GameObject findTarget()
 	{
-		return EntityStuff.findClosestSeeable(this, targets);
+		return Fundementals.findClosestSeeable(this, targets);
 	}
 	
 	/**
@@ -223,7 +230,7 @@ public class Projectile extends Enemy
 	 * Sets the target from the given point.
 	 * @param target The target to fire at.
 	 */
-	public void setTarget(Point2D.Float target)
+	public void setTarget(Vector2 target)
 	{
 		targetX = target.x;
 		targetY = target.y;

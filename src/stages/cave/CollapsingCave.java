@@ -1,15 +1,16 @@
 package stages.cave;
 
 import game.core.Enemy;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.core.MovableObject;
 import game.core.Stage;
+import game.essentials.CameraEffect;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -17,12 +18,15 @@ import game.movable.Dummy;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
+
 import java.io.File;
 import java.util.Random;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -43,7 +47,8 @@ public class CollapsingCave extends Stage
 	private Music collapsing, drilling;
 	private GravityMan gm;
 	private SolidPlatform crusher;
-	private boolean coll1, coll2, coll3, coll4, done;
+	private CameraEffect vShake, hShake;
+	private boolean coll1, coll2, coll3, coll4, done, drugEffect;
 	private GameObject item1, flag, dust;
 	private MovableObject camera;
 	private PathDrone drill;
@@ -73,15 +78,15 @@ public class CollapsingCave extends Stage
 			
 			stageImage       = new Pixmap(new FileHandle("res/collapsingcave/stage.png"));
 			
-			collapsing = Utilities.loadMusic("res/collapsingcave/collapsing.wav");
-			drilling   = Utilities.loadMusic("res/collapsingcave/drilling.wav");
-			collect    = Utilities.loadSound("res/general/collect3.wav");
-			jump       = Utilities.loadSound("res/general/jump.wav");
-			exp1       = Utilities.loadSound("res/collapsingcave/exp1.wav");
-			exp2       = Utilities.loadSound("res/collapsingcave/exp2.wav");
-			exp3       = Utilities.loadSound("res/collapsingcave/exp3.wav");
-			exp4       = Utilities.loadSound("res/collapsingcave/exp4.wav");
-			slam       = Utilities.loadSound("res/collapsingcave/slam.wav");
+			collapsing = TinySound.loadMusic(new File("res/collapsingcave/collapsing.wav"));
+			drilling   = TinySound.loadMusic(new File("res/collapsingcave/drilling.wav"));
+			collect    = TinySound.loadSound(new File("res/general/collect3.wav"));
+			jump       = TinySound.loadSound(new File("res/general/jump.wav"));
+			exp1       = TinySound.loadSound(new File("res/collapsingcave/exp1.wav"));
+			exp2       = TinySound.loadSound(new File("res/collapsingcave/exp2.wav"));
+			exp3       = TinySound.loadSound(new File("res/collapsingcave/exp3.wav"));
+			exp4       = TinySound.loadSound(new File("res/collapsingcave/exp4.wav"));
+			slam       = TinySound.loadSound(new File("res/collapsingcave/slam.wav"));
 			
 			ps = new ParticleEffect();
 			ps.load(new FileHandle("res/collapsingcave/muzzle.p"), new FileHandle("res/collapsingcave"));
@@ -113,18 +118,20 @@ public class CollapsingCave extends Stage
 		
 		background(RenderOption.FULL, backgroundImg);
 		foreground(RenderOption.FULL, foregroundImg);
-		game.drugVertical(0, 0);
-		game.drugHorizontal(0, 0);
+		drugEffect = false;
 		coll1 = coll2 = coll3 = coll4 = done = false;
 		collapsing.stop();
 		drilling.play(true, 0);
+		
+		vShake = CameraEffect.verticalMovement(2, 2, -1);
+		hShake = CameraEffect.horizontalMovement(2, 2, -1);
 		
 		/*
 		 * Main Character
 		 *******************************************
 		 */
 		gm = new GravityMan();
-		gm.setImage(new Frequency<>(3, mainImage));
+		gm.setImage(new Animation<>(3, mainImage));
 		gm.setMultiFaced(true);
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(1);
@@ -146,8 +153,7 @@ public class CollapsingCave extends Stage
 		crusher.setImage(crusherImg);
 		crusher.appendPath(0, -38, Integer.MAX_VALUE, false, () ->
 		{
-			game.drugVertical(0, 0);
-			game.drugHorizontal(0, 0);
+			drugEffect = false;
 			collapsing.stop();
 			slam.play();
 		});
@@ -159,7 +165,7 @@ public class CollapsingCave extends Stage
 		 *******************************************
 		 */
 		drill = new PathDrone(547, 215);
-		drill.setImage(new Frequency<>(1, drillImg));
+		drill.setImage(new Animation<>(1, drillImg));
 		drill.setMoveSpeed(2);
 		drill.zIndex(10);
 		drill.setHitbox(Hitbox.EXACT);
@@ -182,8 +188,7 @@ public class CollapsingCave extends Stage
 			discard(dust);
 			collapsing.play(true);
 			drilling.stop();
-			game.drugVertical(2, 2);
-			game.drugHorizontal(2, 2);
+			drugEffect = true;
 		});
 		drill.addEvent(Factory.hitMain(drill, gm, -1));
 		
@@ -283,7 +288,7 @@ public class CollapsingCave extends Stage
 	{
 		if(drill.getMoveSpeed() == .1f && crusher.getMoveSpeed() == 0 && ++soundCounter % 15 == 0)
 		{
-			double distance = EntityStuff.distance(gm.currX, gm.currY, drill.currX + drill.width / 2, drill.currY);
+			double distance = Fundementals.distance(gm.currX, gm.currY, drill.currX + drill.width / 2, drill.currY);
 			double candidate = 10 * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(1200)), 0);
 			double volume = Math.min(candidate, 1);
 			
@@ -313,13 +318,19 @@ public class CollapsingCave extends Stage
 		if(!done)
 		{
 			camera.moveToward(gm.currX, gm.currY, 7);
-			if(EntityStuff.distance(camera, gm) < 200)
+			if(Fundementals.distance(camera, gm) < 200)
 			{
 				done = true;
 				game.removeFocusObject(camera);
 				game.addFocusObject(gm);
 				gm.unfreeze();
 			}
+		}
+		
+		if(drugEffect)
+		{
+			hShake.update();
+			vShake.update();
 		}
 	}
 

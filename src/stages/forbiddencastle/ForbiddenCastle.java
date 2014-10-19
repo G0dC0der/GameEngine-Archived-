@@ -11,7 +11,7 @@ import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import ui.accessories.Playable;
 
@@ -118,7 +118,7 @@ public class ForbiddenCastle extends StageBuilder
 		w.moveTo(x * 30, y * 30);
 		w.setImage(weak[0]);
 		
-		Frequency<Image2D> weakDie = new Frequency<>(5, weak);
+		Animation<Image2D> weakDie = new Animation<>(5, weak);
 		weakDie.setLoop(false);
 		
 		w.addEvent(Factory.weakPlatform(w, weakDie, 60, weakDieSound, gm));

@@ -1,6 +1,6 @@
 package game.essentials;
 
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.Stage;
 import kuusisto.tinysound.Sound;
@@ -99,9 +99,9 @@ public class SoundBank
 			
 			if(falloff && emitter != null)
 			{
-				GameObject[] focusObjs = Stage.STAGE.game.getFocusList().toArray(new GameObject[Stage.STAGE.game.getFocusList().size()]);
+				GameObject[] focusObjs = Stage.getCurrentStage().game.getFocusList().toArray(new GameObject[Stage.getCurrentStage().game.getFocusList().size()]);
 				
-				double distance = EntityStuff.distance(emitter, EntityStuff.findClosest(emitter, focusObjs));
+				double distance = Fundementals.distance(emitter, Fundementals.findClosest(emitter, focusObjs));
 				double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 				
 				volume = Math.min(candidate, maxVolume);
@@ -269,7 +269,7 @@ public class SoundBank
 	 */
 	public static float getVolume(float emitterX, float emitterY, float listenerX, float listenerY, float maxDistance, float maxVolume, float power)
 	{
-		double distance = EntityStuff.distance(emitterX, emitterY, listenerX, listenerY);
+		double distance = Fundementals.distance(emitterX, emitterY, listenerX, listenerY);
 		double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 		
 		return (float) Math.min(candidate, maxVolume);
@@ -280,7 +280,7 @@ public class SoundBank
 	 */
 	public static float getVolume(GameObject emitter, GameObject listener, float maxDistance, float maxVolume, float power)
 	{
-		double distance = EntityStuff.distance(emitter, listener);
+		double distance = Fundementals.distance(emitter, listener);
 		double candidate = power * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(maxDistance)), 0);
 		
 		return (float) Math.min(candidate, maxVolume);

@@ -1,7 +1,7 @@
 package stages.traning;
 
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Event;
 import game.core.MovableObject;
@@ -49,12 +49,12 @@ public class AbstractTraningStage extends StageBuilder
 						add(Factory.soundChain(indexes, dialog, false));
 					
 					recoveryFrames = 230;
-					currEvent = Factory.printText(text, friendTextColor, friendFont, 220, friend, textOffsetX, textOffsetY, ()->Stage.STAGE.discard(currEvent));
+					currEvent = Factory.printText(text, friendTextColor, friendFont, 220, friend, textOffsetX, textOffsetY, ()->Stage.getCurrentStage().discard(currEvent));
 					add(currEvent);
 				}
 				
 				//Watch the closest guy
-				GameObject closest = EntityStuff.findClosest(friend, people);
+				GameObject closest = Fundementals.findClosest(friend, people);
 				if(closest != null)
 				{
 					if(closest.currX + closest.width / 2 > friend.currX + friend.width / 2)

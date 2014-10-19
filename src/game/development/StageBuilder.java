@@ -2,7 +2,7 @@ package game.development;
 
 import game.core.Stage;
 import game.essentials.Controller;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -89,7 +89,7 @@ public abstract class StageBuilder extends Stage
 								if(!file.exists())
 									throw new RuntimeException(path + field.getName() + ".wav/ogg could not be found.");
 								
-								Sound sound = Utilities.loadSound(file.toString());
+								Sound sound = TinySound.loadSound(new File(file.toString()));
 								field.set(this, sound);
 								break;
 							}
@@ -101,12 +101,17 @@ public abstract class StageBuilder extends Stage
 								if(!file.exists())
 									throw new RuntimeException(path + field.getName() + ".wav/ogg could not be found.");
 									
-								Music music = TinySound.loadMusic(new File(file.toString()));
+								Music music = TinySound.loadMusic(new File(file.toString()),true);
 								field.set(this, music);
 								break;
-							case REPLAY:
 							case WAYPOINT:
-								throw new UnsupportedOperationException();
+								path += field.getName() + ".dat";
+								field.set(this, Utilities.importObject(path));
+								break;
+							case REPLAY:
+								path += field.getName() + ".rlp";
+								field.set(this, Utilities.importObject(path));
+								break;
 						}
 					}
 				}
@@ -125,7 +130,7 @@ public abstract class StageBuilder extends Stage
 					mainImage   = Image2D.loadImages(new File(mainPath + "main"),true);
 					extraHp     = Image2D.loadImages(new File(mainPath + "health"), true);
 					deathImg   	= Image2D.loadImages(new File(mainPath + "main/death"), false);
-					jump        = Utilities.loadSound			   (mainPath + "jump.wav");
+					jump        = TinySound.loadSound(new File(mainPath + "jump.wav"));
 					
 					try{backgroundImg = Image2D.loadImages(stagePath + "background.png");} catch(Exception e){System.err.println("Background image not found");}
 					try{foregroundImg = Image2D.loadImages(stagePath + "foreground.png");} catch(Exception e){System.err.println("Foreground image not found");}
@@ -161,7 +166,7 @@ public abstract class StageBuilder extends Stage
 			 *******************************************
 			 */
 			gm = new GravityMan();
-			gm.setImage(new Frequency<>(3, mainImage));
+			gm.setImage(new Animation<>(3, mainImage));
 			gm.setMultiFaced(true);
 			gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 			gm.hit(1);

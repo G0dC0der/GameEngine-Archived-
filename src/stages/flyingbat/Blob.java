@@ -3,7 +3,6 @@ package stages.flyingbat;
 import game.core.Engine;
 import game.core.GameObject;
 import game.core.MovableObject;
-import game.core.Stage;
 import game.essentials.Factory;
 import game.movable.Missile;
 
@@ -34,7 +33,7 @@ class Blob extends Missile
 		super.hit(subject);
 
 		MovableObject mo = new MovableObject();
-		mo.setImage(currImage);
+		mo.setImage(image);
 		mo.currX = currX;
 		mo.currY = currY;
 		adjust(spawnOn, mo);
@@ -42,7 +41,7 @@ class Blob extends Missile
 		Event deform = Factory.tileDeformer(mo, Engine.SOLID, false);
 		deform.eventHandling();
 		
-		Stage.STAGE.add(mo);
+		stage.add(mo);
 	}
 	
 	private static void adjust(MovableObject src, MovableObject target)

@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  * @param <T> Any type of object.
  */
-public class Frequency<T>
+public class Animation<T>
 {
 	private int counter, speed, index, limit, holder;
 	private boolean loop, stop, multiFaced, pingpong, returning, allowEvent;
@@ -25,7 +25,7 @@ public class Frequency<T>
 	 * @param objs The objects array to use.
 	 */
 	@SafeVarargs
-	public Frequency(int speed, T... objs)
+	public Animation(int speed, T... objs)
 	{
 		this.speed = speed;
 		this.objs = objs;
@@ -275,9 +275,9 @@ public class Frequency<T>
 	 * Returns a clone of this object. Note that the array used is not cloned.
 	 * @return The instance.
 	 */
-	public Frequency<T> getClone()
+	public Animation<T> getClone()
 	{
-		Frequency<T> freq = new Frequency<T>(speed, objs);
+		Animation<T> freq = new Animation<T>(speed, objs);
 		freq.limit = limit;
 		freq.loop = loop;
 		freq.stop = stop;
@@ -290,7 +290,7 @@ public class Frequency<T>
 	 * @param clazz The class of the object array.
 	 * @return The instance.
 	 */
-	public Frequency<T> getReversed(Class<T> clazz)
+	public Animation<T> getReversed(Class<T> clazz)
 	{
 		@SuppressWarnings("unchecked")
 		T[] reversed = (T[]) Array.newInstance(clazz, objs.length);
@@ -305,7 +305,7 @@ public class Frequency<T>
 		        reversed[right] = temp;
 		 }
 		
-		 Frequency<T> freq = getClone();
+		 Animation<T> freq = getClone();
 		 freq.setObjs(reversed);
 		 
 		return freq;

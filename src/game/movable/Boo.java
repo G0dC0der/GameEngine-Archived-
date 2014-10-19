@@ -2,9 +2,9 @@ package game.movable;
 
 import game.core.Enemy;
 import game.core.Engine.Direction;
-import game.core.EntityStuff;
+import game.core.Fundementals;
 import game.core.MovableObject;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import kuusisto.tinysound.Sound;
@@ -19,7 +19,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Boo extends Enemy
 {
 	private MovableObject victim;
-	private Frequency<Image2D> hideImage, huntImage;
+	private Animation<Image2D> hideImage, huntImage;
 	private boolean stone, resetHideImage, resetHuntImage, decline;
 	private boolean hunting;
 	public float velocity, acc, maxSpeed, unfreezeRadius;
@@ -40,6 +40,7 @@ public class Boo extends Enemy
 		acc = 0.03f;
 		unfreezeRadius = 70;
 		sounds = new SoundBank(1);
+		sounds.setEmitter(this);
 	}
 	
 	@Override
@@ -47,6 +48,9 @@ public class Boo extends Enemy
 	{
 		Boo boo = new Boo(x, y, victim);
 		copyData(boo);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(boo);
 		
 		return boo;
 	}
@@ -86,7 +90,7 @@ public class Boo extends Enemy
 			moveToward(victim.currX + victim.width / 2, victim.currY + victim.height / 2, velocity);
 			
 			if(!hunting)
-				currImage = huntImage;
+				image = huntImage;
 			
 			if(stone && !hunting)
 				victim.allowOverlapping(this);
@@ -128,7 +132,7 @@ public class Boo extends Enemy
 	 * Sets the image used when chasing.
 	 */
 	@Override
-	public void setImage(Frequency<Image2D> obj)
+	public void setImage(Animation<Image2D> obj)
 	{
 		super.setImage(obj);
 		huntImage = obj;
@@ -137,7 +141,7 @@ public class Boo extends Enemy
 	/**
 	 * Sets the image used when hiding. If none is set, the default/hunting image will be used as hiding image.
 	 */
-	public void setHideImage(Frequency<Image2D> hideImage)
+	public void setHideImage(Animation<Image2D> hideImage)
 	{
 		this.hideImage = hideImage;	
 	}
@@ -196,7 +200,7 @@ public class Boo extends Enemy
 	
 	protected boolean canSneak()
 	{
-		if(stone && !hunting && EntityStuff.distance(currX + width / 2, currY + height / 2, victim.currX + victim.width / 2, victim.currY + victim.height / 2) < unfreezeRadius)
+		if(stone && !hunting && Fundementals.distance(currX + width / 2, currY + height / 2, victim.currX + victim.width / 2, victim.currY + victim.height / 2) < unfreezeRadius)
 			return false;
 		
 		boolean toTheLeft = currX + width / 2 > victim.currX;

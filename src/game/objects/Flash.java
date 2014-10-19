@@ -58,7 +58,7 @@ public class Flash extends GameObject
 		{
 			framesAlive++;
 			
-			final Engine eng = Stage.STAGE.game;
+			final Engine eng = Stage.getCurrentStage().game;
 			Color orgColor = batch.getColor();
 			Color newColor = new Color(orgColor);
 			newColor.a = (duration - framesAlive) * (1.0f / duration);
@@ -70,7 +70,7 @@ public class Flash extends GameObject
 			batch.setColor(orgColor);
 		}
 		else
-			Stage.STAGE.discard(this);
+			Stage.getCurrentStage().discard(this);
 	}
 	
 	@Override
@@ -78,6 +78,9 @@ public class Flash extends GameObject
 	{
 		Flash flash = new Flash(flashImage,duration);
 		copyData(flash);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(flash);
 		
 		return flash;
 	}

@@ -48,8 +48,8 @@ public class Particle extends GameObject implements Event
 	{
 		sounds.trySound(0, false);
 
-		if (!visible || currImage.getIndex() >= currImage.getArray().length - 2)
-			Stage.STAGE.discard(this);
+		if (!visible || image.getIndex() >= image.getArray().length - 2)
+			Stage.getCurrentStage().discard(this);
 
 		if(victims != null)
 			for (GameObject go : victims)
@@ -71,6 +71,9 @@ public class Particle extends GameObject implements Event
 	{
 		Particle p = new Particle(x, y, victims);
 		copyData(p);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(p);
 		
 		return p;
 	}

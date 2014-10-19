@@ -5,7 +5,7 @@ import game.core.Enemy;
 import game.core.Engine.Direction;
 import game.core.GameObject;
 import game.core.MovableObject;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 
@@ -51,6 +51,7 @@ public class PushableObject extends Enemy
 		pushStrength = 1;
 		obj = new GameObject();
 		sounds = new SoundBank(2); //0 = landing sound, 1 = pushing sound
+		sounds.setEmitter(this);
 		resetPrevs();
 		
 		for(MovableObject mo : pushers)
@@ -62,6 +63,9 @@ public class PushableObject extends Enemy
 	{
 		PushableObject po = new PushableObject(x, y, pushers);
 		copyData(po);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(po);
 		
 		return po;
 	}
@@ -224,7 +228,7 @@ public class PushableObject extends Enemy
 	}
 	
 	@Override
-	public void setImage(Frequency<Image2D> img)
+	public void setImage(Animation<Image2D> img)
 	{
 		super.setImage(img);
 		obj.width = width + 2;
@@ -232,7 +236,7 @@ public class PushableObject extends Enemy
 	}
 	
 	@Override
-	public void endUse()
+	public void dismiss()
 	{
 		for(MovableObject mo : pushers)
 			mo.allowOverlapping(this);

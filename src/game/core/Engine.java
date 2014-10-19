@@ -4,10 +4,12 @@ import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
+import game.essentials.CameraEffect;
 import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
 import game.essentials.Utilities;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.io.PrintWriter;
@@ -17,9 +19,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+
 import kuusisto.tinysound.TinySound;
+
 import org.lwjgl.opengl.GL11;
+
 import pjjava.misc.OtherMath;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -215,11 +221,6 @@ public final class Engine implements Screen
 	public final Color defaultTint = Color.valueOf("fffffffe");
 	
 	/**
-	 * Whether or not to streams sounds directly from the file rather than loading it to the memory. Must be changed before launching game in order for it to take effect.
-	 */
-	public boolean streamSounds = false;
-	
-	/**
 	 * Whether or not to clear the container every frame.
 	 */
 	public boolean clearEachFrame = true;
@@ -277,8 +278,7 @@ public final class Engine implements Screen
 	Dimension viewport;
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
-	private boolean showFps, justRestarted, playReplay, increasingVert, increasingHor, showingDialog, replayHelp, crashed, increasingScale = true;
-	private float vertLength, vertSpeed, vertValue, horLength, horSpeed, horValue, scaleMin, scaleMax, scaleSpeed, scaleValue, musicVolume;
+	private boolean showFps, justRestarted, playReplay, showingDialog, replayHelp, crashed;
 	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
@@ -287,14 +287,30 @@ public final class Engine implements Screen
 	private com.badlogic.gdx.scenes.scene2d.Stage gui;
 	private Skin skin;
 	private Texture errorIcon;
+	private static boolean instanceCreates;
 	
 	/**
-	 * Constructs an Engine.
+	 * Only one instance can of the {@code Engine} can exist at a time. An instance is considered "freed" when the {@code dispose} function is called.
 	 * @param stage The stage to play.
 	 * @param replay The replay to watch. If null is set, you will play the stage rather than watching a replay.
 	 */
-	public Engine(Stage stage, List<List<PressedButtons>> replays)	
+	public static Engine constructEngine(Stage stage, List<List<PressedButtons>> replays)
 	{
+		if(instanceCreates)
+			return null;
+		else
+		{
+			instanceCreates = true;
+			return new Engine(stage, replays);
+		}
+	}
+	
+	/**
+	 * Private constructor. Use the static method instead.
+	 */
+	private Engine(Stage stage, List<List<PressedButtons>> replays)	
+	{
+		Stage.STAGE = stage;
 		stage.game = this;
 		this.stage = stage;
 		elapsedTime = 0;
@@ -344,22 +360,14 @@ public final class Engine implements Screen
 				
 				if(globalState == GameState.PAUSED && !playReplay)
 				{
-					if(stage.music != null  && stage.music.getVolume() != .101f)
-					{
-						if(musicVolume != .1f)
-							musicVolume = (float) stage.music.getVolume();
-						
-						stage.music.setVolume(.101f);
-					}
-					
+					TinySound.setGlobalVolume(.1f);
 					batch.begin();
 					renderPause();
 					batch.end();
 				}
 				else
 				{
-					if(stage.music != null  && stage.music.getVolume() == .101f)
-						stage.music.setVolume(musicVolume);
+					TinySound.setGlobalVolume(masterVolume);
 					
 					update();
 					paint();
@@ -383,19 +391,20 @@ public final class Engine implements Screen
 			Gdx.gl.glClearColor(0, 0, 0, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		}
-		
-		if(vertSpeed > 0)
-			moveVert();
-		if(horSpeed > 0)
-			moveHor();
-		if(scaleSpeed > 0)
-			scale();
-		
+
 		camera.position.set(tx, ty, 0);
 		camera.zoom = zoom;
 		camera.rotate(angle);
-		camera.update();
 		
+		for(CameraEffect ce : stage.cameraEffects)
+		{
+			if(ce.isDone())
+				stage.discard(ce);
+			else
+				ce.update();
+		}
+		
+		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		
@@ -422,12 +431,7 @@ public final class Engine implements Screen
 			}
 		}
 		
-		camera.position.set(viewport.width / 2, viewport.height / 2, 0);
-		camera.zoom = 1;
-		camera.rotate(-angle);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
-
+		clearTransformation();
 		renderStatusBar();
 
 		if(globalState == GameState.ENDED)
@@ -540,7 +544,9 @@ public final class Engine implements Screen
 			skin.dispose();
 			gui.dispose();
 		}
+		instanceCreates = false;
 		MainCharacter.DEFAULT_HEALTH_IMAGE = null;
+		Stage.STAGE = null;
 		stage = null;
 	}
 	
@@ -637,61 +643,6 @@ public final class Engine implements Screen
 	public void removeFocusObject(GameObject obj)
 	{
 		focusObjs.remove(obj);
-	}
-	
-	/**
-	 * Adds a vertical shake effect to the game. Set to 0 to disable the effect.
-	 * @param length The length of the vertical shake. Can not be negative.
-	 * @param speed The speed of the shake. Can not be negative.
-	 */
-	public void drugVertical(float length, float speed)
-	{
-		if(0 > length || 0 > speed)
-			throw new IllegalArgumentException("Both values must be positive.");
-		
-		if(speed == 0)
-			vertValue = 0;
-		
-		vertLength = length;
-		vertSpeed = speed;
-	}
-	
-	/**
-	 * Adds a horizontal shake effect to the game. Set to 0 to disable the effect.
-	 * @param length The length of the horizontal shake. Can not be negative.
-	 * @param speed The speed of the shake. Can not be negative.
-	 */
-	public void drugHorizontal(float length, float speed)
-	{
-		if(0 > length || 0 > speed)
-			throw new IllegalArgumentException("Both values must be positive.");
-		
-		if(speed == 0)
-			horValue = 0;
-		
-		horLength = length;
-		horSpeed = speed;		
-	}
-	
-	/**
-	 * Resizing the overall graphics of the game, cycling from min to max, using the given speed as the speed.
-	 * @param min The minimum size.
-	 * @param max The maximum size.
-	 * @param speed The speed of the cycle.
-	 */
-	public void drugScale(float min, float max, float speed)
-	{
-		if(0 > min || 0 > max || 0 > speed)
-			throw new IllegalArgumentException("All values must be positive.");
-		
-		if(speed == 0)
-			scaleValue = 0;
-		else
-			scaleValue = 1;
-		
-		scaleMin = min;
-		scaleMax = max;
-		scaleSpeed = speed;
 	}
 	
 	/**
@@ -872,15 +823,16 @@ public final class Engine implements Screen
 	
 	private void restart()
 	{
-		justRestarted =  increasingScale = true;
+		justRestarted = true;
 		showingDialog = false;
 		if(!playReplay)
 			replays.clear();
 		globalState = GameState.ONGOING;
-		horValue = vertValue = DELTA_VALUE = 0;
+		DELTA_VALUE = 0;
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
 		focusObjs.clear();
+		stage.cameraEffects.clear();
 	}
 	
 	private void renderStatusBar()
@@ -910,16 +862,25 @@ public final class Engine implements Screen
 		}
 	}
 	
-	private void drawObject(GameObject go)
+	void drawObject(GameObject go)
 	{
 		Image2D img = go.getFrame();
-		if (img != null)
+		if (img != null && go.alpha > 0.0f)
 		{
 			img.setFlip(go.flipX, !go.flipY);
 			
-			batch.setColor(currTint.r, currTint.g, currTint.b, go.alpha);
-			batch.draw(img, go.currX + go.offsetX, go.currY + go.offsetY, img.getWidth() / 2,img.getHeight() / 2, go.width * go.scale, go.height * go.scale, 1, 1, go.rotation);
-			batch.setColor(currTint.r, currTint.g, currTint.b, currTint.a);
+//			batch.setColor(currTint.r, currTint.g, currTint.b, go.alpha);
+			
+			img.setPosition(go.currX + go.offsetX, go.currY + go.offsetY);
+			img.setRotation(go.rotation);
+			img.setAlpha(go.alpha);
+			img.setSize(go.width, go.height);
+			img.setScale(go.scale);
+			img.draw(batch);
+			
+//			batch.draw(img, go.currX + go.offsetX, go.currY + go.offsetY, img.getWidth() / 2,img.getHeight() / 2, go.width * go.scale, go.height * go.scale, 1, 1, go.rotation);
+			
+//			batch.setColor(currTint.r, currTint.g, currTint.b, currTint.a);
 			
 			img.setFlip(!go.flipX, go.flipY);
 		}
@@ -1026,61 +987,6 @@ public final class Engine implements Screen
 		timeFont.draw(batch, "Game is paused.", viewport.width / 2 - 120, viewport.height / 2);
 		renderStatusBar();
 	}
-	
-	private void moveVert()
-	{
-		if(increasingVert)
-		{
-			vertValue += vertSpeed;
-			if(vertValue > vertLength)
-				increasingVert = false;
-		}
-		else
-		{
-			vertValue -= vertSpeed;
-			if(vertValue < -vertLength)
-				increasingVert = true;
-		}
-		
-		ty += vertValue;
-	}
-	
-	private void moveHor()
-	{
-		if(increasingHor)
-		{
-			horValue += horSpeed;
-			if(horValue > horLength)
-				increasingHor = false;
-		}
-		else
-		{
-			horValue -= horSpeed;
-			if(horValue < -horLength)
-				increasingHor = true;
-		}
-		
-		tx += horValue;		
-	}
-	
-	private void scale()
-	{
-		if(increasingScale)
-		{
-			scaleValue += scaleSpeed;
-			if(scaleValue > scaleMax)
-				increasingScale = false;
-		}
-		else
-		{
-			scaleValue -= scaleSpeed;
-			if(scaleValue < scaleMin)
-				increasingScale = true;
-		}
-		
-		zoom = scaleValue;
-	}
-	
 	
 	private String cleanString(String source)
 	{

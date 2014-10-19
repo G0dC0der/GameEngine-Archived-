@@ -9,7 +9,7 @@ import game.core.MovableObject;
 import game.development.AutoInstall;
 import game.development.StageBuilder;
 import game.essentials.Factory;
-import game.essentials.Frequency;
+import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.movable.Boo;
 import java.io.File;
@@ -109,7 +109,7 @@ public class GhostBridge extends StageBuilder
 		{
 			ghost = new Boo(100,100,gm);
 			ghost.setImage(1,booaImg);
-			Frequency<Image2D> hideImg = new Frequency<>(1, boohImg);
+			Animation<Image2D> hideImg = new Animation<>(1, boohImg);
 			hideImg.setMultiFaced(true);
 			ghost.setHideImage(hideImg);
 			ghost.setMultiFaced(true);
@@ -172,7 +172,7 @@ public class GhostBridge extends StageBuilder
 		 * Goal
 		 */
 		final GameObject coin = new GameObject();
-		coin.setImage(new Frequency<>(7, coinImg));
+		coin.setImage(new Animation<>(7, coinImg));
 		coin.currX = 458;
 		coin.currY = 799;
 		coin.addEvent(()->{ if(coin.collidesWith(gm)) discard(coin); });
