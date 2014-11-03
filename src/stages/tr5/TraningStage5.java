@@ -111,7 +111,7 @@ public class TraningStage5 extends StageBuilder
 	@Override
 	public void extra() 
 	{
-		if(game.getGlobalState() == GameState.ENDED || game.getGlobalState() == GameState.FINISH)
+		if(game.getGlobalState() == GameState.ENDED || game.getGlobalState() == GameState.COMPLETED)
 		{
 			for(PathDrone drill : allDrills)
 				drill.freeze();

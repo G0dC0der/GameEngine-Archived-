@@ -66,6 +66,15 @@ public class EvilDog extends Enemy
 	}
 	
 	/**
+	 * How often to play the collision sound when colliding with a target.
+	 * @param delay The time in frames.
+	 */
+	public void setCollisionSoundDelay(int delay)
+	{
+		sounds.setDelay(0, delay);
+	}
+	
+	/**
 	 * The image to use when all targets are out of range.
 	 * @param idleImg The image.
 	 */

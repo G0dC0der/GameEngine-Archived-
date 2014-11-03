@@ -28,6 +28,7 @@ public class Shuttle extends Enemy
 	
 	public float thrust, drag, delta, vx, vy;
 	private int counter;
+	private Vector2 waypointDirection;
 	private LinkedList<Waypoint> waypoints;
 	
 	/**
@@ -43,6 +44,28 @@ public class Shuttle extends Enemy
 		thrust = 500f;
 		drag = .5f;
 		delta = Engine.DELTA;
+	}
+	
+	@Override
+	public Shuttle getClone(float x, float y)
+	{
+		Shuttle s = new Shuttle(x,y);
+		copyData(s);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(s);
+		
+		return s;
+	}
+	
+	protected void copyData(Shuttle dest)
+	{
+		super.copyData(dest);
+		dest.thrust = thrust;
+		dest.delta = delta;
+		dest.drag = drag;
+		dest.counter = counter;
+		dest.waypoints = new LinkedList<>(waypoints);
 	}
 	
 	/**
@@ -120,24 +143,33 @@ public class Shuttle extends Enemy
 		{
 			Waypoint wp = waypoints.get(counter);
 			
-			if(Fundementals.distance(currX, currY, wp.target.x, wp.target.y) < thrust * drag / 2)
+			if(currX == wp.target.x && currY == wp.target.y)	//Make sure we don't get NaN when normalizing.
+				currX--;
+			
+			if(waypointDirection == null)
+				waypointDirection = Fundementals.normalize(currX, currY, wp.target.x, wp.target.y);
+			
+			Vector2 currentDirection = Fundementals.normalize(currX, currY, wp.target.x, wp.target.y);
+			
+			if(waypointDirection.dot(currentDirection) < 0)
 			{
 				counter = ++counter % waypoints.size();
+				waypointDirection = null;
+				
 				if(wp.event != null)
 					wp.event.eventHandling();
 			}
 			else
 			{
-				Vector2 norP = Fundementals.normalize(currX, currY, wp.target.x, wp.target.y);
+				float accelx = thrust * -currentDirection.x - drag * vx;
+				float accely = thrust * -currentDirection.y - drag * vy;
 				
-				float accelx = thrust * -norP.x - drag * vx;
-				float accely = thrust * -norP.y - drag * vy;
-			 
 				vx += delta * accelx;
 				vy += delta * accely;
 				
 				currX += delta * vx;
 				currY += delta * vy;
+				
 			}
 		}
 	}

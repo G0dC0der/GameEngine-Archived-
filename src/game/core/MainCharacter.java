@@ -52,7 +52,7 @@ public abstract class MainCharacter extends MovableObject
 			else if(tileType == LETHAL)
 				hit(Stage.STAGE.lethalDamage);
 			else if(tileType == GOAL)
-				stage.game.setGlobalState(GameState.FINISH);
+				stage.game.setGlobalState(GameState.COMPLETED);
 		});
 
 		setHitEvent(subject -> 

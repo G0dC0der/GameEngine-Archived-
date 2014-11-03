@@ -116,8 +116,8 @@ public class CollapsingCave extends Stage
 		stageData = Utilities.createStageData(stageImage);
 		basicInits();
 		
-		background(RenderOption.FULL, backgroundImg);
-		foreground(RenderOption.FULL, foregroundImg);
+		background(backgroundImg);
+		foreground(foregroundImg);
 		drugEffect = false;
 		coll1 = coll2 = coll3 = coll4 = done = false;
 		collapsing.stop();

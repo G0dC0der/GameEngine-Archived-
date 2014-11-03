@@ -41,6 +41,7 @@ public class AtariStyle extends StageBuilder
 	{
 		super.build();
 		taken1 = taken2 = taken3 = false;
+		gm.facing = Direction.W;
 		
 		/*
 		 * Lava

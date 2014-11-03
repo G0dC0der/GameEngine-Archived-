@@ -20,7 +20,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class TargetLaser extends PathDrone
 {		
-	private boolean stop, specEffect, infBeam;
+	private boolean stop, specEffect, infBeam, frontFire;
 	private int delay, delayCounter;
 	private byte stopTile;
 	private GameObject targets[], laserTarget;
@@ -69,17 +69,17 @@ public class TargetLaser extends PathDrone
 		if(stop)
 			return;
 		
-		float centerX = centerX();
-		float centerY = centerY();
+		float cx = centerX();
+		float cy = centerY();
 		float tcx = laserTarget.centerX(); // Target Center X
-		float tcy = laserTarget.centerX(); // Target Center Y
+		float tcy = laserTarget.centerY(); // Target Center Y
 		Vector2 finalTarget;
 		
 		if(infBeam)
 		{
-			finalTarget = Fundementals.searchTile(centerX, centerY, tcx, tcy, stopTile);
+			finalTarget = Fundementals.searchTile(cx, cy, tcx, tcy, stopTile);
 			if(finalTarget == null)
-				finalTarget = Fundementals.findEdgePoint(centerY, centerY, tcx, tcy);
+				finalTarget = Fundementals.findEdgePoint(cy, cy, tcx, tcy);
 		}
 		else
 			finalTarget = new Vector2(tcx, tcy);
@@ -88,13 +88,20 @@ public class TargetLaser extends PathDrone
 			stage.add(impact.getClone(finalTarget.x - impact.width / 2, finalTarget.y - impact.height / 2));
 		
 		for(GameObject go : targets)
-			if(go.haveHitEvent() && Fundementals.checkLine((int)centerX, (int)centerY, (int)finalTarget.x, (int)finalTarget.y, go))
+			if(go.haveHitEvent() && Fundementals.checkLine((int)cx, (int)cy, (int)finalTarget.x, (int)finalTarget.y, go))
 				go.runHitEvent(this);
 		
 		if(specEffect)
-			rotation = (float) Fundementals.getAngle(centerX, centerY, finalTarget.x, finalTarget.y);
+			rotation = (float) Fundementals.getAngle(cx, cy, finalTarget.x, finalTarget.y);
 		
-		beam.fireAt(centerX, centerY, finalTarget.x, finalTarget.y, 1);
+		if(frontFire)
+		{
+			Vector2 front = getFrontPosition();
+			cx = front.x;
+			cy = front.y;
+		}
+		
+		beam.fireAt(cx, cy, finalTarget.x, finalTarget.y, 1);
 	}
 	
 	/**
@@ -122,6 +129,15 @@ public class TargetLaser extends PathDrone
 	public void infiniteBeam(boolean infBeam)
 	{
 		this.infBeam = infBeam;
+	}
+	
+	/**
+	 * Whether or not to fire from the front rather than the middle point.
+	 * @param frontFire True to fire from the front.
+	 */
+	public void frontFire(boolean frontFire)
+	{
+		this.frontFire = frontFire;
 	}
 	
 	/**
@@ -154,6 +170,16 @@ public class TargetLaser extends PathDrone
 		this.stop = stop;
 	}
 	
+	
+	/**
+	 * Checks whether or not the entity have halted its laser mission.
+	 * @return True if its not firing any lasers.
+	 */
+	public boolean stopped()
+	{
+		return stop;
+	}
+	
 	/**
 	 * Allows you to customize the laser tinting.
 	 * @param tint The tint the lasers should use.
@@ -164,7 +190,7 @@ public class TargetLaser extends PathDrone
 	}
 	
 	/**
-	 * Returns the laser beam of the unit.
+	 * Returns the laser beam associated to it.
 	 * @return The beam.
 	 */
 	public LaserBeam getBeam() 

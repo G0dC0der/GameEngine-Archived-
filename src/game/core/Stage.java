@@ -7,10 +7,10 @@ import game.core.MainCharacter.CharacterState;
 import game.essentials.CameraEffect;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.Image2D;
-import game.essentials.Pair;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,30 +52,6 @@ public abstract class Stage
 	       return name;
 		}
 	}
-	
-	/**
-	 * This enum is used when setting the background/foreground image the quick way with the predefined functions found in {@code Stage}.
-	 * @author Pojahn Moradi
-	 */
-	public enum RenderOption
-	{
-		/**
-		 * Renders the entire background/foreground.
-		 */
-		FULL,
-		/**
-		 * Render the background/foreground at a fixed position(the screen).<br>
-		 */
-		FIXED, 
-		/**
-		 * Render the parts of the background/foreground that is visible to the human eye. Possible performance boosts.
-		 */
-		PORTION,
-		/**
-		 * Repeats the texture vertically and horizontally.
-		 */
-		REPEAT
-	};
 	
 	/**
 	 * This is the stage that currently being played. <br>
@@ -121,7 +97,7 @@ public abstract class Stage
 	List<GameObject> stageObjects;
 	List<MainCharacter> mains;
 	List<Event> events;
-	List<Pair<Object, Integer>> delayedObject;
+	List<AbstractMap.SimpleEntry<Object, Integer>> delayedObject;
 	List<CameraEffect> cameraEffects;
 	
 	public Stage()
@@ -202,11 +178,12 @@ public abstract class Stage
 		int size = delayedObject.size();
 		for(int i = 0; i < size; i++)
 		{
-			Pair<?, Integer> pair = delayedObject.get(i);
+			AbstractMap.SimpleEntry<?, Integer> pair = delayedObject.get(i);
+			pair.setValue(pair.getValue() - 1);
 			
-			if(--pair.obj2 < 0)
+			if(pair.getValue() < 0)
 			{
-				add(pair.obj1);
+				add(pair.getKey());
 				delayedObject.remove(i);
 				size--;
 				i--;
@@ -321,7 +298,7 @@ public abstract class Stage
 					if(game.playingReplay())
 						pbs = game.getReplayFrame(i);
 					else
-						pbs = game.getPressedButtons(main.con);
+						pbs = Engine.getPressedButtons(main.con);
 					
 					if(!pbs.suicide)
 						main.handleInput(pbs);
@@ -353,7 +330,7 @@ public abstract class Stage
 			if(!main.isGhost() && main.getState() == CharacterState.DEAD)
 				aliveMains--;
 			else if(!main.isGhost() && main.getState() == CharacterState.FINISH)
-				game.setGlobalState(GameState.FINISH);
+				game.setGlobalState(GameState.COMPLETED);
 		}   
 		
 		if(0 >= aliveMains)
@@ -389,10 +366,7 @@ public abstract class Stage
 	 */
 	public void add(Object obj, int delay)
 	{
-		Pair<Object, Integer> pair = new Pair<>();
-		pair.obj1 = obj;
-		pair.obj2 = delay;
-		
+		AbstractMap.SimpleEntry<Object, Integer> pair = new AbstractMap.SimpleEntry<>(obj, delay);
 		delayedObject.add(pair);
 	}
 	
@@ -420,24 +394,24 @@ public abstract class Stage
 	 * An optional way of setting the background. Wraps the given image in a {@code GameObject} with {@code z-index} set to -100.
 	 * @param img The image to use as background.
 	 */
-	public void background(RenderOption type, Image2D... img)
+	public void background(Image2D img)
 	{
-		SceneImage wrapper = new SceneImage(type);
-		wrapper.setImage(3,img);
-		wrapper.zIndex(-100);
-		add(wrapper);
+		GameObject bg = new GameObject();
+		bg.zIndex(-100);
+		bg.setImage(img);
+		add(bg);
 	}
 	
 	/**
 	 * An optional way of setting the foreground. Wraps the given image in a {@code GameObject} with {@code z-index} set to 100.
 	 * @param img The image to use as foreground.
 	 */
-	public void foreground(RenderOption type, Image2D... img)
+	public void foreground(Image2D img)
 	{
-		SceneImage wrapper = new SceneImage(type);
-		wrapper.setImage(3,img);
-		wrapper.zIndex(100);
-		add(wrapper);
+		GameObject fg = new GameObject();
+		fg.zIndex(100);
+		fg.setImage(img);
+		add(fg);
 	}
 	
 	/**
@@ -459,7 +433,6 @@ public abstract class Stage
 		events.clear();
 		appendList.clear();
 		discardList.clear();
-		game.elapsedTime = 0;
 	}
 	
 	/**
@@ -470,8 +443,20 @@ public abstract class Stage
 	/**
 	 * Optional and is called once every frame after updating all the entities and translation, right before rendering.
 	 */
-	public void extra()
+	protected void extra()
 	{}
+	
+	/**
+	 * Called by the engine when all playable {@code MainCharacters} are dead and returns whether or not a checkpoint was reached during the play.<br>
+	 * By default, this function always return false so it should be overridden by the subclasses if checkpoints are supported.<br>
+	 * In case a checkpoint was gotten, the player receive a different death message. Furthermore, the time is not reseted and the replay is not saved.<br>
+	 * Other than that, the stage is cleared as usual and {@code build} is called again.
+	 * @return True if one or more of the main characters got a checkpoint during the play.
+	 */
+	protected boolean isSafe()
+	{
+		return false;
+	}
 	
 	/**
 	 * This function sends data to the replay file(default=empty string) that needs to be saved.<br>

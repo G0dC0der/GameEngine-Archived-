@@ -1,18 +1,23 @@
 package game.development;
 
 import game.core.Stage;
+import game.essentials.BigImage;
 import game.essentials.Controller;
 import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
+import game.essentials.BigImage.RenderOption;
 import game.mains.GravityMan;
 import game.objects.Particle;
+
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 
@@ -28,7 +33,8 @@ public abstract class StageBuilder extends Stage
 	public enum VisualType {IMAGE, SOUND, MUSIC, REPLAY, WAYPOINT};
 	
 	protected Pixmap stageImage;
-	protected Image2D backgroundImg[], foregroundImg[], deathImg[], mainImage[], extraHp[];
+	protected Image2D deathImg[], mainImage[], extraHp[];
+	protected BigImage backgroundImg, foregroundImg;
 	protected Sound jump;
 	protected GravityMan gm;
 	private boolean autoInstall;
@@ -132,8 +138,8 @@ public abstract class StageBuilder extends Stage
 					deathImg   	= Image2D.loadImages(new File(mainPath + "main/death"), false);
 					jump        = TinySound.loadSound(new File(mainPath + "jump.wav"));
 					
-					try{backgroundImg = Image2D.loadImages(stagePath + "background.png");} catch(Exception e){System.err.println("Background image not found");}
-					try{foregroundImg = Image2D.loadImages(stagePath + "foreground.png");} catch(Exception e){System.err.println("Foreground image not found");}
+					try{backgroundImg = new BigImage(stagePath + "background.png", RenderOption.PORTION);} catch(Exception e){System.err.println("Background image not found");}
+					try{foregroundImg = new BigImage(stagePath + "foreground.png", RenderOption.PORTION);} catch(Exception e){System.err.println("Foreground image not found");}
 					    stageImage    = new Pixmap(new FileHandle(stagePath + "map.png"));
 				}
 			}
@@ -157,9 +163,9 @@ public abstract class StageBuilder extends Stage
 			basicInits();
 			
 			if(backgroundImg != null)
-				background(RenderOption.PORTION, backgroundImg);
+				background(backgroundImg);
 			if(foregroundImg != null)
-				foreground(RenderOption.PORTION, foregroundImg);
+				foreground(foregroundImg);
 			
 			/*
 			 * Main Character

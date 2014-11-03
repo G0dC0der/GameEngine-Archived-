@@ -10,9 +10,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 /**
  * The {@code Image2D} is very similar to its superclass {@code Sprite} but supports fast access to pixel data.
  * @author Pojahn Moradi
- *
  */
-public final class Image2D extends Sprite
+public class Image2D extends Sprite
 {
 	private int[][] pixelData;
 	

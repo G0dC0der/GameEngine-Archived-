@@ -93,8 +93,8 @@ public class FlyingBattery extends Stage
 		lethalDamage = -10;
 		used = false;
 		
-		foreground(RenderOption.FULL, foregroundImg);
-		background(RenderOption.FULL, backgroundImg);
+		foreground(foregroundImg);
+		background(backgroundImg);
 
 		final GravityMan gm = new GravityMan();
 		gm.setImage(new Animation<>(3, mainImage));

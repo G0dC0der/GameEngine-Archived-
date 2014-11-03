@@ -458,7 +458,7 @@ public class Fundementals
 	}
 	
 	/**
-	 * Returns the bounding box of the rotated rectangle.
+	 * Returns the bounding box of the (rotated) rectangle.
 	 * @param go The {@code GameObject} to calculate the bounding box on.
 	 * @return The bounding box.
 	 */
@@ -829,7 +829,7 @@ public class Fundementals
 	}
 	
 	/**
-	 * Normalizes the two points.
+	 * Normalizes the two points. Returns point (NaN:NaN) if x1 == x2 && y1 == y2.
 	 * @return The normalized point.
 	 */
 	public static Vector2 normalize(float x1, float y1, float x2, float y2)

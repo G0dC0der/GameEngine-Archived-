@@ -6,9 +6,11 @@ import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.GameObject.Hitbox;
 import game.core.Stage;
+import game.essentials.Animation;
+import game.essentials.BigImage;
+import game.essentials.BigImage.RenderOption;
 import game.essentials.Controller;
 import game.essentials.Factory;
-import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
 import game.mains.GravityMan;
@@ -18,10 +20,13 @@ import game.movable.Projectile;
 import game.movable.SolidPlatform;
 import game.objects.Particle;
 import game.objects.Wind;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -64,8 +69,8 @@ public class ClimbMe extends Stage
 			cannonImg 	= new Image2D("res/climb/cannon.png");
 			bouncerImg 	= new Image2D("res/climb/bouncer.png");
 
-			backgroundImg = new Image2D("res/climb/background.png");
-			foregroundImg = new Image2D("res/climb/foreground.png");
+			backgroundImg = new BigImage("res/climb/background.png", RenderOption.PORTION);
+			foregroundImg = new BigImage("res/climb/foreground.png", RenderOption.PORTION);
 			stageImage 	  = new Pixmap(new FileHandle("res/climb/map.png"));
 
 			jump       = TinySound.loadSound(new File(("res/general/jump.wav")));
@@ -99,8 +104,8 @@ public class ClimbMe extends Stage
 		game.timeColor = game.deathTextColor = Color.WHITE;
 		lethalDamage = -3;
 		
-		foreground(RenderOption.PORTION, foregroundImg);
-		background(RenderOption.PORTION, backgroundImg);
+		foreground(foregroundImg);
+		background(backgroundImg);
 		
 		/*
 		 * Main Character

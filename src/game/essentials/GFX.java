@@ -2,8 +2,13 @@ package game.essentials;
 
 import static game.essentials.Utilities.*;
 import game.core.Fundementals;
+import game.core.GameObject;
 import game.core.Stage;
+
 import java.util.Random;
+
+import kuusisto.tinysound.Sound;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,11 +18,54 @@ import com.badlogic.gdx.math.MathUtils;
 /**
  * A collection of static methods to handle or render graphic related stuff.
  * @author Pojahn Moradi
- *
  */
 public class GFX 
 {
 	private static final Texture dot = new Texture("res/data/blob.png");
+	
+	public static Image2D checkpoint;
+	public static Sound checkpointReach;
+	
+	/**
+	 * Renders a checkpoint indication at the middle of the screen.
+	 */
+	public static void renderCheckpoint()
+	{
+		GameObject fx = new GameObject()
+		{
+			boolean soundPlayed;
+			
+			@Override
+			public void drawSpecial(SpriteBatch batch) 
+			{
+				final Stage s = Stage.getCurrentStage();
+				
+				if(0.0f >= alpha)
+					s.discard(this);
+				else
+				{
+					if(!soundPlayed)
+					{
+						checkpointReach.play();
+						soundPlayed = true;
+					}
+					
+					s.game.hudCamera();
+					
+					checkpoint.setFlip(false, true);
+					checkpoint.setPosition(s.game.getScreenWidth() / 2 - checkpoint.getWidth() / 2, s.game.getScreenHeight() / 2 - checkpoint.getHeight() / 2);
+					checkpoint.draw(batch, alpha);
+					
+					s.game.gameCamera();
+					
+					alpha -= 0.01f;
+				}
+			}
+		};
+		fx.zIndex(Integer.MAX_VALUE);
+		
+		Stage.getCurrentStage().add(fx);
+	}
 
 	/**
 	 * Draws an electric beam between the two given points.

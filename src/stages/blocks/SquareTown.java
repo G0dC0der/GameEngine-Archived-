@@ -13,14 +13,18 @@ import game.development.StageBuilder;
 import game.essentials.Animation;
 import game.essentials.Factory;
 import game.essentials.Image2D;
+import game.essentials.BigImage.RenderOption;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
 import game.objects.OneWay;
+
 import java.io.File;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.graphics.Color;
 
 @AutoDispose
@@ -33,7 +37,7 @@ public class SquareTown extends StageBuilder
 	}
 	
 	@AutoLoad(path="res/blocks", type=VisualType.IMAGE)
-	private Image2D backgroundImg, spikeyImg[], spikeyminiImg[], platformImg, crabImg[], gemImg[], yellowBlockImg, redBlockImg, eyeImg[], blockadeImg, gem2Img[], spikesnImg, spikeseImg, spikeswImg, steelBlockImg, flagPoleImg;
+	private Image2D spikeyImg[], spikeyminiImg[], platformImg, crabImg[], gemImg[], yellowBlockImg, redBlockImg, eyeImg[], blockadeImg, gem2Img[], spikesnImg, spikeseImg, spikeswImg, steelBlockImg, flagPoleImg;
 	private Image2D flagImg[]; 
 	
 	private Sound collect1, collect2;
@@ -47,6 +51,8 @@ public class SquareTown extends StageBuilder
 		try
 		{
 			super.init();
+			
+			backgroundImg.setRenderOption(RenderOption.FIXED);
 			
 			flagImg = Image2D.loadImages(new File("res/climb/flag"), false);
 			
@@ -82,7 +88,6 @@ public class SquareTown extends StageBuilder
 		 */
 		super.build();
 		collectedGems = gems = collectedGems2 = gems2 = 0;
-		background(RenderOption.FIXED, backgroundImg);
 		if(getDifficulty() != Difficulty.HARD)
 			gm.hit(2);
 		gm.zIndex(50);
@@ -91,6 +96,7 @@ public class SquareTown extends StageBuilder
 			if(tileType == Engine.LETHAL)
 				gm.setState(CharacterState.DEAD);
 		});
+		gm.flyMode(5);
 		
 		/*
 		 * Spikey

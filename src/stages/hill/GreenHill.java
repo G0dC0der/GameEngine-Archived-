@@ -5,21 +5,26 @@ import game.core.GameObject.Event;
 import game.core.GameObject.Hitbox;
 import game.core.MainCharacter.CharacterState;
 import game.core.Stage;
+import game.essentials.BigImage;
 import game.essentials.Controller;
 import game.essentials.Factory;
 import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.Utilities;
+import game.essentials.BigImage.RenderOption;
 import game.mains.GravityMan;
 import game.movable.PathDrone;
 import game.movable.Projectile;
 import game.movable.SolidPlatform;
 import game.movable.Trailer;
 import game.objects.Particle;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -49,8 +54,8 @@ public class GreenHill extends Stage
 			platformImg  = new Image2D("res/hill/platform.png");
 			pooImg  	 = new Image2D("res/hill/poo.png");
 			stageImage	= new Pixmap(new FileHandle("res/hill/map.png"));
-			foregroundImg = new Image2D("res/hill/foreground.png");
-			backgroundImg = new Image2D("res/hill/background.png");
+			foregroundImg = new BigImage("res/hill/foreground.png", RenderOption.PORTION);
+			backgroundImg = new BigImage("res/hill/background.png", RenderOption.PORTION);
 			
 			jump        = TinySound.loadSound(new File(("res/general/jump.wav")));
 			collectRing = TinySound.loadSound(new File(("res/hill/collectring.wav")));
@@ -81,8 +86,8 @@ public class GreenHill extends Stage
 		game.timeColor = new Color(100,255,100,255);
 		game.deathTextColor = Color.YELLOW;
 		
-		foreground(RenderOption.PORTION, foregroundImg);
-		background(RenderOption.PORTION, backgroundImg);
+		foreground(foregroundImg);
+		background(backgroundImg);
 		
 		/*
 		 * Main Character

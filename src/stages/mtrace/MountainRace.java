@@ -102,7 +102,7 @@ public class MountainRace extends StageBuilder
 				{
 					used = true;
 					
-					String pos = game.getGlobalState() == GameState.FINISH ? "4th" : "3rd";
+					String pos = game.getGlobalState() == GameState.COMPLETED ? "4th" : "3rd";
 					add(Factory.printText(pos + " place goes to Weed Guy!", Color.BLACK, null, 150, gm, -150, -150, null));
 				}
 			}
@@ -128,7 +128,7 @@ public class MountainRace extends StageBuilder
 				{
 					used = true;
 					
-					String pos = game.getGlobalState() == GameState.FINISH ? "3rd" : "2nd";
+					String pos = game.getGlobalState() == GameState.COMPLETED ? "3rd" : "2nd";
 					add(Factory.printText(pos + " place goes to White Boy!", Color.BLACK, null, 150, gm, -150, -150, null));
 				}
 			}
@@ -154,7 +154,7 @@ public class MountainRace extends StageBuilder
 				{
 					used = true;
 					
-					String pos = game.getGlobalState() == GameState.FINISH ? "2nd" : "1st";
+					String pos = game.getGlobalState() == GameState.COMPLETED ? "2nd" : "1st";
 					add(Factory.printText(pos + " place goes to Blackie!", Color.BLACK, null, 150, gm, -150, -150, null));
 				}
 			}

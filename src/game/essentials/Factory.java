@@ -13,17 +13,21 @@ import game.core.Stage;
 import game.mains.GravityMan;
 import game.movable.PathDrone;
 import game.movable.PathDrone.PathData;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 /**
  * A collection of static method that mostly returns different type of events.
@@ -802,6 +806,45 @@ public class Factory
 		charge.pingPong(true);
 		
 		return threeStageLaser(null, charge, null);
+	}
+	
+	/**
+	 * Fade to the room music if inside the given rectangle. When a {@code listener} is colliding with the given rectangle, {@code roomMusic} will start fade in and {@code outsideMusic} out.
+	 * @param room The room where {@code roomMusic} is played.
+	 * @param roomMusic The music to play in the room.
+	 * @param outsideMusic The music thats played outside the room. Usually the stage music. Null is accepted.
+	 * @param fadeSpeed The speed to fade in/out.
+	 * @param maxVolume The max volume of the songs when fading.
+	 * @param listeners The entities interacting with this event.
+	 * @return The event.
+	 */
+	public static Event roomMusic(Rectangle room, Music roomMusic, Music outsideMusic, double fadeSpeed, double maxVolume, GameObject... listeners)	//TODO: TEST
+	{
+		return ()->
+		{
+			boolean oneColliding = false;
+			
+			for(GameObject listener : listeners)
+			{
+				if(Fundementals.rectangleVsRectangle(listener.currX, listener.currY, listener.width(), listener.height(), room.x, room.y, room.width, room.height))
+				{
+					roomMusic.setVolume(Math.min(roomMusic.getVolume() + fadeSpeed, maxVolume));
+					
+					if(outsideMusic != null)
+						outsideMusic.setVolume(Math.max(outsideMusic.getVolume() - fadeSpeed, 0));
+						
+					oneColliding = true;
+					break;
+				}
+			}
+			
+			if(!oneColliding)
+			{
+				roomMusic.setVolume(Math.max(roomMusic.getVolume() - fadeSpeed, 0));
+				if(outsideMusic != null)
+					outsideMusic.setVolume(Math.min(outsideMusic.getVolume() + fadeSpeed, maxVolume));
+			}
+		};
 	}
 	
 	/**

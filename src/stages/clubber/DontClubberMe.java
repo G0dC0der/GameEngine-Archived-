@@ -88,8 +88,8 @@ public class DontClubberMe extends Stage
 		counter = 0;
 		collected1 = collected2 = collected3 = collected4 = false;
 		
-		background(RenderOption.PORTION,backgroundImg);
-		foreground(RenderOption.PORTION,foregroundImg);
+		background(backgroundImg);
+		foreground(foregroundImg);
 
 		gm = new GravityMan();
 		gm.setImage(new Animation<>(3, mainImage));

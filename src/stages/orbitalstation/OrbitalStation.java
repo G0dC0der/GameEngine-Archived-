@@ -16,6 +16,7 @@ import game.development.StageBuilder;
 import game.essentials.Animation;
 import game.essentials.CameraEffect;
 import game.essentials.Factory;
+import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.essentials.LaserBeam;
 import game.essentials.SoundBank;
@@ -27,21 +28,20 @@ import game.movable.RotatingCannon;
 import game.movable.Shuttle;
 import game.movable.SolidPlatform;
 import game.movable.TargetLaser;
+import game.objects.CheckpointsHandler;
 import game.objects.OneWay;
 import game.objects.Particle;
 import game.objects.Wind;
-
 import java.io.File;
 import java.util.LinkedList;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general",path=OrbitalStation.PATH)
@@ -50,26 +50,33 @@ public class OrbitalStation extends StageBuilder
 {
 	static final String PATH = "res/orbitalstation";
 	
+	{
+		setDifficulty(Difficulty.NORMAL);
+	}
+	
 	@AutoLoad(path=PATH, type=VisualType.WAYPOINT)
 	private PathData[] data1, data2;
 
 	@AutoLoad(path=PATH, type=VisualType.IMAGE)
-	private Image2D alphaImage, lava[], platform, lavaenemy[], mine[], fireball[], saw, holder, spikes, gunmachine, bullet, elevator, spaceGate, guard[], crusherLeft, part, crusherUp, crusherDown, button, buttonbody, fan[], suit[], suitItem, gem[], laserbeam;
+	private Image2D alphaImage, lava[], platform, lavaenemy[], mine[], fireball[], saw, holder, spikes, gunmachine, bullet, elevator, spaceGate, guard[], crusherLeft, part, crusherUp, crusherDown, button, buttonbody, fan[], suit[], suitItem, gem[], laserbeam, megacrusher, trapblock, exp[];
 	
 	@AutoLoad(path=PATH, type=VisualType.SOUND)
-	private Sound guarding, slam, gmfire, gmexplode, powerdown;
+	private Sound guarding, slam, gmfire, gmexplode, powerdown, laserexp;
 
 	@AutoLoad(path=PATH, type=VisualType.MUSIC)
 	private Music blowingFan;
 	
 	private Image2D oneway, explosion[], gunfire[], key, wind[], bigExplosion[];
-	private Music stageMusic, spaceMusic, lavaMusic, sawLoop;
-	private Sound elevatorMove, elevatorDone, collect, mineExplode;
+	private Music stageMusic, spaceMusic, lavaMusic, sawLoop, collapsing;
+	private Sound elevatorMove, elevatorDone, collect, mineExplode, shut;
 	
 	private GameObject heatOverlay;
+	private SolidPlatform megac;
+	
+	private CheckpointsHandler cph;
 	
 	private float orginY = 105 * 32, maxAlpha, minAlpha;
-	private boolean alphaValueIncreasing, suited, unfreezeSaws, goNuts, used;
+	private boolean alphaValueIncreasing, suited, unfreezeSaws, goNuts, used, used2, poweredDown;
 	
 	@Override
 	public void init() 
@@ -85,6 +92,8 @@ public class OrbitalStation extends StageBuilder
 		
 		elevatorMove = TinySound.loadSound(new File("res/steelfactory/elevator.wav"));
 		elevatorDone = TinySound.loadSound(new File("res/steelfactory/bam_.wav"));
+		shut = TinySound.loadSound(new File("res/steelfactory/shut.wav"));
+		collapsing = TinySound.loadMusic(new File("res/steelfactory/collapsing.wav"));
 		collect = TinySound.loadSound(new File("res/steelfactory/collectsound.wav"));
 		mineExplode = TinySound.loadSound(new File("res/awfulplace/bossdie.wav"));
 		
@@ -111,9 +120,11 @@ public class OrbitalStation extends StageBuilder
 		 */
 		super.build();
 		alphaValueIncreasing = true;
-		suited = unfreezeSaws = goNuts = used = false;
+		suited = unfreezeSaws = goNuts = used = used2 = poweredDown = false;
 		maxAlpha = minAlpha = 0;
 		
+		elevatorMove.stop();
+		collapsing.stop();
 		sawLoop.stop();
 		sawLoop.setVolume(0);
 		sawLoop.setLoop(true);
@@ -137,9 +148,9 @@ public class OrbitalStation extends StageBuilder
 					Color orgColor = batch.getColor();
 					
 					batch.setColor(orgColor.r, orgColor.g, orgColor.b, heatOverlay.alpha);
-					game.clearTransformation();
+					game.hudCamera();
 					batch.draw(alphaImage, 0, 0);
-					game.restoreTransformation();
+					game.gameCamera();
 					batch.setColor(orgColor.r, orgColor.g, orgColor.b, orgColor.a);
 				}
 			}
@@ -355,7 +366,7 @@ public class OrbitalStation extends StageBuilder
 		/*
 		 * Elevator
 		 */
-		SolidPlatform elv = new SolidPlatform(1920, 2016, gm);
+		SolidPlatform elv = new SolidPlatform(1920, 2017, gm);
 		elv.setImage(elevator);
 		elv.appendPath(1920, 416,0,false,()->{
 			elevatorMove.stop();
@@ -410,7 +421,7 @@ public class OrbitalStation extends StageBuilder
 			if(Fundementals.distance(crusher1, gm) < 600)
 				add(CameraEffect.vibration(1,30));
 			
-			float volume = SoundBank.getVolume(crusher1, gm, 600, 1.0f, 40);
+			double volume = SoundBank.getVolume(crusher1, gm, 600, 1.0f, 40);
 			if(volume > 0.0f)
 				slam.play(volume);
 		});
@@ -434,7 +445,7 @@ public class OrbitalStation extends StageBuilder
 			if(Fundementals.distance(crusher2, gm) < 600)
 				add(CameraEffect.vibration(1,30));
 			
-			float volume = SoundBank.getVolume(crusher2, gm, 600, 1.0f, 40);
+			double volume = SoundBank.getVolume(crusher2, gm, 600, 1.0f, 40);
 			if(volume > 0.0f)
 				slam.play(volume);
 		});
@@ -453,7 +464,7 @@ public class OrbitalStation extends StageBuilder
 				if(Fundementals.distance(cr.currX, cr.currY + cr.height, gm.currX, gm.currY) < 300)
 					add(CameraEffect.vibration(.5f,30));
 				
-				float volume = SoundBank.getVolume(cr, gm, 600, 1.0f, 40);
+				double volume = SoundBank.getVolume(cr.currX, cr.currY + cr.height, gm.currX, gm.currY, 600, 1.0f, 40);
 				if(volume > 0.0f)
 					slam.play(volume);
 			});
@@ -473,7 +484,7 @@ public class OrbitalStation extends StageBuilder
 				if(Fundementals.distance(cr.currX, cr.currY + cr.height, gm.currX, gm.currY) < 400)
 					add(CameraEffect.vibration(.5f,30));
 				
-				float volume = SoundBank.getVolume(cr, gm, 600, 1.0f, 40);
+				double volume = SoundBank.getVolume(cr.currX, cr.currY + cr.height, gm.currX, gm.currY, 600, 1.0f, 40);
 				if(volume > 0.0f)
 					slam.play(volume);
 			});
@@ -495,8 +506,59 @@ public class OrbitalStation extends StageBuilder
 		theWind.width = 550;
 		theWind.zIndex(1);
 		
-		add(Factory.soundFalloff(blowingFan, prop, gm, 800, 0, 50, 1.0f));
+		add(Factory.soundFalloff(blowingFan, prop, gm, 800, 0, 30, 1.0f));
 		add(prop, theWind);
+		
+		/*
+		 * Laser beams
+		 */
+		Shuttle target1 = new Shuttle(2575 - 100, 2795);
+		target1.appendPath();
+		target1.appendPath(2575 + 100, 2795);
+		target1.drag = 1.2f;
+		target1.thrust = 400;
+		
+		TargetLaser laser1 = getTargetLaser(2554, 2625, target1);
+		
+		GameObject target2 = new GameObject();
+		target2.moveTo(2087 + laser1.halfWidth(), 2573 + 100);
+		
+		TargetLaser laser2 = getTargetLaser(2087, 2573, target2);
+		laser2.addEvent(new Event()
+		{
+			int counter = 0;
+
+			@Override
+			public void eventHandling() 
+			{
+				if(poweredDown)
+					laser2.stop(true);
+				else if(++counter % 50 == 0)
+					laser2.stop(!laser2.stopped());
+				
+			}
+		});
+		
+		GameObject target3 = new GameObject();
+		target3.moveTo(1913 - 100, 2651 + laser2.halfHeight());
+		
+		TargetLaser laser3 = getTargetLaser(1913, 2651, target3);
+		laser3.addEvent(new Event()
+		{
+			int counter = 0;
+
+			@Override
+			public void eventHandling() 
+			{
+				if(poweredDown)
+					laser3.stop(true);
+				else if(++counter % 110 == 0)
+					laser3.stop(!laser3.stopped());
+			}
+		});
+		
+		add(target1, laser1, target2, laser2, target3, laser3);
+		laser1.merge(laser2,laser3);
 		
 		/*
 		 * Button & Button body
@@ -505,7 +567,7 @@ public class OrbitalStation extends StageBuilder
 		bbody.setImage(buttonbody);
 		bbody.moveTo(2976, 2203);
 		gm.avoidOverlapping(bbody);
-		
+
 		GameObject theButton = new GameObject();
 		theButton.setImage(button);
 		theButton.moveTo(2979, 2192);
@@ -519,6 +581,8 @@ public class OrbitalStation extends StageBuilder
 				game.removeFocusObject(gm);
 				stageMusic.setVolume(.25f);
 				blowingFan.stop();
+				poweredDown = true;
+				laser1.stop(true);
 				for(SolidPlatform crushe : allCrusher)
 					crushe.freeze();
 				
@@ -593,36 +657,84 @@ public class OrbitalStation extends StageBuilder
 		add(goal);
 		
 		/*
-		 * Laser beams
+		 * Trap Block
 		 */
-		Animation<Image2D> laserImage = new Animation<>(3, LASER_BEAM);
-		Animation<Image2D> laserImpact = new Animation<>(3, LASER_IMPACT);
-		laserImage.pingPong(true);
-		laserImpact.pingPong(true);
+		SolidPlatform trapb = new SolidPlatform(1600, 2590, gm);
+		trapb.setImage(trapblock);
+		trapb.setTileDeformer(true, Engine.SOLID);
+		trapb.setTransformBack(true);
+		trapb.setMoveSpeed(2);
+		trapb.appendPath(1600, 2656);
+		trapb.freeze();
+		add(trapb);
 		
-		LaserBeam beam = Factory.threeStageLaser(null, laserImage, laserImpact);
+		/*
+		 * Mega Crusher
+		 */
+		CameraEffect vib = CameraEffect.vibration(2, -1);
 		
-		Shuttle target1 = new Shuttle(2575 - 300, 2795);
-		target1.appendPath();
-		target1.appendPath(2575 + 300, 2795);
-		target1.drag = 2f;
-		target1.thrust = 200;
+		megac = new SolidPlatform(size.width, size.height, gm);
+		megac.setImage(megacrusher);
+		megac.setMoveSpeed(6.5f);
+		megac.appendPath(1664, 2464,0,false,()->{
+			shut.play();
+			collapsing.stop();
+			vib.stop();
+		});
 		
-		TargetLaser laser1 = new TargetLaser(2554, 2625, target1, gm);
-		laser1.setImage(laserbeam);
-		laser1.useSpecialEffect(true);
-		laser1.setLaserTint(Color.GREEN);
-		laser1.setDrawSpecialBehind(true);
-		laser1.setBeam(beam);
+		/*
+		 * Checkpoints
+		 */
+		Vector2 cp1 = new Vector2(548, 2764);
+		Vector2 cp2 = new Vector2(1808, 1996);
+		Vector2 cp3 = new Vector2(4195, 620);
+		Vector2 cp4 = new Vector2(517, 3340);
 		
-		add(target1, laser1);
+		if(cph == null && getDifficulty() != Difficulty.HARD)
+		{
+			cph = new CheckpointsHandler();
+			cph.setReachEvent(()->{
+				GFX.renderCheckpoint();
+			});
+			
+			if(getDifficulty() == Difficulty.EASY)
+				cph.appendCheckpoint(cp1, 480, 2687, 150, 150);
+			
+			cph.appendCheckpoint(cp2, 1777, 1946, 70, 70);
+			
+			if(getDifficulty() == Difficulty.EASY)
+				cph.appendCheckpoint(cp3, 4155, 570, 70, 70);
+			
+			cph.appendCheckpoint(cp4, 384, 3264, 150, 150);
+		}
+		
+		if(cph != null)
+		{
+			cph.setUsers(gm);
+			
+			Vector2 latestCp = cph.getLastestCheckpoint();
+			if(latestCp != null)
+			{
+				gm.moveTo(latestCp.x, latestCp.y);
+	
+				if(latestCp.equals(cp4))
+				{
+					discard(theButton, theWind);
+					poweredDown = true;
+					laser1.stop(true);
+				}
+			}
+			
+			add(cph);
+		}
 		
 		/*
 		 * Main Character
 		 */
 		game.timeColor = Color.WHITE;
 		gm.facing = Direction.W;
-		gm.hit(2);
+		if(getDifficulty() != Difficulty.HARD)
+			gm.hit(2);
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		gm.addTileEvent((tileType)->{
 			if(tileType == Engine.AREA_TRIGGER_2)
@@ -647,11 +759,30 @@ public class OrbitalStation extends StageBuilder
 			}
 		});
 		gm.setHitEvent((hitter)->{
-			if(hitter.sameAs(proj) || hitter.sameAs(laser1))
+			if(hitter.sameAs(proj))
 				gm.hit(-1);
+			else if(hitter.sameAs(laser1))
+			{
+				if(!used2)
+				{
+					trapb.unfreeze();
+					collapsing.setVolume(.6);
+					collapsing.play(true);
+					add(vib);
+					
+					megac.moveTo(2730, 2464);
+					add(megac);
+					used2 = true;
+				}
+			}
 		});
 	}
 	
+	@Override
+	protected boolean isSafe() 
+	{
+		return cph != null && cph.getLastestCheckpoint() != null;
+	}
 	
 	@Override
 	public void extra() 
@@ -669,7 +800,7 @@ public class OrbitalStation extends StageBuilder
 		
 		if(distance > 0)
 		{
-			maxAlpha = Math.min(distance / 300.0f, .80f);
+			maxAlpha = Math.min(distance / 300.0f, .85f);
 			minAlpha = Math.max(maxAlpha - 0.2f, 0.0f);
 
 			if(alphaValueIncreasing)
@@ -789,7 +920,7 @@ public class OrbitalStation extends StageBuilder
 		
 		if(unfreezeSaws)
 		{
-			float volume = SoundBank.getVolume(gm.currX, gm.currY, 247, 2310, 800, 1.0f, 30);
+			double volume = SoundBank.getVolume(gm.currX, gm.currY, 247, 2310, 800, 1.0f, 30);
 			if(volume > 0.0f && !sawLoop.playing())
 				sawLoop.resume();
 			else if(volume == 0.0f && sawLoop.playing())
@@ -797,6 +928,32 @@ public class OrbitalStation extends StageBuilder
 			
 			sawLoop.setVolume(volume);
 		}
+	}
+	
+	TargetLaser getTargetLaser(float x, float y, GameObject laserTarget)
+	{
+		TargetLaser laser = new TargetLaser(x, y, laserTarget, gm);
+		laser.setImage(laserbeam);
+		laser.useSpecialEffect(true);
+		laser.setLaserTint(Color.GREEN);
+		laser.setDrawSpecialBehind(true);
+		laser.setBeam(getLaser());
+		laser.useFastCollisionCheck(true);
+		laser.addEvent(()->{
+			if(laser.collidesWith(megac))
+			{
+				discard(laser, laserTarget);
+				
+				Particle e = new Particle();
+				e.setImage(4, exp);
+				e.setIntroSound(laserexp);
+				e.moveTo(laser.centerX() - e.halfWidth(), laser.centerY() - e.halfHeight());
+				
+				add(e);
+			}
+		});
+		
+		return laser;
 	}
 	
 	void addSpaceGuard(float x, float y, String text)
@@ -828,7 +985,7 @@ public class OrbitalStation extends StageBuilder
 				else
 					ed.freeze();
 				
-				if(!talked && !goNuts && Fundementals.distance(ed, gm) < 280)
+				if(!talked && !goNuts && Fundementals.distance(ed, gm) < 305)
 				{
 					guarding.play();
 					talked = true;
@@ -865,5 +1022,14 @@ public class OrbitalStation extends StageBuilder
 		s.setImage(saw);
 		
 		add(h,s);
+	}
+	
+	static LaserBeam getLaser()
+	{
+		Animation<Image2D> laserImage = new Animation<>(3, LASER_BEAM);
+		Animation<Image2D> laserImpact = new Animation<>(3, LASER_IMPACT);
+		laserImage.pingPong(true);
+		laserImpact.pingPong(true);
+		return Factory.threeStageLaser(null, laserImage, laserImpact);
 	}
 }

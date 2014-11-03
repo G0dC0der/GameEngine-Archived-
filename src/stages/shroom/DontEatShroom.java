@@ -277,14 +277,14 @@ public class DontEatShroom extends StageBuilder
 				if(alpha.a > 1)
 					alpha.a = 1;
 					
-				game.clearTransformation();
+				game.hudCamera();
 				
 				Image2D img = drugAnim.getObject();
 				batch.setColor(alpha);
 				batch.draw(img, 0, 0, img.getWidth() * scale, img.getHeight() * scale);
 				batch.setColor(game.defaultTint);
 				
-				game.restoreTransformation();
+				game.gameCamera();
 			}
 		};
 		drug.setVisible(true);

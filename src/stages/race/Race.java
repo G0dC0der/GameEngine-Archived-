@@ -8,7 +8,9 @@ import game.core.MovableObject;
 import game.core.MovableObject.TileEvent;
 import game.core.Stage;
 import game.essentials.Controller;
+import game.essentials.BigImage.RenderOption;
 import game.essentials.Controller.PressedButtons;
+import game.essentials.BigImage;
 import game.essentials.Factory;
 import game.essentials.Animation;
 import game.essentials.Image2D;
@@ -18,10 +20,13 @@ import game.movable.Bouncer;
 import game.movable.SolidPlatform;
 import game.movable.TimedEnemy;
 import game.objects.Particle;
+
 import java.io.File;
+
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -53,8 +58,8 @@ public class Race extends Stage
 			blImg       = Image2D.loadImages("res/race/blocker.png");			
 			boImg       = Image2D.loadImages("res/race/bounce.png");
 			
-			backgroundImg = new Image2D("res/race/background.png", false);
-			foregroundImg = new Image2D("res/race/foreground.png", false);
+			backgroundImg = new BigImage("res/race/background.png", RenderOption.PORTION);
+			foregroundImg = new BigImage("res/race/foreground.png", RenderOption.PORTION);
 			
 			replay1 = (PressedButtons[]) PressedButtons.decode("res/race/cont1.rlp")[1];
 			replay2 = (PressedButtons[]) PressedButtons.decode("res/race/cont2.rlp")[1];
@@ -89,11 +94,11 @@ public class Race extends Stage
 		 *******************************************
 		 */
 		super.build();
-
+		
 		stageData = Utilities.createStageData(stageImage);
 		
-		background(RenderOption.PORTION, backgroundImg);
-		foreground(RenderOption.PORTION, foregroundImg);
+		background(backgroundImg);
+		foreground(foregroundImg);
 		
 		basicInits();
 		pos1 = pos2 = pos3 = null;	
@@ -154,14 +159,14 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos1 == null)
-								pos1 = game.getGlobalState() == GameState.FINISH ? "4th" : "3rd";
+								pos1 = game.getGlobalState() == GameState.COMPLETED ? "4th" : "3rd";
 							
-							game.clearTransformation();
+							game.hudCamera();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos1 + " place goes to Weed Guy!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
-							game.restoreTransformation();
+							game.gameCamera();
 						}
 					});
 				}
@@ -201,14 +206,14 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos2 == null)
-								pos2 = game.getGlobalState() == GameState.FINISH ? "3rd" : "2nd";
+								pos2 = game.getGlobalState() == GameState.COMPLETED ? "3rd" : "2nd";
 							
-							game.clearTransformation();
+							game.hudCamera();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos2 + " place goes to White Boy!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
-							game.restoreTransformation();
+							game.gameCamera();
 						}
 					});
 				}
@@ -248,14 +253,14 @@ public class Race extends Stage
 						public void drawSpecial(SpriteBatch batch) 
 						{
 							if(pos3 == null)
-								pos3 = game.getGlobalState() == GameState.FINISH ? "2nd" : "1st";
+								pos3 = game.getGlobalState() == GameState.COMPLETED ? "2nd" : "1st";
 							
-							game.clearTransformation();
+							game.hudCamera();
 							
 							game.timeFont.setColor(Color.WHITE);
 							game.timeFont.draw(batch, pos3 + " place goes to Blackie!", game.getScreenWidth() / 2 - 190, game.getScreenHeight() / 2 - 50);
 							
-							game.restoreTransformation();
+							game.gameCamera();
 						}
 					});
 				}
@@ -338,9 +343,6 @@ public class Race extends Stage
 		flag.moveTo(3912, 514);
 		add(flag);
 	}
-	
-	Image2D rec = new Image2D("res/data/rec.png");
-	Image2D rec2 = new Image2D("res/data/rec2.png");
 
 	@Override
 	public void dispose() 

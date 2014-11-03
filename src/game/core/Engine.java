@@ -5,6 +5,7 @@ import game.core.MainCharacter.CharacterState;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
 import game.essentials.CameraEffect;
+import game.essentials.GFX;
 import game.essentials.HighScore;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
@@ -236,7 +237,7 @@ public final class Engine implements Screen
 	 * The state of the game can be manipulated with the help of these enums.
 	 * @author Pojahn Moradi
 	 */
-	public enum GameState {ONGOING, ENDED, FINISH, PAUSED};
+	public enum GameState {ONGOING, ENDED, COMPLETED, PAUSED};
 	
 	/**
 	 * The translation X of the world.
@@ -278,10 +279,10 @@ public final class Engine implements Screen
 	Dimension viewport;
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
-	private boolean showFps, justRestarted, playReplay, showingDialog, replayHelp, crashed;
+	private boolean showFps, justRestarted, playReplay, showingDialog, replayHelp, crashed, checkpoint, flipY;
 	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
-	private OrthographicCamera camera;
+	private OrthographicCamera camera, hudCamera;
 	private Color currTint;
 	private Event exitEvent;
 	private com.badlogic.gdx.scenes.scene2d.Stage gui;
@@ -320,7 +321,7 @@ public final class Engine implements Screen
 		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
 		justRestarted = true;
 		focusObjs = new ArrayList<>();
-		viewport = new Dimension(800, 600);
+		viewport = new Dimension();
 		
 		if(replays == null)
 		{
@@ -391,10 +392,6 @@ public final class Engine implements Screen
 			Gdx.gl.glClearColor(0, 0, 0, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		}
-
-		camera.position.set(tx, ty, 0);
-		camera.zoom = zoom;
-		camera.rotate(angle);
 		
 		for(CameraEffect ce : stage.cameraEffects)
 		{
@@ -403,55 +400,28 @@ public final class Engine implements Screen
 			else
 				ce.update();
 		}
-		
+
+		camera.position.set(tx, ty, 0);
+		camera.zoom = zoom;
+		camera.rotate(angle);
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		
-		if(globalState == GameState.FINISH)
+		if(globalState == GameState.COMPLETED)
 		{
 			Utilities.fadeColor(currTint, wintTint, .005f);
 			batch.setColor(currTint);
 		}
 		
-		for(GameObject go : stage.stageObjects)
-		{
-			if (go.visible)
-			{
-				if(go.drawSpecialBehind)
-				{
-					go.drawSpecial(batch);
-					drawObject(go);
-				}
-				else
-				{
-					drawObject(go);
-					go.drawSpecial(batch);
-				}
-			}
-		}
+		renderEntities();
 		
-		clearTransformation();
+		camera.rotate(-angle);
+		hudCamera();
+		
 		renderStatusBar();
-
-		if(globalState == GameState.ENDED)
-		{
-			if(!replayHelp && !playReplay)
-				timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", viewport.width / 2 - 320, viewport.height / 2);
-			else
-				timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
-		}
-		else if(replayHelp)
-			timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
-		
-		if(showFps)
-		{
-			if(++fpsWriterCounter % 10 == 0)
-				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
-			
-			fpsFont.setColor(Color.WHITE);
-			fpsFont.draw(batch, fps + " fps", viewport.width - 60, 5);
-		}
+		renderHelpText();
+		renderFPS();
 			
 		batch.end();
 		
@@ -462,48 +432,37 @@ public final class Engine implements Screen
 		}
 	}
 	
-	public void update()
+	private void update()
 	{
+		updateClock();
+		stage.moveEnemies();
+		updateCamera();
+		stage.extra();
+		SoundBank.FRAME_COUNTER++;
+		
 		if(replayHelp && Gdx.input.isKeyPressed(Keys.B))
-		{
 			runExitEvent();
-			return;
-		}
-		
-		DELTA_VALUE = (int) (Gdx.graphics.getDeltaTime() * 1000f);
-		
-		if(globalState == GameState.ENDED)
+		else if(globalState == GameState.ENDED)
 		{
-			if(Gdx.input.isKeyPressed(Keys.R) && !playReplay)
+			if((Gdx.input.isKeyPressed(Keys.R) && !playReplay) || (checkpoint && playReplay))	//TODO: Bug fix
 			{
 				restart();
 				stage.build();
 			}
 			else if(Gdx.input.isKeyPressed(Keys.B))
-				runExitEvent();
-		}
-		else if(globalState == GameState.FINISH)
-			winAction();
-		
-		if(globalState == GameState.ONGOING)
-		{
-			if(!justRestarted)
-				elapsedTime += DELTA_VALUE;
-			else
-				justRestarted = false;
-		}
-		
-		stage.moveEnemies();
-		
-		updateCamera();
-		
-		stage.extra();
+			{
+				if(checkpoint && !playReplay)
+					saveReplay("Looser");
 
-		SoundBank.FRAME_COUNTER++;
+				runExitEvent();
+			}
+		}
+		else if(globalState == GameState.COMPLETED)
+			winAction();
 	}
 	
 	@Override
-	public void show()  
+	public void show()
 	{
 		timeFont = new BitmapFont(Gdx.files.internal("res/data/sansserif32.fnt"), true);
 		fpsFont  = new BitmapFont(Gdx.files.internal("res/data/cambria20.fnt"), true);
@@ -519,14 +478,15 @@ public final class Engine implements Screen
 		TinySound.init();
 		TinySound.setGlobalVolume(masterVolume);
 
+		GFX.checkpoint = new Image2D("res/data/checkpoint.png");
+		GFX.checkpointReach = TinySound.loadSound(new File("res/data/checkpoint.wav"));
+
+		setViewport(800, 600);
+		batch = new SpriteBatch();
+
 		stage.init();
 		stage.build();
 
-		batch = new SpriteBatch();
-		camera = new OrthographicCamera(viewport.width, viewport.height);
-		camera.setToOrtho(true,viewport.width, viewport.height);
-
-		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
 		ShaderProgram.pedantic = false;
 	}
 	
@@ -538,7 +498,7 @@ public final class Engine implements Screen
 		timeFont.dispose();
 		fpsFont.dispose();
 		errorIcon.dispose();
-		Stage.disposeBatch(LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE, MainCharacter.DEFAULT_HEALTH_IMAGE);
+		Stage.disposeBatch(LASER_BEAM, LASER_BEGIN, LASER_IMPACT, LASER_CHARGE, MainCharacter.DEFAULT_HEALTH_IMAGE, GFX.checkpoint, GFX.checkpointReach);
 		if(!playReplay)
 		{
 			skin.dispose();
@@ -546,6 +506,8 @@ public final class Engine implements Screen
 		}
 		instanceCreates = false;
 		MainCharacter.DEFAULT_HEALTH_IMAGE = null;
+		GFX.checkpoint = null;
+		GFX.checkpointReach = null;
 		Stage.STAGE = null;
 		stage = null;
 	}
@@ -571,12 +533,17 @@ public final class Engine implements Screen
 	 */
 	void setGlobalState(GameState globalState)
 	{
-		if(this.globalState != GameState.FINISH && this.globalState != GameState.ENDED)
+		if(this.globalState != GameState.COMPLETED && this.globalState != GameState.ENDED)
 		{
 			this.globalState = globalState;
 
 			if(this.globalState == GameState.ENDED)
-				saveReplay("Loser");
+			{
+				checkpoint = stage.isSafe();
+				
+				if(!checkpoint)
+					saveReplay("Loser");
+			}
 		}
 	}
 	
@@ -592,6 +559,9 @@ public final class Engine implements Screen
 		
 		camera = new OrthographicCamera(viewport.width, viewport.height);
 		camera.setToOrtho(true,viewport.width, viewport.height);
+		
+		hudCamera = new OrthographicCamera(viewport.width, viewport.height);
+		hudCamera.setToOrtho(true,viewport.width, viewport.height);
 		
 		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
 	}
@@ -646,26 +616,18 @@ public final class Engine implements Screen
 	}
 	
 	/**
-	 * Clears the transformation matrix.
+	 * Enables HUD camera.
 	 */
-	public void clearTransformation()
+	public void hudCamera()
 	{
-		camera.position.set(viewport.width / 2, viewport.height / 2, 0);
-		camera.zoom = 1;
-		camera.rotate(-angle);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+		batch.setProjectionMatrix(hudCamera.combined);
 	}
 	
 	/**
-	 * Restores the transformation matrix.
+	 * Restores the camera.
 	 */
-	public void restoreTransformation()
+	public void gameCamera()
 	{
-		camera.position.set(tx, ty, 0);
-		camera.zoom = zoom;
-		camera.rotate(angle);
-		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 	}
 	
@@ -697,13 +659,22 @@ public final class Engine implements Screen
 	{
 		return playReplay;
 	}
+	
+	public void flipWorldY()
+	{
+		camera.setToOrtho(flipY);
+		flipY = !flipY;
+		
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+	}
 
 	/**
 	 * Checks which button of the given controller are down.
 	 * @param con The controller.
 	 * @return The buttons being held down.
 	 */
-	public PressedButtons getPressedButtons(Controller con)
+	public static PressedButtons getPressedButtons(Controller con)
 	{
 		PressedButtons pb = new PressedButtons();
 		pb.down 	  = Gdx.input.isKeyPressed(con.down);
@@ -765,7 +736,7 @@ public final class Engine implements Screen
 			tx = Math.min(stage.size.width  - viewport.width,   Math.max(0, first.centerX() - viewport.width  / 2)) + viewport.width  / 2; 
 			ty = Math.min(stage.size.height - viewport.height,  Math.max(0, first.centerY() - viewport.height / 2)) + viewport.height / 2;
 		}
-		else if(size > 1)
+		else
 		{
 			final float marginX = viewport.width  / 2;
 			final float marginY = viewport.height / 2;
@@ -825,27 +796,59 @@ public final class Engine implements Screen
 	{
 		justRestarted = true;
 		showingDialog = false;
-		if(!playReplay)
-			replays.clear();
 		globalState = GameState.ONGOING;
 		DELTA_VALUE = 0;
 		batch.setColor(defaultTint);
 		currTint = new Color(defaultTint);
 		focusObjs.clear();
 		stage.cameraEffects.clear();
+
+		if(!playReplay && !checkpoint)
+			replays.clear();
+		
+		if(!checkpoint)
+			elapsedTime = 0;
+	}
+	
+	private void updateClock()
+	{
+		DELTA_VALUE = (int) (Gdx.graphics.getDeltaTime() * 1000f);
+		
+		if(globalState == GameState.ONGOING)
+		{
+			if(!justRestarted)
+				elapsedTime += DELTA_VALUE;
+			else
+				justRestarted = false;
+		}
+	}
+	
+	private void renderEntities()
+	{
+		for(GameObject go : stage.stageObjects)
+		{
+			if (go.visible)
+			{
+				if(go.drawSpecialBehind)
+				{
+					go.drawSpecial(batch);
+					drawObject(go);
+				}
+				else
+				{
+					drawObject(go);
+					go.drawSpecial(batch);
+				}
+			}
+		}
 	}
 	
 	private void renderStatusBar()
 	{
-		if(globalState == GameState.PAUSED)
-			timeFont.setColor(Color.WHITE);
-		else
-			timeFont.setColor(timeColor);
+		timeFont.setColor(globalState == GameState.PAUSED ? Color.WHITE : timeColor);
 		timeFont.draw(batch, OtherMath.round((double)elapsedTime/1000, 1) + "", 10, 10);
 
-		int y = 40;
-		
-		for(int index = 0; index < stage.mains.size(); index++)
+		for(int index = 0, y = 40; index < stage.mains.size(); index++)
 		{
 			MainCharacter main = stage.mains.get(index);
 			int hp = main.getHP();
@@ -868,21 +871,12 @@ public final class Engine implements Screen
 		if (img != null && go.alpha > 0.0f)
 		{
 			img.setFlip(go.flipX, !go.flipY);
-			
-//			batch.setColor(currTint.r, currTint.g, currTint.b, go.alpha);
-			
 			img.setPosition(go.currX + go.offsetX, go.currY + go.offsetY);
 			img.setRotation(go.rotation);
 			img.setAlpha(go.alpha);
 			img.setSize(go.width, go.height);
 			img.setScale(go.scale);
 			img.draw(batch);
-			
-//			batch.draw(img, go.currX + go.offsetX, go.currY + go.offsetY, img.getWidth() / 2,img.getHeight() / 2, go.width * go.scale, go.height * go.scale, 1, 1, go.rotation);
-			
-//			batch.setColor(currTint.r, currTint.g, currTint.b, currTint.a);
-			
-			img.setFlip(!go.flipX, go.flipY);
 		}
 	}
 	
@@ -948,7 +942,7 @@ public final class Engine implements Screen
 		}.show(gui);
 	}
 	
-	private void showCrashDialog(final Exception e)
+	private final void showCrashDialog(final Exception e)
 	{
 		Gdx.input.setInputProcessor(gui);
 		new Dialog("Fatal Error", skin)
@@ -978,7 +972,7 @@ public final class Engine implements Screen
 		}.show(gui);
 	}
 
-	private void renderPause()
+	private final void renderPause()
 	{
 		Gdx.gl.glClearColor(0, 0, 0, .4f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -986,6 +980,39 @@ public final class Engine implements Screen
 		timeFont.setColor(Color.WHITE);
 		timeFont.draw(batch, "Game is paused.", viewport.width / 2 - 120, viewport.height / 2);
 		renderStatusBar();
+	}
+	
+	private final void renderHelpText()
+	{
+		if(globalState == GameState.ENDED)
+		{
+			if(!replayHelp && !playReplay)
+			{
+				if(!checkpoint)
+					timeFont.draw(batch, "You are dead. Press 'R' to retry or 'B' to go back.", viewport.width / 2 - 320, viewport.height / 2);
+				else
+				{
+					timeFont.draw(batch, "Press 'R' to resume from your latest checkpoint", viewport.width / 2 - 320, viewport.height / 2);
+					timeFont.draw(batch, "or 'B' to go back.", viewport.width / 2 - 140, (viewport.height + 100) / 2);
+				}
+			}
+			else
+				timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
+		}
+		else if(replayHelp)
+			timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
+	}
+	
+	private final void renderFPS()
+	{
+		if(showFps)
+		{
+			if(++fpsWriterCounter % 10 == 0)
+				fps = (int)(1.0f/Gdx.graphics.getDeltaTime());
+			
+			fpsFont.setColor(Color.WHITE);
+			fpsFont.draw(batch, fps + " fps", viewport.width - 60, 5);
+		}
 	}
 	
 	private String cleanString(String source)

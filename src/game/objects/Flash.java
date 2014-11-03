@@ -64,9 +64,9 @@ public class Flash extends GameObject
 			newColor.a = (duration - framesAlive) * (1.0f / duration);
 			
 			batch.setColor(newColor);
-			eng.clearTransformation();
+			eng.hudCamera();
 			batch.draw(flashImage, 0, 0, eng.getScreenWidth(), eng.getScreenHeight());
-			eng.restoreTransformation();
+			eng.gameCamera();
 			batch.setColor(orgColor);
 		}
 		else

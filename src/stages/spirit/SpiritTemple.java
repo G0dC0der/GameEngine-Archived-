@@ -117,8 +117,8 @@ public class SpiritTemple extends Stage
 		game.deathTextColor = Color.WHITE;
 		game.timeColor = Color.WHITE;
 		
-		background(RenderOption.FULL, backgroundImg);
-		foreground(RenderOption.FULL, foregroundImg);
+		background(backgroundImg);
+		foreground(foregroundImg);
 		
 		basicInits();
 		game.zoom = 1;

@@ -16,7 +16,6 @@ import game.essentials.Factory;
 import game.essentials.Animation;
 import game.essentials.GFX;
 import game.essentials.Image2D;
-import game.essentials.Pair;
 import game.movable.Circle;
 import game.movable.PathDrone;
 import game.movable.PathDrone.PathData;
@@ -25,18 +24,15 @@ import game.movable.SimpleWeapon;
 import game.movable.SolidPlatform;
 import game.objects.OneWay;
 import game.objects.Particle;
-
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import ui.accessories.Playable;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -230,7 +226,7 @@ public class DiamondCave extends StageBuilder
 		proj.setImpact(explosion);
 		proj.setCloneEvent(cloned ->{
 			cloned.addEvent(()->{
-				cloned.rotation += 10;
+				cloned.rotation -= 10;
 			});
 		});
 		
@@ -401,8 +397,12 @@ public class DiamondCave extends StageBuilder
 	
 	PathDrone getBacteria(PathData... waypoints)
 	{
-		Pair<Integer, Integer> value = new Pair<>();
-		value.obj1 = 0;
+		class Int32
+		{
+			int i;
+		}
+		Int32 value = new Int32();
+		value.i = 0;
 		
 		PathDrone b = new PathDrone(waypoints[0].targetX, waypoints[0].targetY);
 		b.setImage(ThreadLocalRandom.current().nextInt(3,8), bacteria);
@@ -412,9 +412,9 @@ public class DiamondCave extends StageBuilder
 		b.appendPath(waypoints);
 		b.addEvent(()->
 		{
-			if(--value.obj1 < 0 && b.collidesWith(gm))
+			if(--value.i < 0 && b.collidesWith(gm))
 			{
-				value.obj1 = 60;
+				value.i = 60;
 				zapp.play();
 			}
 		});
