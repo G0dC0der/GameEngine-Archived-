@@ -24,8 +24,8 @@ public class HorizontalDrone extends Enemy
 	public HorizontalDrone (float x, float y, boolean startLeft)
 	{
 		super();
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		this.startLeft = moveLeft = startLeft;
 		sounds = new SoundBank(1);
 		sounds.setEmitter(this);

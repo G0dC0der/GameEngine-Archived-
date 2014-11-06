@@ -100,8 +100,8 @@ public class DontClubberMe extends Stage
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
 		game.addFocusObject(gm);
-		gm.currX = startX;
-		gm.currY = startY;
+		gm.loc.x = startX;
+		gm.loc.y = startY;
 		add(gm);
 		
 		Animation<Image2D> pressureV = new Animation<>(1, pressure1);
@@ -147,15 +147,15 @@ public class DontClubberMe extends Stage
 		p5.avoidOverlapping(p1,p2,p3,p4);
 		
 		final GameObject door = new GameObject();
-		door.currX = 882;
-		door.currY = 64;
+		door.loc.x = 882;
+		door.loc.y = 64;
 		door.setImage(doorimg);
 		gm.avoidOverlapping(door);
 
 		final GameObject key = new GameObject();
 		key.setImage(new Animation<>(1, keyimg));
-		key.currX = 1598;
-		key.currY = 150;
+		key.loc.x = 1598;
+		key.loc.y = 150;
 		key.addEvent(()->{
 			if(key.collidesWith(gm))
 			{
@@ -210,13 +210,13 @@ public class DontClubberMe extends Stage
 		weap.setFiringParticle(gunfire);
 		
 		final GameObject sign = Factory.textPrinter("Collect all the diamonds to finish the stage.", Color.WHITE, null, 200, -200, -50, gm);
-		sign.currX = 580;
-		sign.currY = 73;
+		sign.loc.x = 580;
+		sign.loc.y = 73;
 		add(sign);
 		
 		GameObject weakp = new GameObject();
-		weakp.currX = 300;
-		weakp.currY = 300;
+		weakp.loc.x = 300;
+		weakp.loc.y = 300;
 		weakp.setImage(owImage[0]);
 		weakp.addEvent(Factory.weakPlatform(weakp, new Animation<>(6, owImage), 20, null, gm));
 		
@@ -230,8 +230,8 @@ public class DontClubberMe extends Stage
 		weakp4.addEvent(Factory.weakPlatform(weakp4, new Animation<>(6, owImage), 20, null, gm));
 		
 		final GameObject dia1 = new GameObject();
-		dia1.currX = 303;
-		dia1.currY = 270;
+		dia1.loc.x = 303;
+		dia1.loc.y = 270;
 		dia1.setImage(new Animation<>(6, diamond));
 		dia1.addEvent(new Event() 
 		{

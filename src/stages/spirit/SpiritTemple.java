@@ -167,23 +167,23 @@ public class SpiritTemple extends Stage
 		spike1.addEvent(Factory.hitMain(spike1, gm, -1));
 		spike1.addEvent(Factory.soundFalloff(steel, spike1, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike2 = spike1.getClone(2142, spike1.currY + height);
+		HorizontalDrone spike2 = spike1.getClone(2142, spike1.loc.y + height);
 		spike2.addEvent(Factory.hitMain(spike2, gm, -1));
 		spike2.addEvent(Factory.soundFalloff(steel2, spike2, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike3 = spike2.getClone(2142, spike2.currY + height + 35);
+		HorizontalDrone spike3 = spike2.getClone(2142, spike2.loc.y + height + 35);
 		spike3.addEvent(Factory.hitMain(spike3, gm, -1));
 		spike3.addEvent(Factory.soundFalloff(steel3, spike3, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike4 = spike3.getClone(2142, spike3.currY + height);
+		HorizontalDrone spike4 = spike3.getClone(2142, spike3.loc.y + height);
 		spike4.addEvent(Factory.hitMain(spike4, gm, -1));
 		spike4.addEvent(Factory.soundFalloff(steel4, spike4, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike5 = spike4.getClone(2142, spike4.currY + height);
+		HorizontalDrone spike5 = spike4.getClone(2142, spike4.loc.y + height);
 		spike5.addEvent(Factory.hitMain(spike5, gm, -1));
 		spike5.addEvent(Factory.soundFalloff(steel5, spike5, gm, 700, 3, 10,1));
 
-		HorizontalDrone spike6 = spike5.getClone(2142, spike5.currY + height);
+		HorizontalDrone spike6 = spike5.getClone(2142, spike5.loc.y + height);
 		spike6.addEvent(Factory.hitMain(spike6, gm, -1));
 		spike6.addEvent(Factory.soundFalloff(steel6, spike6, gm, 700, 3, 10,1));
 		
@@ -191,15 +191,15 @@ public class SpiritTemple extends Stage
 		spike7.addEvent(Factory.hitMain(spike7, gm, -1));
 		spike7.addEvent(Factory.soundFalloff(steel7, spike7, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike8 = spike7.getClone(2374, spike7.currY + height + 193);
+		HorizontalDrone spike8 = spike7.getClone(2374, spike7.loc.y + height + 193);
 		spike8.addEvent(Factory.hitMain(spike8, gm, -1));
 		spike8.addEvent(Factory.soundFalloff(steel8, spike8, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike9 = spike8.getClone(2374, spike8.currY + height);
+		HorizontalDrone spike9 = spike8.getClone(2374, spike8.loc.y + height);
 		spike9.addEvent(Factory.hitMain(spike9, gm, -1));
 		spike9.addEvent(Factory.soundFalloff(steel9, spike9, gm, 700, 3, 10,1));
 		
-		HorizontalDrone spike10 = spike9.getClone(2374, spike9.currY + height);
+		HorizontalDrone spike10 = spike9.getClone(2374, spike9.loc.y + height);
 		spike10.addEvent(Factory.hitMain(spike10, gm, -1));
 		spike10.addEvent(Factory.soundFalloff(steel10, spike10, gm, 700, 3, 10,1));
 
@@ -248,8 +248,8 @@ public class SpiritTemple extends Stage
 		 *******************************************
 		 */
 		final MovableObject board = new MovableObject();
-		board.currX = 106;
-		board.currY = 853;
+		board.loc.x = 106;
+		board.loc.y = 853;
 		board.setImage(new Animation<>(1, boardImg));
 		gm.avoidOverlapping(board);
 		
@@ -305,8 +305,8 @@ public class SpiritTemple extends Stage
 		 *******************************************
 		 */
 		final MovableObject board2 = new MovableObject();
-		board2.currX = 236;
-		board2.currY = 1272;
+		board2.loc.x = 236;
+		board2.loc.y = 1272;
 		board2.setImage(new Animation<>(1, board2Img));
 		gm.avoidOverlapping(board2);
 		
@@ -324,8 +324,8 @@ public class SpiritTemple extends Stage
 		
 		final GameObject silverGlove = new GameObject();
 		silverGlove.setImage(new Animation<>(1, sgloveImg));
-		silverGlove.currX = 554;
-		silverGlove.currY = 122;
+		silverGlove.loc.x = 554;
+		silverGlove.loc.y = 122;
 		silverGlove.addEvent(new Event()
 		{	
 			@Override
@@ -345,8 +345,8 @@ public class SpiritTemple extends Stage
 		final Animation<Image2D> pb = new Animation<>(1, bspImage);
 		
 		final GameObject button = new GameObject();
-		button.currX = 1784;
-		button.currY = 956;
+		button.loc.x = 1784;
+		button.loc.y = 956;
 		button.setImage(nb);
 		button.addEvent(()->
 		{	
@@ -358,7 +358,7 @@ public class SpiritTemple extends Stage
 			if(button.collidesWith(silver1))
 			{
 				discard(button);
-				board2.currX = -100;
+				board2.loc.x = -100;
 			}
 		});
 		
@@ -379,8 +379,8 @@ public class SpiritTemple extends Stage
 		
 		final GameObject gglove = new GameObject();
 		gglove.setImage(new Animation<>(1, ggloveImg));
-		gglove.currX = 1706;
-		gglove.currY = 1342;
+		gglove.loc.x = 1706;
+		gglove.loc.y = 1342;
 		gglove.addEvent(()->
 		{	
 			if(gm.collidesWith(gglove))
@@ -466,22 +466,22 @@ public class SpiritTemple extends Stage
 		debris7.appendPath(1490, 1624,  0,  false, null);
 		
 		final GameObject quaker = new GameObject();
-		quaker.currX = 847;
-		quaker.currY = 1162;
+		quaker.loc.x = 847;
+		quaker.loc.y = 1162;
 		quaker.setImage(new Animation<>(1, quImg));
 		quaker.addEvent(new Event() 
 		{
 			@Override
 			public void eventHandling() 
 			{
-				if(!angry && Fundementals.checkLine(quaker.currX, quaker.currY, quaker.currX, 1640, gm))
+				if(!angry && Fundementals.checkLine(quaker.loc.x, quaker.loc.y, quaker.loc.x, 1640, gm))
 				{
 					quaker.setImage(new Animation<>(1, quaImg));
 					game.addFocusObject(quaker);
 					gm.freeze();
 					
-					add(Factory.printText("May you be crushed to death!", null, null, 200, new PathDrone(quaker.currX - 60, quaker.currY + 90),0,0, null));
-					add(Factory.printText("How dare you disrupt the peace?", null, null, 200, new PathDrone(quaker.currX - 60, quaker.currY + 60),0,0, new Event()
+					add(Factory.printText("May you be crushed to death!", null, null, 200, new PathDrone(quaker.loc.x - 60, quaker.loc.y + 90),0,0, null));
+					add(Factory.printText("How dare you disrupt the peace?", null, null, 200, new PathDrone(quaker.loc.x - 60, quaker.loc.y + 60),0,0, new Event()
 					{
 						@Override
 						public void eventHandling() 
@@ -511,8 +511,8 @@ public class SpiritTemple extends Stage
 		 */
 		GameObject coin = new GameObject();
 		coin.setImage(new Animation<>(7, coinImg));
-		coin.currX = 2993;
-		coin.currY = 1520;
+		coin.loc.x = 2993;
+		coin.loc.y = 1520;
 		add(coin);
 		
 		gm.addTileEvent(new TileEvent()
@@ -557,7 +557,7 @@ public class SpiritTemple extends Stage
 	@Override
 	public void extra() 
 	{
-		boolean close = Fundementals.distance(gm.currX, gm.currY, 2142, 1695) < 1550;
+		boolean close = Fundementals.distance(gm.loc.x, gm.loc.y, 2142, 1695) < 1550;
 		
 		if(muted && close)
 		{

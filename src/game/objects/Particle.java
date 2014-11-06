@@ -24,8 +24,8 @@ public class Particle extends GameObject implements Event
 	 */
 	public Particle(float x, float y, GameObject... victims)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		if(victims != null && victims.length > 0)
 			this.victims = victims;
 		sounds = new SoundBank(1);

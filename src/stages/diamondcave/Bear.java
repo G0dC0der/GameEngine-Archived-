@@ -20,7 +20,7 @@ class Bear extends Enemy
 		this.targets = targets;
 		
 		scanBox = new GameObject();
-		scanBox.moveTo(currX - 100, currY + 50);
+		scanBox.moveTo(loc.x - 100, loc.y + 50);
 		scanBox.width = 100;
 		scanBox.height = 20;
 	}
@@ -51,7 +51,7 @@ class Bear extends Enemy
 			{
 				attacking = true;
 				image = attackImage;
-				currX -= 15;
+				loc.x -= 15;
 				attack.play();
 //				rotation = -7.5f;
 			}
@@ -63,7 +63,7 @@ class Bear extends Enemy
 				attacking = false;
 				recovery = 120;
 				rotation = 0;
-				currX += 15;
+				loc.x += 15;
 			}
 		}
 		

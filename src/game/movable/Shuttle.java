@@ -73,7 +73,7 @@ public class Shuttle extends Enemy
 	 */
 	public void appendPath()
 	{
-		appendPath(currX,currY);
+		appendPath(loc.x,loc.y);
 	}
 	
 	/**
@@ -143,13 +143,13 @@ public class Shuttle extends Enemy
 		{
 			Waypoint wp = waypoints.get(counter);
 			
-			if(currX == wp.target.x && currY == wp.target.y)	//Make sure we don't get NaN when normalizing.
-				currX--;
+			if(loc.x == wp.target.x && loc.y == wp.target.y)	//Make sure we don't get NaN when normalizing.
+				loc.x--;
 			
 			if(waypointDirection == null)
-				waypointDirection = Fundementals.normalize(currX, currY, wp.target.x, wp.target.y);
+				waypointDirection = Fundementals.normalize(loc.x, loc.y, wp.target.x, wp.target.y);
 			
-			Vector2 currentDirection = Fundementals.normalize(currX, currY, wp.target.x, wp.target.y);
+			Vector2 currentDirection = Fundementals.normalize(loc.x, loc.y, wp.target.x, wp.target.y);
 			
 			if(waypointDirection.dot(currentDirection) < 0)
 			{
@@ -167,8 +167,8 @@ public class Shuttle extends Enemy
 				vx += delta * accelx;
 				vy += delta * accely;
 				
-				currX += delta * vx;
-				currY += delta * vy;
+				loc.x += delta * vx;
+				loc.y += delta * vy;
 				
 			}
 		}

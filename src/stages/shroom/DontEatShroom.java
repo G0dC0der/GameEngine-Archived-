@@ -174,8 +174,8 @@ public class DontEatShroom extends StageBuilder
 		 */
 		final GameObject bars = new GameObject();
 		bars.setImage(barsImg);
-		bars.currX = 819;
-		bars.currY = 1121;
+		bars.loc.x = 819;
+		bars.loc.y = 1121;
 		add(bars);
 		
 		/*
@@ -183,13 +183,13 @@ public class DontEatShroom extends StageBuilder
 		 */
 		final GameObject goal = new GameObject();
 		goal.setImage(goalImg);
-		goal.currX = 823;
-		goal.currY = 1128;
+		goal.loc.x = 823;
+		goal.loc.y = 1128;
 		goal.addEvent(()->{if(gm.collidesWith(goal)) gm.setState(CharacterState.FINISH);});
 		
 		final GameObject key = new GameObject();
-		key.currX = 1197;
-		key.currY = 2540;
+		key.loc.x = 1197;
+		key.loc.y = 2540;
 		key.setImage(keyImg);
 		key.addEvent(()->
 		{	
@@ -225,6 +225,8 @@ public class DontEatShroom extends StageBuilder
 		m.setTrailer(trailer);
 		m.setTrailerDelay(2);
 		m.setProperties(MissileProperties.FAST_VERY_FLOATY);
+		m.adjustTrailer(true);
+		m.setFaceTarget(false);
 		
 		Weapon weapon = new Weapon(1901, 750,1,1,100, gm);
 		weapon.setImage(cannonImg);
@@ -292,8 +294,8 @@ public class DontEatShroom extends StageBuilder
 		drug.zIndex(400);
 		
 		final GameObject m = new GameObject();
-		m.currX = 666;
-		m.currY = 2538;
+		m.loc.x = 666;
+		m.loc.y = 2538;
 		m.setImage(shroomImg);
 		m.addEvent(new Event()
 		{	

@@ -110,13 +110,13 @@ public class EvilDog extends Enemy
 			vx = vx + delta * accelx;
 			vy = vy + delta * accely;
 			
-			currX = currX + delta * vx;
-			currY = currY + delta * vy;
+			loc.x = loc.x + delta * vx;
+			loc.y = loc.y + delta * vy;
 			
 			if(collidesWith(closest))
 			{
 				if(impact != null)
-					Stage.getCurrentStage().add(impact.getClone(currX, currY));
+					Stage.getCurrentStage().add(impact.getClone(loc.x, loc.y));
 				
 				closest.runHitEvent(this);
 				sounds.trySound(0, true);

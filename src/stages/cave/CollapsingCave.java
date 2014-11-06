@@ -260,7 +260,7 @@ public class CollapsingCave extends Stage
 			@Override
 			public void drawSpecial(SpriteBatch batch)
 			{
-				ps.setPosition(drill.currX + drill.width / 2, drill.currY + 50);
+				ps.setPosition(drill.loc.x + drill.width / 2, drill.loc.y + 50);
 				ps.draw(batch, Gdx.graphics.getDeltaTime());
 			}
 		};
@@ -288,7 +288,7 @@ public class CollapsingCave extends Stage
 	{
 		if(drill.getMoveSpeed() == .1f && crusher.getMoveSpeed() == 0 && ++soundCounter % 15 == 0)
 		{
-			double distance = Fundementals.distance(gm.currX, gm.currY, drill.currX + drill.width / 2, drill.currY);
+			double distance = Fundementals.distance(gm.loc.x, gm.loc.y, drill.loc.x + drill.width / 2, drill.loc.y);
 			double candidate = 10 * Math.max((1 / Math.sqrt(distance)) - (1 / Math.sqrt(1200)), 0);
 			double volume = Math.min(candidate, 1);
 			
@@ -317,7 +317,7 @@ public class CollapsingCave extends Stage
 	
 		if(!done)
 		{
-			camera.moveToward(gm.currX, gm.currY, 7);
+			camera.moveToward(gm.loc.x, gm.loc.y, 7);
 			if(Fundementals.distance(camera, gm) < 200)
 			{
 				done = true;

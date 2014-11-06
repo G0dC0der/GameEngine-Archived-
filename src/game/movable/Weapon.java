@@ -98,9 +98,9 @@ public class Weapon extends PathDrone
 				}
 				else
 				{
-					projClone = proj.getClone(currX + firingOffsetX, currY + firingOffsetY);
+					projClone = proj.getClone(loc.x + firingOffsetX, loc.y + firingOffsetY);
 					if(firingParticle != null)
-						partClone = firingParticle.getClone(currX + firingOffsetX, currY + firingOffsetY);
+						partClone = firingParticle.getClone(loc.x + firingOffsetX, loc.y + firingOffsetY);
 				}
 				projClone.setTarget(targetX, targetY);
 				projClone.setDisposable(true);
@@ -221,10 +221,10 @@ public class Weapon extends PathDrone
 	{
 		if(rotationAllowed && rotationSpeed != 0.0f && haveTarget())
 		{
-			float x1 = currX + width / 2,
-				  y1 = currY + height / 2,
-				  x2 = currTarget.currX + currTarget.width / 2,
-				  y2 = currTarget.currY + currTarget.height / 2;
+			float x1 = loc.x + width / 2,
+				  y1 = loc.y + height / 2,
+				  x2 = currTarget.loc.x + currTarget.width / 2,
+				  y2 = currTarget.loc.y + currTarget.height / 2;
 			
 			if(alwaysRotate || currTarget.canSee(this, Accuracy.MID))
 				rotation = Fundementals.rotateTowardsPoint(x1,y1,x2,y2, rotation, rotationSpeed);
@@ -255,16 +255,16 @@ public class Weapon extends PathDrone
 			return canSee(currTarget, Accuracy.MID);
 		}
 		
-		float centerX = currX + width / 2;
-		float centerY = currY + height / 2;
+		float centerX = loc.x + width / 2;
+		float centerY = loc.y + height / 2;
 		
 		Vector2 front = getFrontPosition();
 		Vector2 edge = Fundementals.findEdgePoint(centerX, centerY, front.x, front.y);
 		Vector2 wall = Fundementals.findWallPoint(centerX, centerY, edge.x, edge.y);
 		
 		GameObject dummy = new GameObject();
-		dummy.currX = currTarget.currX + currTarget.width / 2;
-		dummy.currY = currTarget.currY + currTarget.height / 2;
+		dummy.loc.x = currTarget.loc.x + currTarget.width / 2;
+		dummy.loc.y = currTarget.loc.y + currTarget.height / 2;
 		boolean targeting = Fundementals.checkLine((int)centerX, (int)centerY, (int)wall.x, (int)wall.y, dummy);
 		if(targeting)
 		{

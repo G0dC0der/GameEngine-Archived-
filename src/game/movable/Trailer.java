@@ -52,7 +52,7 @@ public class Trailer extends PathDrone
 			if(++counter % freq == 0)
 			{
 				spitCounter++;
-				stage.add(trailers[counter2++].getClone(currX, currY));
+				stage.add(trailers[counter2++].getClone(loc.x, loc.y));
 			}
 		}
 		super.moveEnemy();

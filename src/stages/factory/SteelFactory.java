@@ -193,7 +193,7 @@ public class SteelFactory extends StageBuilder
 		ld.setImage(laserImage);
 		ld.setProjectile(magic);
 		ld.setRotationSpeed(0.08f);
-		ld.addEvent(()->ld.moveToward(gm.currX, gm.currY, .5f));
+		ld.addEvent(()->ld.moveToward(gm.loc.x, gm.loc.y, .5f));
 		ld.addEvent(()->{if(gm.getState() == CharacterState.DEAD)ld.halt(true);});
 		
 		/*
@@ -202,8 +202,8 @@ public class SteelFactory extends StageBuilder
 		for(int x = 55, y = 3900; x < size.width - 200 ; x += 282)
 		{
 			GameObject sawObj = new GameObject();
-			sawObj.currX = x;
-			sawObj.currY = y;
+			sawObj.loc.x = x;
+			sawObj.loc.y = y;
 			sawObj.setHitbox(Hitbox.CIRCLE);
 			sawObj.setImage(saw);
 			sawObj.addEvent(()->sawObj.rotation-=3);
@@ -212,9 +212,9 @@ public class SteelFactory extends StageBuilder
 		}
 		
 		final GameObject soundEmitter = new GameObject();
-		soundEmitter.currY = 3900;
+		soundEmitter.loc.y = 3900;
 		soundEmitter.setVisible(false);
-		soundEmitter.addEvent(()->soundEmitter.currX = gm.currX);
+		soundEmitter.addEvent(()->soundEmitter.loc.x = gm.loc.x);
 		add(soundEmitter);
 
 		/*
@@ -230,8 +230,8 @@ public class SteelFactory extends StageBuilder
 		
 		final GameObject co1 = new GameObject();
 		co1.setImage(collect);
-		co1.currX = 4568;
-		co1.currY = 1597;
+		co1.loc.x = 4568;
+		co1.loc.y = 1597;
 		co1.addEvent(getCollectEvent(co1, 1));
 		
 		GameObject co2 = co1.getClone(4423, 1717);
@@ -250,8 +250,8 @@ public class SteelFactory extends StageBuilder
 		
 		final GameObject lasersound = new GameObject();
 		final GameObject laserbeam = new GameObject();
-		laserbeam.currX = 4165;
-		laserbeam.currY = 2325;
+		laserbeam.loc.x = 4165;
+		laserbeam.loc.y = 2325;
 		laserbeam.setImage(4, beam);
 		laserbeam.setHitbox(Hitbox.EXACT);
 		laserbeam.addEvent(()->
@@ -265,7 +265,7 @@ public class SteelFactory extends StageBuilder
 				add(Factory.soundFalloff(sawssound, gm, soundEmitter, 600, 3, 80,1));
 				sawssound.play(true,0);
 				
-				Particle exp = new Particle(ld.currX,ld.currY);
+				Particle exp = new Particle(ld.loc.x,ld.loc.y);
 				exp.setImage(3, metExplode);
 				add(exp);
 			}
@@ -274,11 +274,11 @@ public class SteelFactory extends StageBuilder
 		});
 		add(laserbeam);
 		
-		lasersound.currY = laserbeam.currY;
+		lasersound.loc.y = laserbeam.loc.y;
 		lasersound.addEvent(()->
 		{	
-			if(laserbeam.currX - 30 < gm.currX && laserbeam.currX + laserbeam.width + 30 > gm.currX)
-				lasersound.currX = gm.currX;
+			if(laserbeam.loc.x - 30 < gm.loc.x && laserbeam.loc.x + laserbeam.width + 30 > gm.loc.x)
+				lasersound.loc.x = gm.loc.x;
 		});
 		
 		add(lasersound, Factory.soundFalloff(laserloop, gm, lasersound, 400, 3, 70,1));
@@ -288,14 +288,14 @@ public class SteelFactory extends StageBuilder
 		 */
 		
 		final GameObject elRU = new GameObject();
-		elRU.currX = 4805;
-		elRU.currY = 2421;
+		elRU.loc.x = 4805;
+		elRU.loc.y = 2421;
 		elRU.setHitbox(Hitbox.EXACT);
 		Animation<Image2D> elRUImg = new Animation<>(2, electric);
 		elRUImg.addEvent(()->buzz1.play(), 28);
 		elRU.setImage(elRUImg);
 		elRU.addEvent(Factory.hitMain(elRU, gm, -1));
-		elRU.addEvent(Factory.soundFalloff(buzz1, gm, elRU.currX, elRU.currY + elRU.height / 2, 300, 3, 25,1));
+		elRU.addEvent(Factory.soundFalloff(buzz1, gm, elRU.loc.x, elRU.loc.y + elRU.height / 2, 300, 3, 25,1));
 		
 		GameObject elRD = elRU.getClone(4805, 2761);
 		elRD.addEvent(Factory.hitMain(elRD, gm, -1));
@@ -303,28 +303,28 @@ public class SteelFactory extends StageBuilder
 		elRDImg.setIndex(15);
 		elRDImg.addEvent(()->buzz2.play(), 28);
 		elRD.setImage(elRDImg);
-		elRD.addEvent(Factory.soundFalloff(buzz2, gm, elRD.currX, elRD.currY + elRD.height / 2, 300, 3, 25,1));
+		elRD.addEvent(Factory.soundFalloff(buzz2, gm, elRD.loc.x, elRD.loc.y + elRD.height / 2, 300, 3, 25,1));
 		
 		final GameObject elLU = new GameObject();
-		elLU.currX = 4134;
-		elLU.currY = 2421;
+		elLU.loc.x = 4134;
+		elLU.loc.y = 2421;
 		elLU.setHitbox(Hitbox.EXACT);
 		Animation<Image2D> elLUImg = new Animation<>(2, electric2);
 		elLUImg.setIndex(14);
 		elLUImg.addEvent(()->buzz3.play(), 28);
 		elLU.setImage(elLUImg);
 		elLU.addEvent(Factory.hitMain(elLU, gm, -1));
-		elLU.addEvent(Factory.soundFalloff(buzz3, gm, elLU.currX, elLU.currY + elLU.height / 2, 300, 3, 25,1));
+		elLU.addEvent(Factory.soundFalloff(buzz3, gm, elLU.loc.x, elLU.loc.y + elLU.height / 2, 300, 3, 25,1));
 		
 		GameObject elLD = new GameObject();
-		elLD.currX = 4134;
-		elLD.currY = 2761;
+		elLD.loc.x = 4134;
+		elLD.loc.y = 2761;
 		elLD.setHitbox(Hitbox.EXACT);
 		Animation<Image2D> elLDImg = new Animation<>(2, electric2);
 		elLDImg.addEvent(()->buzz4.play(),28);
 		elLD.setImage(elLDImg);
 		elLD.addEvent(Factory.hitMain(elLD, gm, -1));
-		elLD.addEvent(Factory.soundFalloff(buzz4, gm, elLD.currX, elLD.currY + elLD.height / 2, 300, 3, 25,1));
+		elLD.addEvent(Factory.soundFalloff(buzz4, gm, elLD.loc.x, elLD.loc.y + elLD.height / 2, 300, 3, 25,1));
 		
 		add(elRU,elRD,elLU,elLD);
 		
@@ -332,8 +332,8 @@ public class SteelFactory extends StageBuilder
 		 * Three energy pieces for the movable platform
 		 */
 		GameObject en1 = new GameObject();
-		en1.currX = 4136;
-		en1.currY = 2782;
+		en1.loc.x = 4136;
+		en1.loc.y = 2782;
 		en1.setImage(3, energy);
 		en1.addEvent(getEnergyEvent(en1, 1));
 		
@@ -361,7 +361,7 @@ public class SteelFactory extends StageBuilder
 				shut.play();
 				collapsing.stop();
 				
-				if(gm.currX > theShutter.currY + theShutter.height)
+				if(gm.loc.x > theShutter.loc.y + theShutter.height)
 				{
 					discard(elRU);
 					discard(elLU);
@@ -431,7 +431,7 @@ public class SteelFactory extends StageBuilder
 		theWind.setImage(3, wind);
 		theWind.setHitbox(Hitbox.EXACT);
 		theWind.addEvent(Factory.follow(theEngine, theWind, theEngine.width - 45, 10));
-		theWind.addEvent(()-> {if(gm.collidesWith(theWind)) gm.currX += 1;});
+		theWind.addEvent(()-> {if(gm.collidesWith(theWind)) gm.loc.x += 1;});
 		
 		final Dummy thePropeller = new Dummy(0,0);
 		thePropeller.setImage(2, propeller);
@@ -471,14 +471,14 @@ public class SteelFactory extends StageBuilder
 		 * Top-Middle side saws
 		 */
 		GameObject leftSaws = new GameObject();
-		leftSaws.currX = 196;
-		leftSaws.currY = 2481;
+		leftSaws.loc.x = 196;
+		leftSaws.loc.y = 2481;
 		leftSaws.setImage(4, swleft);
 		leftSaws.addEvent(Factory.hitMain(leftSaws, gm, -1));
 		
 		GameObject rightSaws = new GameObject();
-		rightSaws.currX = 615;
-		rightSaws.currY = 2481;
+		rightSaws.loc.x = 615;
+		rightSaws.loc.y = 2481;
 		rightSaws.setImage(4, swright);
 		rightSaws.addEvent(Factory.hitMain(rightSaws, gm, -1));
 		
@@ -491,8 +491,8 @@ public class SteelFactory extends StageBuilder
 		thing1.setImage(3, thing);
 		thing1.setHitbox(Hitbox.EXACT);
 		thing1.addEvent(Factory.hitMain(thing1, gm, -1));
-		thing1.currX = 236;
-		thing1.currY = 2956;
+		thing1.loc.x = 236;
+		thing1.loc.y = 2956;
 		
 		float distance = 20;
 		
@@ -612,10 +612,10 @@ public class SteelFactory extends StageBuilder
 		turret.addEvent(()->{if(gm.getState() == CharacterState.DEAD)turret.halt(true);});
 		turret.addEvent(()->
 		{	
-			float value = (turret.currX - gm.currX > 0) ? 2 : -2;			
+			float value = (turret.loc.x - gm.loc.x > 0) ? 2 : -2;			
 			
-			if(turret.canGoTo(turret.currX + value, 1865))
-				turret.moveToward(gm.currX, 1865, 1.5f);
+			if(turret.canGoTo(turret.loc.x + value, 1865))
+				turret.moveToward(gm.loc.x, 1865, 1.5f);
 		});
 		
 		/*
@@ -670,8 +670,8 @@ public class SteelFactory extends StageBuilder
 		 */
 		GameObject goalDoor = new GameObject();
 		goalDoor.setImage(goal);
-		goalDoor.currX = 784;
-		goalDoor.currY = 517;
+		goalDoor.loc.x = 784;
+		goalDoor.loc.y = 517;
 		add(goalDoor);
 		
 		/*
@@ -693,8 +693,8 @@ public class SteelFactory extends StageBuilder
 		if(deathCounter >= 7)
 		{
 			final GameObject lob = new GameObject();
-			lob.currX = 4398;
-			lob.currY = 361;
+			lob.loc.x = 4398;
+			lob.loc.y = 361;
 			lob.setImage(lobot);
 			lob.addEvent(()->
 			{
@@ -707,11 +707,11 @@ public class SteelFactory extends StageBuilder
 					gm.vy = 0;
 					add(Factory.printText("This stage is so hard!\nHere, have an extra heart :)", Color.WHITE, null, 200, lob, -40, -40, ()->gm.unfreeze()));
 
-					PathDrone heart3 = new PathDrone(lob.currX + lob.width / 2 - 10, lob.currY + lob.height / 2 - 30);
+					PathDrone heart3 = new PathDrone(lob.loc.x + lob.width / 2 - 10, lob.loc.y + lob.height / 2 - 30);
 					heart3.setImage(5, extraHp);
 					heart3.addEvent(getHeartEvent(heart3));
 					heart3.setMoveSpeed(.5f);
-					heart3.appendPath(heart3.currX, heart3.currY - 40);
+					heart3.appendPath(heart3.loc.x, heart3.loc.y - 40);
 					
 					add(heart3);
 				}
@@ -800,7 +800,7 @@ public class SteelFactory extends StageBuilder
 								
 							}
 							else
-								solp.appendPath(solp.currX - 400, size.height - solp.height);
+								solp.appendPath(solp.loc.x - 400, size.height - solp.height);
 						}
 						break;
 					case Engine.AREA_TRIGGER_4:
@@ -897,7 +897,7 @@ public class SteelFactory extends StageBuilder
 						crusherDown.appendPath(4120, size.height - 176, 0, false, ()->
 						{
 							magnetfinish.play();
-							magnetDown.currX += 0.01f;
+							magnetDown.loc.x += 0.01f;
 							Factory.tileDeformer(magnetDown, Engine.SOLID, false).eventHandling();
 							crusherDown.clearData();
 						});
@@ -908,7 +908,7 @@ public class SteelFactory extends StageBuilder
 						crusherLeft.appendPath(3700, 3369, 0, false, ()->
 						{	
 							magnetfinish.play();
-							magnetLeft.currX += 0.01f;
+							magnetLeft.loc.x += 0.01f;
 							Factory.tileDeformer(magnetLeft, Engine.SOLID, false).eventHandling();
 							crusherLeft.clearData();
 						});
@@ -919,7 +919,7 @@ public class SteelFactory extends StageBuilder
 						crusherUp.appendPath(3037, 3056,0,false,()->
 						{
 							magnetfinish.play();
-							magnetUp.currX += 0.01f;
+							magnetUp.loc.x += 0.01f;
 							Factory.tileDeformer(magnetUp, Engine.SOLID, false).eventHandling();
 							crusherUp.clearData();
 						});
@@ -934,7 +934,7 @@ public class SteelFactory extends StageBuilder
 						{
 							magnetfinish.play();
 							crusherUp.moveTo(2054, 3611);
-							magnetUp.currX += 0.01f;
+							magnetUp.loc.x += 0.01f;
 							moveMU.eventHandling();
 							Factory.tileDeformer(magnetUp, Engine.SOLID, false).eventHandling();
 							crusherUp.clearData();
@@ -946,7 +946,7 @@ public class SteelFactory extends StageBuilder
 						{	
 							magnetfinish.play();
 							crusherLeft.moveTo(2038, 3377);
-							magnetLeft.currX += 0.01f;
+							magnetLeft.loc.x += 0.01f;
 							moveML.eventHandling();
 							Factory.tileDeformer(magnetLeft, Engine.SOLID, false).eventHandling();
 							crusherLeft.clearData();
@@ -958,7 +958,7 @@ public class SteelFactory extends StageBuilder
 						{	
 							magnetfinish.play();
 							crusherDown.moveTo(2054, 3377);
-							magnetDown.currX += 0.01f;
+							magnetDown.loc.x += 0.01f;
 							moveMD.eventHandling();
 							Factory.tileDeformer(magnetDown, Engine.SOLID, false).eventHandling();
 							crusherDown.clearData();
@@ -1041,7 +1041,7 @@ public class SteelFactory extends StageBuilder
 	@Override
 	public void extra()
 	{
-		if(gm.currY + gm.height >= 3900)
+		if(gm.loc.y + gm.height >= 3900)
 			for(GameObject go : saws)
 				if(go.collidesWith(gm))
 					gm.hit(-99);

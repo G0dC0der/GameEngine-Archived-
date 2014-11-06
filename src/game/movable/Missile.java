@@ -4,8 +4,6 @@ import game.core.Fundementals;
 import game.core.GameObject;
 import game.essentials.Image2D;
 import game.objects.Particle;
-
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -35,7 +33,7 @@ public class Missile extends Projectile
 	public float thrust, drag, delta;
 	private float vx, vy;
 	private int trailerDelay, delayCounter, reloadCounter;
-	private boolean faceTarget, pointAtDirection;
+	private boolean faceTarget, adjustTrailer;
 	private Particle trailer;
 	GameObject currTarget;
 	
@@ -76,6 +74,7 @@ public class Missile extends Projectile
 		dest.trailerDelay = trailerDelay;
 		dest.trailer = trailer;
 		dest.currTarget = currTarget;
+		dest.adjustTrailer = adjustTrailer;
 	}
 	
 	@Override
@@ -91,8 +90,8 @@ public class Missile extends Projectile
 			GameObject go = findTarget();
 			if(go != null)
 			{
-				targetX = go.currX + go.width  / 2;
-				targetY = go.currY + go.height / 2;
+				targetX = go.loc.x + go.width  / 2;
+				targetY = go.loc.y + go.height / 2;
 				currTarget = go;
 			}
 		}
@@ -100,12 +99,12 @@ public class Missile extends Projectile
 		{
 			if(currTarget != null)
 			{
-				targetX = currTarget.currX + currTarget.width  / 2;
-				targetY = currTarget.currY + currTarget.height / 2;
+				targetX = currTarget.loc.x + currTarget.width  / 2;
+				targetY = currTarget.loc.y + currTarget.height / 2;
 			}
 			
-			float dx = targetX - currX;
-			float dy = targetY - currY;
+			float dx = targetX - loc.x;
+			float dy = targetY - loc.y;
 			double length = Math.sqrt( dx*dx + dy*dy );
 			dx /= length;
 			dy /= length;
@@ -116,13 +115,29 @@ public class Missile extends Projectile
 			vx = vx + delta * accelx;
 			vy = vy + delta * accely;
 			
-			currX = currX + delta * vx;
-			currY = currY + delta * vy;
+			loc.x = loc.x + delta * vx;
+			loc.y = loc.y + delta * vy;
 			
 			visible = true;
 			sounds.trySound(0, false);
 			
 			checkCollisions();
+		}
+		
+		if(faceTarget)
+			rotation = (float) Fundementals.getAngle(centerX(), centerY(), targetX, targetY);
+		else
+			rotation = (float) Math.toDegrees(Math.atan2(vy, vx));
+		
+		if(visible && haveTarget() && trailer != null && ++delayCounter % trailerDelay == 0)
+		{
+			if(adjustTrailer)
+			{
+				Vector2 rare = getRarePosition();
+				stage.add(trailer.getClone(rare.x - trailer.halfWidth(), rare.y - trailer.halfHeight()));
+			}
+			else
+				stage.add(trailer.getClone(loc.x, loc.y));
 		}
 	}
 	
@@ -172,12 +187,12 @@ public class Missile extends Projectile
 	}
 	
 	/**
-	 * Whether or not this missile should rotate towards its direction.
-	 * @param pointAtDirection True to rottate towards its current direction.
+	 * Whether or not the trailer should be adjusted so its always behind the missile.
+	 * @param adjustTrailer True to adjust the trailer so its always behind the missile no matter what the rotation is?
 	 */
-	public void pointAtDirection(boolean pointAtDirection)
+	public void adjustTrailer(boolean adjustTrailer)
 	{
-		this.pointAtDirection = pointAtDirection;
+		this.adjustTrailer = adjustTrailer;
 	}
 	
 	/**
@@ -205,29 +220,6 @@ public class Missile extends Projectile
 			return null;
 		else
 			return image.getObject();
-	}
-		
-	@Override
-	public void drawSpecial(SpriteBatch g)
-	{
-		float centerX = currX + width / 2;
-		float centerY = currY + height / 2;
-		
-			if(faceTarget)
-				rotation = (float) Fundementals.getAngle(centerX, centerY, targetX, targetY);
-			else if (pointAtDirection)
-				rotation = (float) Math.toDegrees(Math.atan2(vy, vx));
-		
-		if(visible && haveTarget() && trailer != null && ++delayCounter % trailerDelay == 0)
-		{
-			if(pointAtDirection)
-			{
-				Vector2 loc = getRarePosition();
-				stage.add(trailer.getClone(loc.x - trailer.width / 2, loc.y - trailer.height / 2));
-			}
-			else
-				stage.add(trailer.getClone(centerX - trailer.width / 2, centerY - trailer.height / 2));
-		}
 	}
 	
 	@Override

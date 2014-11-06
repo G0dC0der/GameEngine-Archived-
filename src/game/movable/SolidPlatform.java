@@ -92,8 +92,8 @@ public class SolidPlatform extends PathDrone
 			super.moveEnemy();
 		else
 		{
-			currX = target.currX + targetOffsetX;
-			currY = target.currY + targetOffsetY;
+			loc.x = target.loc.x + targetOffsetX;
+			loc.y = target.loc.y + targetOffsetY;
 		}
 		
 		if(collapsing && counter++ > destroyFrames)
@@ -256,8 +256,8 @@ public class SolidPlatform extends PathDrone
 		for(int x = 1; x < width - 2; x++)
 			for(int y = 1; y < height - 2; y++)
 			{
-				int posX = (int) (x + currX);
-				int posY = (int) (y + currY);
+				int posX = (int) (x + loc.x);
+				int posY = (int) (y + loc.y);
 				
 				d[posY][posX] = transformTo; 
 			}
@@ -268,12 +268,12 @@ public class SolidPlatform extends PathDrone
 	 */
 	protected boolean collides(MovableObject mo)
 	{
-		boolean bool = strict && (collidingWhen(this, currX, currY - 1, mo)             || collidingWhen(mo, mo.currX, mo.currY + moveSpeed + 2, this) ||
-				   				  collidingWhen(this, currX - moveSpeed - 4, currY, mo) || collidingWhen(this, currX + moveSpeed + 4, currY, mo));
+		boolean bool = strict && (collidingWhen(this, loc.x, loc.y - 1, mo)             || collidingWhen(mo, mo.loc.x, mo.loc.y + moveSpeed + 2, this) ||
+				   				  collidingWhen(this, loc.x - moveSpeed - 4, loc.y, mo) || collidingWhen(this, loc.x + moveSpeed + 4, loc.y, mo));
 		
 		if(!bool)
-			bool = !strict && (collidingWhen(this, currX, currY - 1, mo) || collidingWhen(this, currX - 1, currY, mo) || 
-					           collidingWhen(this, currX + 1, currY, mo));
+			bool = !strict && (collidingWhen(this, loc.x, loc.y - 1, mo) || collidingWhen(this, loc.x - 1, loc.y, mo) || 
+					           collidingWhen(this, loc.x + 1, loc.y, mo));
 		
 		return bool;
 	}
@@ -283,15 +283,15 @@ public class SolidPlatform extends PathDrone
 	 */
 	protected static boolean collidingWhen(GameObject go1, float go1X, float go1Y, GameObject go2)
 	{
-		float x = go1.currX;
-		float y = go1.currY;
-		go1.currX = go1X;
-		go1.currY = go1Y;
+		float x = go1.loc.x;
+		float y = go1.loc.y;
+		go1.loc.x = go1X;
+		go1.loc.y = go1Y;
 		
 		boolean colliding = go1.collidesWith(go2);
 		
-		go1.currX = x;
-		go1.currY = y;
+		go1.loc.x = x;
+		go1.loc.y = y;
 		
 		return colliding;
 	}

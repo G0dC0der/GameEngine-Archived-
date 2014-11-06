@@ -98,8 +98,8 @@ public class GreenHill extends Stage
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(1);
 		gm.setJumpingSound(jump);
-		gm.currX = startX;
-		gm.currY = startY;
+		gm.loc.x = startX;
+		gm.loc.y = startY;
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		gm.deathImg = new Particle();
 		gm.deathImg.setImage(4, deathImg);
@@ -230,7 +230,7 @@ public class GreenHill extends Stage
 					{
 						ringCounter++;
 						discard(go);
-						add(collect.getClone(go.currX, go.currY));
+						add(collect.getClone(go.loc.x, go.loc.y));
 						collectRing.play();
 					}
 				}
@@ -247,9 +247,9 @@ public class GreenHill extends Stage
 		{
 			super(initialX, initialY, targets);
 			this.parent = parent;
-			this.initialX = parent.currX;
-			this.initialY = parent.currY;
-			this.targetX = parent.currX;
+			this.initialX = parent.loc.x;
+			this.initialY = parent.loc.y;
+			this.targetX = parent.loc.x;
 			this.targetY = Stage.getCurrentStage().size.height;
 			this.targets = targets;
 		}

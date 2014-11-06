@@ -106,28 +106,28 @@ public class RotatingCannon extends PathDrone
 				{
 					Vector2 spawn;
 
-					spawn = Fundementals.getRotatedPoint(currX + width, centerY(), centerX(), centerY(), 45);
+					spawn = Fundementals.getRotatedPoint(loc.x + width, centerY(), centerX(), centerY(), 45);
 					Projectile proj1 = proj.getClone(spawn.x - proj.halfWidth(), spawn.y - proj.halfHeight());
 					proj1.setTarget(getTarget(Direction.SE));
 					proj1.rotation = 45;
 					if(firingAnim != null)
 						stage.add(firingAnim.getClone(spawn.x - firingAnim.halfWidth(), spawn.y - firingAnim.halfHeight()));
 					
-					spawn = Fundementals.getRotatedPoint(currX + width, centerY(), centerX(), centerY(), 135);
+					spawn = Fundementals.getRotatedPoint(loc.x + width, centerY(), centerX(), centerY(), 135);
 					Projectile proj2 = proj.getClone(spawn.x - proj.halfWidth(), spawn.y - proj.halfHeight());
 					proj2.setTarget(getTarget(Direction.SW));
 					proj2.rotation = 135;
 					if(firingAnim != null)
 						stage.add(firingAnim.getClone(spawn.x - firingAnim.halfWidth(), spawn.y - firingAnim.halfHeight()));
 					
-					spawn = Fundementals.getRotatedPoint(currX + width, centerY(), centerX(), centerY(), 225);
+					spawn = Fundementals.getRotatedPoint(loc.x + width, centerY(), centerX(), centerY(), 225);
 					Projectile proj3 = proj.getClone(spawn.x - proj.halfWidth(), spawn.y - proj.halfHeight());
 					proj3.setTarget(getTarget(Direction.NW));
 					proj3.rotation = 225;
 					if(firingAnim != null)
 						stage.add(firingAnim.getClone(spawn.x - firingAnim.halfWidth(), spawn.y - firingAnim.halfHeight()));
 
-					spawn = Fundementals.getRotatedPoint(currX + width, centerY(), centerX(), centerY(), 315);
+					spawn = Fundementals.getRotatedPoint(loc.x + width, centerY(), centerX(), centerY(), 315);
 					Projectile proj4 = proj.getClone(spawn.x - proj.halfWidth(), spawn.y - proj.halfHeight());
 					proj4.setTarget(getTarget(Direction.NE));
 					proj4.rotation = 315;
@@ -139,37 +139,37 @@ public class RotatingCannon extends PathDrone
 
 				if(!diaognalFire || fireAll)
 				{
-					Projectile proj1 = proj.getClone(centerX() - (proj.width() / 2), currY - (proj.height() / 2));
+					Projectile proj1 = proj.getClone(centerX() - (proj.width() / 2), loc.y - (proj.height() / 2));
 					targetX = centerX() - (proj.width() / 2);
 					targetY = 0;
 					proj1.setTarget(targetX, targetY);
 					proj1.rotation = 270;
 					if(firingAnim != null)
-						stage.add(firingAnim.getClone(centerX() - firingAnim.width() / 2, currY - firingAnim.height() / 2));
+						stage.add(firingAnim.getClone(centerX() - firingAnim.width() / 2, loc.y - firingAnim.height() / 2));
 					
-					Projectile proj2 = proj.getClone(currX + width() - (proj.width() / 2), centerY() - (proj.height() / 2));
+					Projectile proj2 = proj.getClone(loc.x + width() - (proj.width() / 2), centerY() - (proj.height() / 2));
 					targetX = stage.size.width;
 					targetY = centerY() - (proj.height() / 2);
 					proj2.setTarget(targetX, targetY);
 					proj2.rotation = 0;
 					if(firingAnim != null)
-						stage.add(firingAnim.getClone(currX + width() - (firingAnim.width() / 2), centerY() - firingAnim.height() / 2));
+						stage.add(firingAnim.getClone(loc.x + width() - (firingAnim.width() / 2), centerY() - firingAnim.height() / 2));
 					
-					Projectile proj3 = proj.getClone(centerX() - (proj.width() / 2), currY + height() - (proj.height() / 2));
+					Projectile proj3 = proj.getClone(centerX() - (proj.width() / 2), loc.y + height() - (proj.height() / 2));
 					targetX = centerX() - (proj.width() / 2);
 					targetY = stage.size.height;
 					proj3.setTarget(targetX, targetY);
 					proj3.rotation = 90;
 					if(firingAnim != null)
-						stage.add(firingAnim.getClone(centerX() - firingAnim.width() / 2, currY + height() - firingAnim.height() / 2));
+						stage.add(firingAnim.getClone(centerX() - firingAnim.width() / 2, loc.y + height() - firingAnim.height() / 2));
 					
-					Projectile proj4 = proj.getClone(currX - (proj.width() / 2), centerY() - (proj.height() / 2));
+					Projectile proj4 = proj.getClone(loc.x - (proj.width() / 2), centerY() - (proj.height() / 2));
 					targetX = 0;
 					targetY = centerY() - (proj.height() / 2);
 					proj4.setTarget(targetX, targetY);
 					proj4.rotation = 180;
 					if(firingAnim != null)
-						stage.add(firingAnim.getClone(currX - (firingAnim.width() / 2), centerY() - firingAnim.height() / 2));
+						stage.add(firingAnim.getClone(loc.x - (firingAnim.width() / 2), centerY() - firingAnim.height() / 2));
 					
 					stage.add(proj1, proj2, proj3, proj4);
 				}
@@ -204,8 +204,8 @@ public class RotatingCannon extends PathDrone
 	
 	private Vector2 getTarget(Direction dir)
 	{
-		float middleX = currX + width  / 2;
-		float middleY = currY + height / 2;
+		float middleX = loc.x + width  / 2;
+		float middleY = loc.y + height / 2;
 		float x,y;
 		
 		switch (dir)

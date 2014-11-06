@@ -60,7 +60,7 @@ public class Goomba extends PathDrone
 				{
 					Stage.getCurrentStage().discard(this);
 					if(deathImg != null)
-						Stage.getCurrentStage().add(deathImg.getClone(currX, currX));
+						Stage.getCurrentStage().add(deathImg.getClone(loc.x, loc.x));
 					
 					sounds.stop(0);
 					sounds.playSound(1);		

@@ -117,8 +117,8 @@ public class TraningStage1 extends AbstractTraningStage
 	{
 		crystals++;
 		final GameObject crystal = new GameObject();
-		crystal.currX = x;
-		crystal.currY = y;
+		crystal.loc.x = x;
+		crystal.loc.y = y;
 		crystal.setImage(5,crystalImg);
 		crystal.addEvent(()->{
 			if(crystal.collidesWith(gm))

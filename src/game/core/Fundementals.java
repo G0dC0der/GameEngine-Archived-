@@ -6,10 +6,9 @@ import game.essentials.Image2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 /**
  * This class holds a number of static methods for essential calculations such as collision detection etc.
@@ -26,10 +25,10 @@ public class Fundementals
 	 */
 	public static final boolean rectangleVsRecganle(GameObject rec1, GameObject rec2)
 	{
-		if ((rec1.currY + rec1.height() < rec2.currY) ||
-	        (rec1.currY > rec2.currY + rec2.height()) ||
-	        (rec1.currX + rec1.width() < rec2.currX)  ||
-	        (rec1.currX > rec2.currX + rec2.width()))
+		if ((rec1.loc.y + rec1.height() < rec2.loc.y) ||
+	        (rec1.loc.y > rec2.loc.y + rec2.height()) ||
+	        (rec1.loc.x + rec1.width() < rec2.loc.x)  ||
+	        (rec1.loc.x > rec2.loc.x + rec2.width()))
 	        return false;
 		
 		return true;
@@ -60,12 +59,12 @@ public class Fundementals
 	public static boolean rotatedRectanglesCollision(GameObject rec1, GameObject rec2)
 	{
 		RotRect rr1 = new RotRect();
-		rr1.C = new Vector2(rec1.currX + (rec1.width * rec1.scale) / 2, rec1.currY + (rec1.height * rec1.scale) / 2);
+		rr1.C = new Vector2(rec1.loc.x + (rec1.width * rec1.scale) / 2, rec1.loc.y + (rec1.height * rec1.scale) / 2);
 		rr1.S = new Vector2((rec1.width * rec1.scale) / 2, (rec1.height * rec1.scale) / 2);
 		rr1.ang = (float) Math.toRadians(rec1.rotation);
 		
 		RotRect rr2 = new RotRect();
-		rr2.C = new Vector2(rec2.currX + (rec2.width * rec2.scale) / 2, rec2.currY + (rec2.height * rec2.scale) / 2);
+		rr2.C = new Vector2(rec2.loc.x + (rec2.width * rec2.scale) / 2, rec2.loc.y + (rec2.height * rec2.scale) / 2);
 		rr2.S = new Vector2((rec2.width * rec2.scale) / 2, (rec2.height * rec2.scale) / 2);
 		rr2.ang = (float) Math.toRadians(rec2.rotation);
 		
@@ -180,8 +179,8 @@ public class Fundementals
 	 */
 	public static boolean circleVsRectangle(GameObject circle, GameObject rect)
 	{
-	    float circleDistanceX = Math.abs((circle.currX + circle.width()  / 2) - (rect.currX + rect.width()  / 2));
-	    float circleDistanceY = Math.abs((circle.currY + circle.height() / 2) - (rect.currY + rect.height() / 2));
+	    float circleDistanceX = Math.abs((circle.loc.x + circle.width()  / 2) - (rect.loc.x + rect.width()  / 2));
+	    float circleDistanceY = Math.abs((circle.loc.y + circle.height() / 2) - (rect.loc.y + rect.height() / 2));
 	    float radius = circle.width / 2;
 
 	    if (circleDistanceX > (rect.width() / 2 + radius) || (circleDistanceY > (rect.height() / 2 + radius)))
@@ -205,10 +204,10 @@ public class Fundementals
 		
 		return results;
 		/*
-		double rectCx = rect.currX + rect.width / 2,	//Rectangle center x
-			   rectCy = rect.currY + rect.height / 2,	//Rectangle center y
-			   ccX = circle.currX + circle.width / 2,	//Circle center x
-			   ccY = circle.currY + circle.height/ 2,	//Circle center y
+		double rectCx = rect.loc.x + rect.width / 2,	//Rectangle center x
+			   rectCy = rect.loc.y + rect.height / 2,	//Rectangle center y
+			   ccX = circle.loc.x + circle.width / 2,	//Circle center x
+			   ccY = circle.loc.y + circle.height/ 2,	//Circle center y
 			   rot = Math.toRadians(rect.rotation),
 			   rotSin = Math.sin(rot),
 			   rotCos = Math.cos(rot),
@@ -216,17 +215,17 @@ public class Fundementals
 			   cy = rotSin * (ccX - rectCx) + rotCos * (ccY - rectCy) + rectCy,
 			   x,y;
 		 
-		if (cx < rect.currX)
-		    x = rect.currX;
-		else if (cx > rect.currX + rect.width)
-		    x = rect.currX + rect.width;
+		if (cx < rect.loc.x)
+		    x = rect.loc.x;
+		else if (cx > rect.loc.x + rect.width)
+		    x = rect.loc.x + rect.width;
 		else
 		    x = cx;
 		 
-		if (cy < rect.currY)
-		    y = rect.currY;
-		else if (cy > rect.currY + rect.height)
-		    y = rect.currY + rect.height;
+		if (cy < rect.loc.y)
+		    y = rect.loc.y;
+		else if (cy > rect.loc.y + rect.height)
+		    y = rect.loc.y + rect.height;
 		else
 		    y = cy;
 		 
@@ -248,10 +247,10 @@ public class Fundementals
 	 */
 	public static boolean circleVsCircle(GameObject c1, GameObject c2)
 	{
-		float x1 = c1.currX + c1.width()  / 2,
-			  y1 = c1.currY + c1.height() / 2,
-			  x2 = c2.currX + c2.width()  / 2,
-			  y2 = c2.currY + c2.height() / 2,
+		float x1 = c1.loc.x + c1.width()  / 2,
+			  y1 = c1.loc.y + c1.height() / 2,
+			  x2 = c2.loc.x + c2.width()  / 2,
+			  y2 = c2.loc.y + c2.height() / 2,
 			  r1 = c1.width() / 2,
 			  r2 = c2.height() / 2;
 
@@ -259,6 +258,36 @@ public class Fundementals
 	    float dy = y2 - y1;
 	    float d = r1 + r2;
 	    return (dx * dx + dy * dy) < (d * d);
+	}
+	
+	/**
+	 * Checks for collision with the polygons stored by each object. The polygons are updated if their data don't match with their holder.
+	 * @param obj1 The first object.
+	 * @param obj2 The second object.
+	 * @return True if the polygons are colliding.
+	 */
+	public static boolean polygonCollision(GameObject obj1, GameObject obj2)
+	{
+		if(obj1.poly == null || obj2.poly == null)
+			throw new RuntimeException("Can not peform a polygon collision if no polygon is set.");
+		
+		for(int i = 0; i < 2; i++)
+		{
+			GameObject obj = i == 0 ? obj1 : obj2;
+			
+			if(	obj.loc.x 				!= obj.poly.getX() 	||
+				obj.loc.y 				!= obj.poly.getY() 	|| 
+				obj.poly.getRotation() 	!= obj.rotation 	|| 
+				obj.poly.getScaleX() 	!= obj.scale		|| 
+				obj.poly.getScaleY() 	!= obj.scale)
+			{
+				obj.poly.setRotation(obj.rotation);
+				obj.poly.setScale(obj.scale, obj.scale);
+				obj.poly.setPosition(obj.loc.x, obj.loc.y);
+			}
+		}
+		
+		return Intersector.overlapConvexPolygons(obj1.poly, obj2.poly);
 	}
 	
 	/**
@@ -282,23 +311,23 @@ public class Fundementals
 			return false;
 		
 		final float width1  = image1.getWidth();
-		final float height1 = image1.getHeight();
 		final float width2  = image2.getWidth();
+		final float height1 = image1.getHeight();
 		final float height2 = image2.getHeight();
-		final int top    = (int) Math.max(obj1.currY, obj2.currY);
-		final int bottom = (int) Math.min(obj1.currY + height1, obj2.currY + height2);
-		final int left   = (int) Math.max(obj1.currX, obj2.currX);
-		final int right  = (int) Math.min(obj1.currX + width1, obj2.currX + width2);
+		final int top    = (int) Math.max(obj1.loc.y, obj2.loc.y);
+		final int bottom = (int) Math.min(obj1.loc.y + height1, obj2.loc.y + height2);
+		final int left   = (int) Math.max(obj1.loc.x, obj2.loc.x);
+		final int right  = (int) Math.min(obj1.loc.x + width1, obj2.loc.x + width2);
 		
 		for (int y = top; y < bottom; y++)
 		{
 			for (int x = left; x < right; x++)
 			{
-				int x1 = (obj1.flipX) ? (int)(width1  - (x - obj1.currX) - 1) : (int) (x - obj1.currX);
-				int y1 = (obj1.flipY) ? (int)(height1 - (y - obj1.currY) - 1) : (int) (y - obj1.currY);
+				int x1 = (obj1.flipX) ? (int)(width1  - (x - obj1.loc.x) - 1) : (int) (x - obj1.loc.x);
+				int y1 = (obj1.flipY) ? (int)(height1 - (y - obj1.loc.y) - 1) : (int) (y - obj1.loc.y);
 				
-				int x2 = (obj2.flipX) ? (int)(width2  - (x - obj2.currX) - 1) : (int) (x - obj2.currX);
-				int y2 = (obj2.flipY) ? (int)(height2 - (y - obj2.currY) - 1) : (int) (y - obj2.currY);
+				int x2 = (obj2.flipX) ? (int)(width2  - (x - obj2.loc.x) - 1) : (int) (x - obj2.loc.x);
+				int y2 = (obj2.flipY) ? (int)(height2 - (y - obj2.loc.y) - 1) : (int) (y - obj2.loc.y);
 				
 				if (image1.getColor(x1, y1) != 0 && image2.getColor(x2, y2) != 0)
 					return true;
@@ -307,18 +336,18 @@ public class Fundementals
 		return false;
 	}
 	
-	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)	//TODO: Test
+	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)	//TODO:
 	{
-//		throw new RuntimeException("Method not implemented yet.");
-		
+		throw new RuntimeException("Method not implemented yet.");
+		/*
 		Image2D image1 = getEntityImage(obj1);
 		Image2D image2 = getEntityImage(obj2);
 		
 		if(image1 == null ||image2 == null)
 			return false;
 		
-		Matrix4 m1 = new Matrix4().rotate(obj1.centerX(), obj1.centerY(), 0, obj1.rotation);
-		Matrix4 m2 = new Matrix4().rotate(obj2.centerX(), obj2.centerY(), 0, obj2.rotation);
+		Matrix4 m1 = new Matrix4().setToRotation(obj1.centerX(), obj2.centerY(), 0, obj1.rotation);
+		Matrix4 m2 = new Matrix4().setToRotation(obj2.centerX(), obj2.centerY(), 0, obj2.rotation);
 		
 		Matrix4 transformAToB = new Matrix4(m1).mul(new Matrix4(m2).inv());
 		
@@ -347,7 +376,7 @@ public class Fundementals
 			yPosInB.y += stepY.y;
 		}
 		
-		return false;
+		return false;*/
 	}
 	
 	/**
@@ -397,8 +426,8 @@ public class Fundementals
 	public static boolean circleVsLine(float Ax, float Ay, float Bx, float By, GameObject circle)
 	{
 		float r = circle.width() / 2;
-		float Cx = circle.currX + r;
-		float Cy = circle.currY + circle.height() / 2;
+		float Cx = circle.loc.x + r;
+		float Cy = circle.loc.y + circle.height() / 2;
 		
 		double LAB = Math.sqrt((Bx-Ax)*(Bx-Ax) + (By-Ay)*(By-Ay));
 		double Dx = (Bx-Ax)/LAB;
@@ -464,6 +493,9 @@ public class Fundementals
 	 */
 	public static Rectangle getBoundingBox(GameObject go)
 	{
+		if(go.rotation == 0)
+			return new Rectangle(go.loc.x, go.loc.y, go.width(), go.height());
+		
 		ArrayList<Vector2> points = new ArrayList<>(4);
 		float[] arr = new float[8];
 		
@@ -475,20 +507,20 @@ public class Fundementals
 			switch(i)
 			{
 				case 0:
-					x = go.currX;
-					y = go.currY;
+					x = go.loc.x;
+					y = go.loc.y;
 					break;
 				case 1:
-					x = go.currX + go.width();
-					y = go.currY;
+					x = go.loc.x + go.width();
+					y = go.loc.y;
 					break;
 				case 2:
-					x = go.currX;
-					y = go.currY + go.height();
+					x = go.loc.x;
+					y = go.loc.y + go.height();
 					break;
 				case 3:
-					x = go.currX + go.width();
-					y = go.currY + go.height();
+					x = go.loc.x + go.width();
+					y = go.loc.y + go.height();
 					break;
 			}
 
@@ -535,6 +567,9 @@ public class Fundementals
 	 */
 	public static Vector2 getRotatedPoint(float x, float y, float cx, float cy, float rotation)
 	{
+		if(rotation == 0)
+			return new Vector2(x,y);
+		
 		final float[] arr = {x, y, 0, 0, 0, 0, 0, 0};
 		
 		AffineTransform at = new AffineTransform();
@@ -661,10 +696,10 @@ public class Fundementals
 			return circleVsLine(x1,y1,x2,y2,go);
 		else
 		{
-			if(lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX + go.width, go.currY)              			||
-			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY, go.currX, go.currY + go.height)             			||
-			   lineIntersect(x1,y1,x2,y2, go.currX + go.width, go.currY, go.currX + go.width(), go.currY + go.height()) ||
-			   lineIntersect(x1,y1,x2,y2, go.currX, go.currY + go.height, go.currX + go.width(), go.currY + go.height()))
+			if(lineIntersect(x1,y1,x2,y2, go.loc.x, go.loc.y, go.loc.x + go.width, go.loc.y)              			||
+			   lineIntersect(x1,y1,x2,y2, go.loc.x, go.loc.y, go.loc.x, go.loc.y + go.height)             			||
+			   lineIntersect(x1,y1,x2,y2, go.loc.x + go.width, go.loc.y, go.loc.x + go.width(), go.loc.y + go.height()) ||
+			   lineIntersect(x1,y1,x2,y2, go.loc.x, go.loc.y + go.height, go.loc.x + go.width(), go.loc.y + go.height()))
 				return true;
 					
 			return false;
@@ -727,7 +762,7 @@ public class Fundementals
 	 */
 	public static double distance(GameObject go1, GameObject go2)
 	{
-		return Fundementals.distance(go1.currX, go1.currY, go2.currX, go2.currY);
+		return Fundementals.distance(go1.loc.x, go1.loc.y, go2.loc.x, go2.loc.y);
 	}
 	
 	/**
@@ -776,15 +811,15 @@ public class Fundementals
 	 */
 	public static Vector2 findEdgePoint(GameObject observer, GameObject target)
 	{
-		return findEdgePoint(observer.currX + observer.width / 2,
-							 observer.currY + observer.height / 2,
-							 target.currX + target.width / 2,
-							 target.currY + target.height / 2);
+		return findEdgePoint(observer.loc.x + observer.width / 2,
+							 observer.loc.y + observer.height / 2,
+							 target.loc.x + target.width / 2,
+							 target.loc.y + target.height / 2);
 	}
 	
 	public static void rotateTowardsPoint(GameObject src, GameObject target, float speed)
 	{
-		float rotation = rotateTowardsPoint(src.currX, src.currY, target.currX, target.currY, src.rotation, speed);
+		float rotation = rotateTowardsPoint(src.loc.x, src.loc.y, target.loc.x, target.loc.y, src.rotation, speed);
 		src.rotation = rotation;
 	}
 	
@@ -851,7 +886,7 @@ public class Fundementals
 	 */
 	public static Vector2 normalize(GameObject go1, GameObject go2)
 	{
-		return normalize(go1.currX, go1.currY, go2.currX, go2.currY);
+		return normalize(go1.loc.x, go1.loc.y, go2.loc.x, go2.loc.y);
 	}
 
 	/**

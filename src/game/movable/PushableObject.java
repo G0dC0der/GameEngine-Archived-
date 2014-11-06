@@ -40,8 +40,8 @@ public class PushableObject extends Enemy
 	 */
 	public PushableObject(float x, float y, MovableObject... pushers)
 	{
-		nextX = currX = x;
-		currY = y;
+		nextX = loc.x = x;
+		loc.y = y;
 		this.pushers = pushers;
 		useGravity = true;
 		mass = 1.0f;
@@ -103,9 +103,9 @@ public class PushableObject extends Enemy
 				 vy *= 1.0 - (damping * DELTA);
 				 float force = mass * gravity;
 				 vy += (force / mass) * DELTA;
-				 float nextY = currY - vy * DELTA;
-				 if(canGoTo(currX,nextY))
-					 moveTo(currX, nextY);
+				 float nextY = loc.y - vy * DELTA;
+				 if(canGoTo(loc.x,nextY))
+					 moveTo(loc.x, nextY);
 				 else
 					 tryDown(10);
 			}
@@ -117,7 +117,7 @@ public class PushableObject extends Enemy
 			{
 				if(canPush(mo))
 				{
-					float value = mo.currX - mo.getPrevX();
+					float value = mo.loc.x - mo.getPrevX();
 					
 					if(value == 0)	//Bug fix,  when wall sliding and mustStand is true.
 					{
@@ -128,13 +128,13 @@ public class PushableObject extends Enemy
 					}
 
 					if(value > 0)
-						nextX = currX + pushLength;
+						nextX = loc.x + pushLength;
 					else if(value < 0)
-						nextX = currX - pushLength;
+						nextX = loc.x - pushLength;
 				}
 			}
 		}
-		int pos    = (int) currX, 
+		int pos    = (int) loc.x, 
 			target = (int) nextX;
 		
 		if(pos != target)
@@ -142,18 +142,18 @@ public class PushableObject extends Enemy
 			if(target > pos)
 			{				
 				tryRight(pushStrength);
-				if(nextX < currX)
-					currX = nextX;
+				if(nextX < loc.x)
+					loc.x = nextX;
 			}
 			else
 			{
 				tryLeft(pushStrength);
-				if(nextX > currX)
-					currX = nextX;
+				if(nextX > loc.x)
+					loc.x = nextX;
 			}
 		}
 		
-		if(currX != getPrevX())
+		if(loc.x != getPrevX())
 			sounds.trySound(1, true);
 	}
 	
@@ -222,8 +222,8 @@ public class PushableObject extends Enemy
 	@Override
 	public void moveTo(float x, float y)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		updateDummy();
 	}
 	
@@ -267,14 +267,14 @@ public class PushableObject extends Enemy
 	protected boolean canPush(MovableObject pusher)
 	{
 		if(mustStand)
-			return currY + height - 2 > pusher.currY && !pusher.canGoDown() && obj.collidesWith(pusher);
+			return loc.y + height - 2 > pusher.loc.y && !pusher.canGoDown() && obj.collidesWith(pusher);
 			
-		return currY + height - 2 > pusher.currY && obj.collidesWith(pusher);
+		return loc.y + height - 2 > pusher.loc.y && obj.collidesWith(pusher);
 	}
 	
 	protected void updateDummy()
 	{
-		obj.currX = currX - 1;
-		obj.currY = currY;
+		obj.loc.x = loc.x - 1;
+		obj.loc.y = loc.y;
 	}
 }

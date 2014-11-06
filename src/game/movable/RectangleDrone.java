@@ -27,8 +27,8 @@ public class RectangleDrone extends Enemy
 	public RectangleDrone (float x, float y, float w, float h, boolean clockwise)
 	{
 		super();
-		this.currX = this.x = x;
-		this.currY = this.y = y;
+		this.loc.x = this.x = x;
+		this.loc.y = this.y = y;
 		this.w = w;
 		this.h = h;
 		this.clockwise = clockwise;
@@ -46,8 +46,8 @@ public class RectangleDrone extends Enemy
 		case Keys.RIGHT:
 			for (int i = 0; i < moveSpeed; i++)
 			{
-				if (targetX > currX)
-					currX++;
+				if (targetX > loc.x)
+					loc.x++;
 				else
 				{
 					targetDirr = (clockwise) ? Keys.DOWN: Keys.UP;
@@ -59,8 +59,8 @@ public class RectangleDrone extends Enemy
 		case Keys.DOWN:
 			for (int i = 0; i < moveSpeed; i++)
 			{
-				if (targetY > currY)
-					currY++;
+				if (targetY > loc.y)
+					loc.y++;
 				else
 				{
 					targetDirr = (clockwise) ? Keys.LEFT : Keys.RIGHT;
@@ -72,8 +72,8 @@ public class RectangleDrone extends Enemy
 		case Keys.LEFT:
 			for (int i = 0; i < moveSpeed; i++)
 			{
-				if (currX > targetX)
-					currX--;
+				if (loc.x > targetX)
+					loc.x--;
 				else
 				{
 					targetDirr = (clockwise) ? Keys.UP : Keys.DOWN;
@@ -85,8 +85,8 @@ public class RectangleDrone extends Enemy
 		case Keys.UP:
 			for (int i = 0; i < moveSpeed; i++)
 			{
-				if (currY > targetY)
-					currY--;
+				if (loc.y > targetY)
+					loc.y--;
 				else
 				{
 					targetDirr = (clockwise) ? Keys.RIGHT : Keys.LEFT;

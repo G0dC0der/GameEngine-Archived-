@@ -33,8 +33,8 @@ public class Circle extends Enemy
 	{
 		counter+=moveSpeed;
 		
-		currX = (float) (radius * Math.cos(counter) + centerX);
-	    currY = (float) (radius * Math.sin(counter) + centerY);
+		loc.x = (float) (radius * Math.cos(counter) + centerX);
+	    loc.y = (float) (radius * Math.sin(counter) + centerY);
 	}
 	
 	/**

@@ -44,9 +44,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
-@AutoInstall(mainPath="res/general",path=OrbitalStation.PATH)
-@Playable(name="Orbital Station", description="Stage: Orbital Station\nAuthor: Pojahn Moradi\nDifficulty: 8\nAverage time: 230 sec\nProfessional time: 180 sec\nObjective: Enter goal.")
-public class OrbitalStation extends StageBuilder
+@AutoInstall(mainPath="res/general",path=SecretLaboratory.PATH)
+@Playable(name="Secret Laboratory", description="Stage: Secret Laboratory\nAuthor: Pojahn Moradi\nAverage time: 230 sec\nProfessional time: 180 sec\nObjective: Grab the gem.")
+public class SecretLaboratory extends StageBuilder
 {
 	static final String PATH = "res/orbitalstation";
 	
@@ -191,11 +191,11 @@ public class OrbitalStation extends StageBuilder
 		 */
 		SolidPlatform solp1 = new SolidPlatform(size.width, (123 * 32) - 23, gm);
 		solp1.setImage(platform);
-		solp1.appendPath(0 - solp1.width, solp1.currY);
-		solp1.appendPath(solp1.currX, solp1.currY, 0, true, null);
+		solp1.appendPath(0 - solp1.width, solp1.loc.y);
+		solp1.appendPath(solp1.loc.x, solp1.loc.y, 0, true, null);
 		solp1.setMoveSpeed(1.5f);
 
-		add(solp1, solp1.getClone(size.width - 2000, solp1.currY), solp1.getClone(size.width - 3500, solp1.currY));
+		add(solp1, solp1.getClone(size.width - 2000, solp1.loc.y), solp1.getClone(size.width - 3500, solp1.loc.y));
 		
 		/*
 		 * Rectangle moving lava enemy
@@ -243,11 +243,11 @@ public class OrbitalStation extends StageBuilder
 			{
 				gm.hit(-1);
 				discard(mine1);
-				add(mineExp.getClone(mine1.currX - mineExp.halfWidth(), mine1.currY - mineExp.halfHeight()));
+				add(mineExp.getClone(mine1.loc.x - mineExp.halfWidth(), mine1.loc.y - mineExp.halfHeight()));
 			}
 		});
 		
-		PathDrone mine2 = mine1.getClone(mine1.currX, mine1.currY);
+		PathDrone mine2 = mine1.getClone(mine1.loc.x, mine1.loc.y);
 		mine2.clearData();
 		mine2.appendPath(data2);
 		mine2.addEvent(()->{
@@ -255,7 +255,7 @@ public class OrbitalStation extends StageBuilder
 			{
 				gm.hit(-1);
 				discard(mine2);
-				add(mineExp.getClone(mine2.currX - mineExp.halfWidth(), mine2.currY - mineExp.halfHeight()));
+				add(mineExp.getClone(mine2.loc.x - mineExp.halfWidth(), mine2.loc.y - mineExp.halfHeight()));
 			}
 		});
 		
@@ -394,7 +394,7 @@ public class OrbitalStation extends StageBuilder
 			{
 				collect.play();
 				discard(theKey);
-				sGate.appendPath(sGate.currX - sGate.width, sGate.currY);
+				sGate.appendPath(sGate.loc.x - sGate.width, sGate.loc.y);
 				goNuts = true;
 			}
 		});
@@ -415,8 +415,8 @@ public class OrbitalStation extends StageBuilder
 		SolidPlatform crusher1 = new SolidPlatform(4028, 1152, gm);
 		crusher1.setImage(crusherLeft);
 		crusher1.setMoveSpeed(6);
-		crusher1.appendPath(4028, crusher1.currY, 0, false, ()->{crusher1.setMoveSpeed(6);});
-		crusher1.appendPath(4316, crusher1.currY, 50, false, ()->{
+		crusher1.appendPath(4028, crusher1.loc.y, 0, false, ()->{crusher1.setMoveSpeed(6);});
+		crusher1.appendPath(4316, crusher1.loc.y, 50, false, ()->{
 			crusher1.setMoveSpeed(2);
 			if(Fundementals.distance(crusher1, gm) < 600)
 				add(CameraEffect.vibration(1,30));
@@ -429,8 +429,8 @@ public class OrbitalStation extends StageBuilder
 		SolidPlatform part1 = new SolidPlatform(4028 - part.getWidth(), 1155, gm);
 		part1.setImage(part);
 		part1.setMoveSpeed(6);
-		part1.appendPath(4028 - part1.width, part1.currY, 0, false, ()->{part1.setMoveSpeed(6);});
-		part1.appendPath(4316 - part1.width, part1.currY, 50, false, ()->{part1.setMoveSpeed(2);});
+		part1.appendPath(4028 - part1.width, part1.loc.y, 0, false, ()->{part1.setMoveSpeed(6);});
+		part1.appendPath(4316 - part1.width, part1.loc.y, 50, false, ()->{part1.setMoveSpeed(2);});
 		
 		add(crusher1, part1);
 		allCrusher.add(crusher1);
@@ -459,12 +459,12 @@ public class OrbitalStation extends StageBuilder
 			SolidPlatform cr = new SolidPlatform(x, y, gm);
 			cr.setImage(crusherDown);
 			cr.setMoveSpeed(6);
-			cr.appendPath(cr.currX, cr.currY, 50, false, null);
-			cr.appendPath(cr.currX, 2272, 50, false, ()->{
-				if(Fundementals.distance(cr.currX, cr.currY + cr.height, gm.currX, gm.currY) < 300)
+			cr.appendPath(cr.loc.x, cr.loc.y, 50, false, null);
+			cr.appendPath(cr.loc.x, 2272, 50, false, ()->{
+				if(Fundementals.distance(cr.loc.x, cr.loc.y + cr.height, gm.loc.x, gm.loc.y) < 300)
 					add(CameraEffect.vibration(.5f,30));
 				
-				double volume = SoundBank.getVolume(cr.currX, cr.currY + cr.height, gm.currX, gm.currY, 600, 1.0f, 40);
+				double volume = SoundBank.getVolume(cr.loc.x, cr.loc.y + cr.height, gm.loc.x, gm.loc.y, 600, 1.0f, 40);
 				if(volume > 0.0f)
 					slam.play(volume);
 			});
@@ -478,13 +478,13 @@ public class OrbitalStation extends StageBuilder
 			SolidPlatform cr = new SolidPlatform(x, y, gm);
 			cr.setImage(crusherDown);
 			cr.setMoveSpeed(4.5f);
-			cr.appendPath(cr.currX, cr.currY, 10, false, ()->{cr.setMoveSpeed(7);});
-			cr.appendPath(cr.currX, 2272, 130, false, ()->{
+			cr.appendPath(cr.loc.x, cr.loc.y, 10, false, ()->{cr.setMoveSpeed(7);});
+			cr.appendPath(cr.loc.x, 2272, 130, false, ()->{
 				cr.setMoveSpeed(5);
-				if(Fundementals.distance(cr.currX, cr.currY + cr.height, gm.currX, gm.currY) < 400)
+				if(Fundementals.distance(cr.loc.x, cr.loc.y + cr.height, gm.loc.x, gm.loc.y) < 400)
 					add(CameraEffect.vibration(.5f,30));
 				
-				double volume = SoundBank.getVolume(cr.currX, cr.currY + cr.height, gm.currX, gm.currY, 600, 1.0f, 40);
+				double volume = SoundBank.getVolume(cr.loc.x, cr.loc.y + cr.height, gm.loc.x, gm.loc.y, 600, 1.0f, 40);
 				if(volume > 0.0f)
 					slam.play(volume);
 			});
@@ -790,13 +790,13 @@ public class OrbitalStation extends StageBuilder
 		/*
 		 * Suit Check
 		 */
-		if(!suited && gm.currY - (orginY + 250) > 0)
+		if(!suited && gm.loc.y - (orginY + 250) > 0)
 			gm.hit(-1);
 		
 		/*
 		 * Alpha image
 		 */
-		float distance = gm.currY - orginY;
+		float distance = gm.loc.y - orginY;
 		
 		if(distance > 0)
 		{
@@ -842,7 +842,7 @@ public class OrbitalStation extends StageBuilder
 			
 			//Fading lava song
 			float orginY2 = 109 * 32;
-			float distance2 = gm.currY - orginY2;
+			float distance2 = gm.loc.y - orginY2;
 			
 			if(distance2 > 0)
 			{
@@ -862,10 +862,10 @@ public class OrbitalStation extends StageBuilder
 		 * Fading stage music in space
 		 */
 		float height = 600;
-		if(Fundementals.rectangleVsRectangle(1920, 416, 64, height, gm.currX, gm.currY, gm.width(), gm.height()))
+		if(Fundementals.rectangleVsRectangle(1920, 416, 64, height, gm.loc.x, gm.loc.y, gm.width(), gm.height()))
 		{
 			float orginY = 416 + height, newVolume;
-			distance = orginY - gm.currY;
+			distance = orginY - gm.loc.y;
 			
 			if(distance > 0)
 			{
@@ -886,7 +886,7 @@ public class OrbitalStation extends StageBuilder
 		 * Fading space song
 		 */
 		float orginY = 700, newVolume;
-		distance = orginY - gm.currY;
+		distance = orginY - gm.loc.y;
 		if(distance > 0)
 		{
 			newVolume = Math.min(distance / 500.0f, 1.0f);
@@ -902,7 +902,7 @@ public class OrbitalStation extends StageBuilder
 			/*
 			 * Fade Stage Music after space
 			 */
-			if(gm.currX > 3500)
+			if(gm.loc.x > 3500)
 			{
 				newVolume = Math.min(10.0f / distance, .7f);
 				newVolume = Math.max(newVolume, 0.0f);
@@ -920,7 +920,7 @@ public class OrbitalStation extends StageBuilder
 		
 		if(unfreezeSaws)
 		{
-			double volume = SoundBank.getVolume(gm.currX, gm.currY, 247, 2310, 800, 1.0f, 30);
+			double volume = SoundBank.getVolume(gm.loc.x, gm.loc.y, 247, 2310, 800, 1.0f, 30);
 			if(volume > 0.0f && !sawLoop.playing())
 				sawLoop.resume();
 			else if(volume == 0.0f && sawLoop.playing())
@@ -1002,7 +1002,7 @@ public class OrbitalStation extends StageBuilder
 		PathDrone h = new PathDrone(x, (flippedY) ? y - holder.getHeight() : y);
 		h.setMoveSpeed(.7f);
 		h.setImage(holder);
-		h.appendPath(x, h.currY - ((flippedY) ? 420 : 550));
+		h.appendPath(x, h.loc.y - ((flippedY) ? 420 : 550));
 		h.addEvent(()->{
 			if(unfreezeSaws)
 				h.unfreeze();

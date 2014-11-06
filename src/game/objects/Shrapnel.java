@@ -47,8 +47,8 @@ public class Shrapnel extends Particle
 		{
 			once = true;
 			Stage s = Stage.getCurrentStage();
-			float middleX = currX + width  / 2,
-				  middleY = currY + height / 2;
+			float middleX = loc.x + width  / 2,
+				  middleY = loc.y + height / 2;
 			
 			if(expType == ExplosionType.SPLIT)
 			{
@@ -71,7 +71,7 @@ public class Shrapnel extends Particle
 				for(int i = 0; i < splits; i++)
 				{
 					Vector2 edgePoints = Fundementals.findEdgePoint(middleX, middleY, r.nextInt(width), r.nextInt(height));
-					Projectile proj = split.getClone(currX, currY);
+					Projectile proj = split.getClone(loc.x, loc.y);
 					proj.setDisposable(true);
 					proj.setTarget(edgePoints.x, edgePoints.y);
 					s.add(proj);
@@ -116,8 +116,8 @@ public class Shrapnel extends Particle
 	
 	Vector2[] getEightDirection()
 	{
-		float middleX = currX + width  / 2,
-			  middleY = currY + height / 2,
+		float middleX = loc.x + width  / 2,
+			  middleY = loc.y + height / 2,
 			  x,y;
 		
 		//NW Point

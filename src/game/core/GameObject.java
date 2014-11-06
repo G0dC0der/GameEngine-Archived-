@@ -5,10 +5,13 @@ import game.core.Engine.Direction;
 import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
+
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -83,17 +86,12 @@ public class GameObject
 	/**
 	 * These are the hitboxes of a {@code GameObject}.
 	 */
-	public enum Hitbox {RECTANGLE, CIRCLE, EXACT, INVINCIBLE};
+	public enum Hitbox {RECTANGLE, CIRCLE, EXACT, POLYGON, INVINCIBLE};
 	
 	/**
-	 * The objects X position.
+	 * The position of the entity.
 	 */
-	public float currX;
-	
-	/**
-	 * The objects Y position.
-	 */
-	public float currY;
+	public final Vector2 loc = new Vector2();
 	
 	/**
 	 * The rotation(in degrees) of the objects image. 
@@ -154,6 +152,7 @@ public class GameObject
 	private int id, zIndex;
 	boolean drawSpecialBehind;
 	LinkedList<Event> removeQueue, events;
+	Polygon poly;
 	
 	/**
 	 * Constructs a {@code GameObject} with with, height and scale set to 1 and visibility set to true.
@@ -195,7 +194,7 @@ public class GameObject
 	 */
 	public float centerX()
 	{
-		return currX + (width() / 2);
+		return loc.x + (width() / 2);
 	}
 	
 	/**
@@ -204,7 +203,7 @@ public class GameObject
 	 */
 	public float centerY()
 	{
-		return currY + (height() / 2);
+		return loc.y + (height() / 2);
 	}
 	
 	/**
@@ -230,8 +229,8 @@ public class GameObject
 	 */
 	public void moveTo(float x, float y)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 	}
 	
 	/**
@@ -325,8 +324,8 @@ public class GameObject
 			}
 			else
 			{
-				Rectangle r1 = (rotation == 0) ? new Rectangle(currX, currY, width, height)					: getBoundingBox(this);
-				Rectangle r2 = (rotation == 0) ? new Rectangle(obj.currX, obj.currY, obj.width, obj.height) : getBoundingBox(obj);
+				Rectangle r1 = (rotation == 0) ? new Rectangle(loc.x, loc.y, width, height)					: getBoundingBox(this);
+				Rectangle r2 = (rotation == 0) ? new Rectangle(obj.loc.x, obj.loc.y, obj.width, obj.height) : getBoundingBox(obj);
 				
 				if(!rectangleVsRectangle(r1.x, r1.y, r1.width, r1.height, r2.x, r2.y, r2.width, r2.height))
 					return false;
@@ -334,8 +333,12 @@ public class GameObject
 				return pixelPerfectRotation(this, obj);
 			}
 		}
-		else
-			return false;
+		else if(hitbox == Hitbox.POLYGON || obj.hitbox == Hitbox.POLYGON)
+		{
+			return polygonCollision(this, obj);
+		}
+
+		return false;
 	}
 	
 	/**
@@ -354,12 +357,12 @@ public class GameObject
 	
 	public boolean at(float x, float y)
 	{
-		return currX == x && currY == y;
+		return loc.x == x && loc.y == y;
 	}
 	
 	public boolean at(float x, float y, double tolerance)
 	{
-		return tolerance >= Fundementals.distance(currX, currY, x, y);
+		return tolerance >= Fundementals.distance(loc.x, loc.y, x, y);
 	}
 	
 	/**
@@ -369,13 +372,13 @@ public class GameObject
 	 */
 	public Direction monitor(GameObject go)
 	{
-		if (currX + width < go.currX)
+		if (loc.x + width < go.loc.x)
 			return Direction.E;
-		if (go.currX + go.width < currX)
+		if (go.loc.x + go.width < loc.x)
 			return Direction.W;
-		if (currY > go.currY + go.height)
+		if (loc.y > go.loc.y + go.height)
 			return Direction.N;
-		if (go.currX > currY + height)
+		if (go.loc.x > loc.y + height)
 			return Direction.S;
 
 		return null;
@@ -390,8 +393,8 @@ public class GameObject
 	public GameObject getClone(float x, float y)
 	{
 		GameObject go = new GameObject();
-		go.currX = x;
-		go.currY = y;
+		go.loc.x = x;
+		go.loc.y = y;
 		copyData(go);
 		
 		if(cloneEvent != null)
@@ -542,6 +545,14 @@ public class GameObject
 	}
 	
 	/**
+	 * Required if the hitbox is {@code POLYGON}.
+	 */
+	public void setPolygon(Polygon poly)
+	{
+		this.poly = poly;
+	}
+	
+	/**
 	 * Runs all the events. This function is usual called from automatic processes and not manually.
 	 */
 	public void runEvents()
@@ -626,8 +637,8 @@ public class GameObject
 	 */
 	public Vector2 getFrontPosition()
 	{
-		float locX = currX + width() / 2;
-		float locY = currY + height() / 2;
+		float locX = loc.x + width() / 2;
+		float locY = loc.y + height() / 2;
 		
 		locX += Math.cos(Math.toRadians(rotation)) * (width() / 2);
 		locY += Math.sin(Math.toRadians(rotation)) * (height() / 2);
@@ -641,8 +652,8 @@ public class GameObject
 	 */
 	public Vector2 getRarePosition()
 	{
-		float locX = currX + width() / 2;
-		float locY = currY + height() / 2;
+		float locX = loc.x + width() / 2;
+		float locY = loc.y + height() / 2;
 		
 		locX -= Math.cos(Math.toRadians(rotation)) * (width() / 2);
 		locY -= Math.sin(Math.toRadians(rotation)) * (height() / 2);
@@ -709,18 +720,18 @@ public class GameObject
 		if(!target.visible)
 			return false;
 		
-		int midX1   = (int) (target.currX + target.width() / 2),
-			midY1   = (int) (target.currY + target.height() / 2),
-			midX2   = (int) (currX + width() / 2),
-			midY2   = (int) (currY + height() / 2), 
-			left1   = (int) (target.currX), 
-			left2   = (int) (currX), 
-			right1  = (int) (target.currX + target.width()), 
-			right2  = (int) (currX + width()),
-			top1    = (int) (target.currY),
-			top2    = (int) (currY),
-			bottom1 = (int) (target.currY + target.height()), 
-			bottom2 = (int) (currY + height());
+		int midX1   = (int) (target.loc.x + target.width() / 2),
+			midY1   = (int) (target.loc.y + target.height() / 2),
+			midX2   = (int) (loc.x + width() / 2),
+			midY2   = (int) (loc.y + height() / 2), 
+			left1   = (int) (target.loc.x), 
+			left2   = (int) (loc.x), 
+			right1  = (int) (target.loc.x + target.width()), 
+			right2  = (int) (loc.x + width()),
+			top1    = (int) (target.loc.y),
+			top2    = (int) (loc.y),
+			bottom1 = (int) (target.loc.y + target.height()), 
+			bottom2 = (int) (loc.y + height());
 		
 		switch (accuracy)
 		{

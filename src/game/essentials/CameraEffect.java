@@ -11,7 +11,7 @@ import game.core.Stage;
 public interface CameraEffect
 {	
 	/**
-	 * Update Engine.tx, Engine.ty, Engine.rotation and/or Engine.scale.
+	 * Update Engine.tx, Engine.ty, Engine.rotation and/or Engine.scale for example.
 	 */
 	void update();
 

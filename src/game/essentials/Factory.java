@@ -201,8 +201,8 @@ public class Factory
 	public static Event soundFalloff(Music sound, GameObject go, float x2, float y2, float maxDistance, int freq, float power, float max)
 	{
 		GameObject go2 = new GameObject();
-		go2.currX = x2;
-		go2.currY = y2;
+		go2.loc.x = x2;
+		go2.loc.y = y2;
 		
 		return soundFalloff(sound,go,go2,maxDistance,freq,power,max);
 	}
@@ -236,8 +236,8 @@ public class Factory
 	public static Event soundFalloff(Sound sound, GameObject go, float x2, float y2, float maxDistance, int freq, float power, float max)
 	{
 		GameObject go2 = new GameObject();
-		go2.currX = x2;
-		go2.currY = y2;
+		go2.loc.x = x2;
+		go2.loc.y = y2;
 		
 		return soundFalloff(sound,go,go2,maxDistance,freq,power,max);
 	}
@@ -254,7 +254,7 @@ public class Factory
 	{
 		return ()->
 		{
-			if(target.getPrevX() != target.currX || target.getPrevY() != target.currY)
+			if(target.getPrevX() != target.loc.x || target.getPrevY() != target.loc.y)
 			{
 				byte[][] data  = Stage.getCurrentStage().stageData;
 				Animation<Image2D> img = target.getImage();
@@ -265,8 +265,8 @@ public class Factory
 				
 				int prevX = (int) target.getPrevX(),
 					prevY = (int) target.getPrevY(),
-					currX = (int) target.currX,
-					currY = (int) target.currY;
+					currX = (int) target.loc.x,
+					currY = (int) target.loc.y;
 				
 				for(int x1 = prevX, x2 = currX; x1 < prevX + target.width - 1; x1++, x2++)
 					for(int y1 = prevY, y2 = currY; y1 < prevY + target.height - 1; y1++, y2++)
@@ -323,7 +323,7 @@ public class Factory
 					if(textColor != null)
 						theFont.setColor(textColor);
 
-					theFont.drawMultiLine(b, text, position.currX + ox, position.currY + oy);
+					theFont.drawMultiLine(b, text, position.loc.x + ox, position.loc.y + oy);
 				}
 			}
 		};
@@ -373,8 +373,8 @@ public class Factory
 			@Override
 			public void eventHandling() 
 			{
-				tail.currX = target.currX + offsetX;
-				tail.currY = target.currY + offsetY;
+				tail.loc.x = target.loc.x + offsetX;
+				tail.loc.y = target.loc.y + offsetY;
 			}
 		};
 	}
@@ -394,8 +394,8 @@ public class Factory
 			@Override
 			public void eventHandling() 
 			{				
-				float targetX = target.currX + offsetX;
-				float targetY = target.currY + offsetY;
+				float targetX = target.loc.x + offsetX;
+				float targetY = target.loc.y + offsetY;
 				
 				tail.clearData();
 				tail.appendPath(targetX, targetY);
@@ -428,8 +428,8 @@ public class Factory
 			@Override
 			public void eventHandling() 
 			{
-				dummy.currX = target.currX - 1;
-				dummy.currY = target.currY - 1;
+				dummy.loc.x = target.loc.x - 1;
+				dummy.loc.y = target.loc.y - 1;
 				dummy.width = target.width + 2;
 				dummy.height= target.height+ 2;
 				
@@ -534,44 +534,44 @@ public class Factory
 					switch (dir)
 					{
 					case N:
-						if(mo.canGoUp(mo.currY - pushStrength))
-							mo.currY -= pushStrength;
+						if(mo.canGoUp(mo.loc.y - pushStrength))
+							mo.loc.y -= pushStrength;
 						break;
 					case NE:
-						if(mo.canGoUp(mo.currY - pushStrength))
-							mo.currY -= pushStrength;
-						if(mo.canGoRight(mo.currX + pushStrength))
-							mo.currX += pushStrength;
+						if(mo.canGoUp(mo.loc.y - pushStrength))
+							mo.loc.y -= pushStrength;
+						if(mo.canGoRight(mo.loc.x + pushStrength))
+							mo.loc.x += pushStrength;
 						break;
 					case E:
-						if(mo.canGoRight(mo.currX + pushStrength))
-							mo.currX += pushStrength;
+						if(mo.canGoRight(mo.loc.x + pushStrength))
+							mo.loc.x += pushStrength;
 						break;
 					case SE:
-						if(mo.canGoDown(mo.currY + pushStrength))
-							mo.currY += pushStrength;
-						if(mo.canGoRight(mo.currX + pushStrength))
-							mo.currX += pushStrength;
+						if(mo.canGoDown(mo.loc.y + pushStrength))
+							mo.loc.y += pushStrength;
+						if(mo.canGoRight(mo.loc.x + pushStrength))
+							mo.loc.x += pushStrength;
 						break;
 					case S:
-						if(mo.canGoDown(mo.currY + pushStrength))
-							mo.currY += pushStrength;
+						if(mo.canGoDown(mo.loc.y + pushStrength))
+							mo.loc.y += pushStrength;
 						break;
 					case SW:
-						if(mo.canGoDown(mo.currY + pushStrength))
-							mo.currY += pushStrength;
-						if(mo.canGoLeft(mo.currX - pushStrength))
-							mo.currX -= pushStrength;
+						if(mo.canGoDown(mo.loc.y + pushStrength))
+							mo.loc.y += pushStrength;
+						if(mo.canGoLeft(mo.loc.x - pushStrength))
+							mo.loc.x -= pushStrength;
 						break;
 					case W:
-						if(mo.canGoLeft(mo.currX - pushStrength))
-							mo.currX -= pushStrength;
+						if(mo.canGoLeft(mo.loc.x - pushStrength))
+							mo.loc.x -= pushStrength;
 						break;
 					case NW:
-						if(mo.canGoUp(mo.currY - pushStrength))
-							mo.currY -= pushStrength;
-						if(mo.canGoLeft(mo.currX - pushStrength))
-							mo.currX -= pushStrength;
+						if(mo.canGoUp(mo.loc.y - pushStrength))
+							mo.loc.y -= pushStrength;
+						if(mo.canGoLeft(mo.loc.x - pushStrength))
+							mo.loc.x -= pushStrength;
 						break;
 					}
 				}
@@ -606,7 +606,7 @@ public class Factory
 					if(textColor != null)
 						f.setColor(textColor);
 					
-					f.draw(b, text, currX + ox, currY + oy);
+					f.draw(b, text, loc.x + ox, loc.y + oy);
 				}
 				else
 				{
@@ -826,7 +826,7 @@ public class Factory
 			
 			for(GameObject listener : listeners)
 			{
-				if(Fundementals.rectangleVsRectangle(listener.currX, listener.currY, listener.width(), listener.height(), room.x, room.y, room.width, room.height))
+				if(Fundementals.rectangleVsRectangle(listener.loc.x, listener.loc.y, listener.width(), listener.height(), room.x, room.y, room.width, room.height))
 				{
 					roomMusic.setVolume(Math.min(roomMusic.getVolume() + fadeSpeed, maxVolume));
 					

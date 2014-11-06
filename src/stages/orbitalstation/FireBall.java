@@ -28,14 +28,14 @@ class FireBall extends Enemy
 	@Override
 	public void moveEnemy() 
 	{
-		if(Fundementals.distance(initialX, initialY, currX, currY) < 30)
+		if(Fundementals.distance(initialX, initialY, loc.x, loc.y) < 30)
 			vy = flyPower;
 		
 		vy *= 1.0 - (damping * DELTA);
 	    float force = mass * gravity;
 	    vy += (force / mass) * DELTA;
 	    
-	    currY -= vy * DELTA;
+	    loc.y -= vy * DELTA;
 	}
 	
 	@Override

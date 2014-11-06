@@ -59,8 +59,8 @@ public final class Thwump extends Enemy
 	{
 		dummy = new GameObject();
 		scanDummy = new GameObject();
-		currX = this.initialX = initialX;
-		currY = this.initialY = initialY;
+		loc.x = this.initialX = initialX;
+		loc.y = this.initialY = initialY;
 		this.targets = targets;
 		attackSpeed = 7;
 		returnSpeed = 3;
@@ -122,7 +122,7 @@ public final class Thwump extends Enemy
 				moveDummy();
 			
 			for(MovableObject mo : targets)
-				if(SolidPlatform.collidingWhen(this, currX, currY - 1, mo) || SolidPlatform.collidingWhen(this, currX - 1, currY, mo) ||  SolidPlatform.collidingWhen(this, currX + 1, currY, mo))
+				if(SolidPlatform.collidingWhen(this, loc.x, loc.y - 1, mo) || SolidPlatform.collidingWhen(this, loc.x - 1, loc.y, mo) ||  SolidPlatform.collidingWhen(this, loc.x + 1, loc.y, mo))
 					adjust(mo, true);
 		}
 	}
@@ -227,28 +227,28 @@ public final class Thwump extends Enemy
 		switch(fallingDir)
 		{
 		case S:
-			x1 = (int) currX;
-			y1 = (int)(currY + height);
-			x2 = (int) (currX + width);
-			y2 = (int) (currY + height);
+			x1 = (int) loc.x;
+			y1 = (int)(loc.y + height);
+			x2 = (int) (loc.x + width);
+			y2 = (int) (loc.y + height);
 			break;
 		case N:
-			x1 = (int) currX;
-			y1 = (int) currY;
-			x2 = (int)(currX + width);
-			y2 = (int) currY;
+			x1 = (int) loc.x;
+			y1 = (int) loc.y;
+			x2 = (int)(loc.x + width);
+			y2 = (int) loc.y;
 			break;
 		case E:
-			x1 = (int)(currX + width);
-			y1 = (int) currY;
-			x2 = (int)(currX + width);
-			y2 = (int)(currY + height);
+			x1 = (int)(loc.x + width);
+			y1 = (int) loc.y;
+			x2 = (int)(loc.x + width);
+			y2 = (int)(loc.y + height);
 			break;
 		case W:
-			x1 = (int) currX;
-			y1 = (int) currY;
-			x2 = (int) currX;
-			y2 = (int)(currY + height);
+			x1 = (int) loc.x;
+			y1 = (int) loc.y;
+			x2 = (int) loc.x;
+			y2 = (int)(loc.y + height);
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal falling direction: " + fallingDir);
@@ -362,27 +362,27 @@ public final class Thwump extends Enemy
 		switch(fallingDir)
 		{
 			case N:
-				scanDummy.currX = x1;
-				scanDummy.currY = 0;
+				scanDummy.loc.x = x1;
+				scanDummy.loc.y = 0;
 				scanDummy.width = width;
 				scanDummy.height = y1;
 				break;
 			case S:
-				scanDummy.currX = x1;
-				scanDummy.currY = currY + height;
+				scanDummy.loc.x = x1;
+				scanDummy.loc.y = loc.y + height;
 				scanDummy.width = width;
-				scanDummy.height = stage.size.height - currY - height;
+				scanDummy.height = stage.size.height - loc.y - height;
 				break;
 			case W:
-				scanDummy.currX = 0;
-				scanDummy.currY = currY;
-				scanDummy.width = currX;
+				scanDummy.loc.x = 0;
+				scanDummy.loc.y = loc.y;
+				scanDummy.width = loc.x;
 				scanDummy.height = height;
 				break;
 			case E:
-				scanDummy.currX = currX + width;
-				scanDummy.currY = currY;
-				scanDummy.width = stage.size.width - currX - width;
+				scanDummy.loc.x = loc.x + width;
+				scanDummy.loc.y = loc.y;
+				scanDummy.width = stage.size.width - loc.x - width;
 				scanDummy.height = height;
 				break;
 			default:
@@ -395,20 +395,20 @@ public final class Thwump extends Enemy
 		switch(fallingDir)
 		{
 			case N:
-				dummy.currX = currX;
-				dummy.currY = currY - 1;
+				dummy.loc.x = loc.x;
+				dummy.loc.y = loc.y - 1;
 				break;
 			case S:
-				dummy.currX = currX;
-				dummy.currY = currY + height + 1;
+				dummy.loc.x = loc.x;
+				dummy.loc.y = loc.y + height + 1;
 				break;
 			case E:
-				dummy.currX = currX + width + 1;
-				dummy.currY = currY;
+				dummy.loc.x = loc.x + width + 1;
+				dummy.loc.y = loc.y;
 				break;
 			case W:
-				dummy.currX = currX - 1;
-				dummy.currY = currY;
+				dummy.loc.x = loc.x - 1;
+				dummy.loc.y = loc.y;
 				break;
 			default:
 				throw new IllegalStateException("Illegal direction of Thwump: " + fallingDir.toString());
@@ -424,10 +424,10 @@ public final class Thwump extends Enemy
 			
 		for (int i = 0; i < steps; i++)
 		{
-			if(rising && (int)currX == targetX && (int)currY == targetY)
+			if(rising && (int)loc.x == targetX && (int)loc.y == targetY)
 				return false;
 			if (canGoUp())
-				currY--;
+				loc.y--;
 			else
 			{
 				sounds.trySound(0, true);
@@ -446,10 +446,10 @@ public final class Thwump extends Enemy
 		
 		for (int i = 0; i < steps; i++)
 		{
-			if(rising && (int)currX == targetX && (int)currY == targetY)
+			if(rising && (int)loc.x == targetX && (int)loc.y == targetY)
 				return false;
 			if (canGoDown())
-				currY++;
+				loc.y++;
 			else
 			{
 				sounds.trySound(0, true);
@@ -468,10 +468,10 @@ public final class Thwump extends Enemy
 			
 		for (int i = 0; i < steps; i++)
 		{
-			if(rising && (int)currX == targetX && (int)currY == targetY)
+			if(rising && (int)loc.x == targetX && (int)loc.y == targetY)
 				return false;
 			if (canGoLeft())
-				currX--;
+				loc.x--;
 			else
 			{
 				sounds.trySound(0, true);
@@ -490,10 +490,10 @@ public final class Thwump extends Enemy
 			
 		for (int i = 0; i < steps; i++)
 		{
-			if(rising && (int)currX == targetX && (int)currY == targetY)
+			if(rising && (int)loc.x == targetX && (int)loc.y == targetY)
 				return false;
 			if (canGoRight())
-				currX++;
+				loc.x++;
 			else
 			{
 				sounds.trySound(0, true);

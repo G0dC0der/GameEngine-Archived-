@@ -40,7 +40,7 @@ public class Guard extends PathDrone
 		if(currTarget != null)
 		{
 			sounds.trySound(0, false);
-			moveToward(currTarget.currX, currTarget.currY, huntSpeed);
+			moveToward(currTarget.loc.x, currTarget.loc.y, huntSpeed);
 		}
 		else
 		{

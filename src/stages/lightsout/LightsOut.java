@@ -92,10 +92,10 @@ public class LightsOut extends StageBuilder
 		saw5.appendPath(13 * 30, 7 * 30);
 		
 		PathDrone saw6 = getSaw(17, 13);
-		saw6.currX -= 18;
+		saw6.loc.x -= 18;
 		
 		PathDrone saw7 = getSaw(23, 13);
-		saw7.currX -= 10;
+		saw7.loc.x -= 10;
 		
 		PathDrone saw8 = getSaw(29,12);
 		
@@ -159,18 +159,18 @@ public class LightsOut extends StageBuilder
 		dummy1.setImage(dummy);
 		dummy1.setMoveSpeed(1.5f);
 		dummy1.appendPath();
-		dummy1.appendPath(dummy1.currX, 884);
+		dummy1.appendPath(dummy1.loc.x, 884);
 
 		SolidPlatform dummy2 = new SolidPlatform(690, 719, gm);
 		dummy2.setImage(dummy);
 		dummy2.setMoveSpeed(1.5f);
 		dummy2.appendPath();
-		dummy2.appendPath(dummy2.currX, 868);
+		dummy2.appendPath(dummy2.loc.x, 868);
 		
 		Particle trailer = new Particle();
 		trailer.setImage(1, explosion);
 		trailer.scale = .7f;
-		trailer.offsetY = 5;
+		trailer.offsetY = -5;
 
 		Particle fireExp = new Particle();
 		fireExp.setImage(3, explosion);
@@ -192,6 +192,7 @@ public class LightsOut extends StageBuilder
 		proj.setTrailer(trailer);
 		proj.setTrailerDelay(8);
 		proj.setImpact(fireExp);
+		proj.adjustTrailer(true);
 		
 		SimpleWeapon weap1 = new SimpleWeapon(0, 0, proj, Direction.E, 80);
 		weap1.setImage(cannon);
@@ -243,14 +244,14 @@ public class LightsOut extends StageBuilder
 				y = 870 + 8;
 			
 			PathDrone spik = new PathDrone(xStart, y);
-			spik.appendPath(spik.currX,spik.currY,0,true,()->{spikesspawn.play(SoundBank.getVolume(spik, gm, 700, 1.0f, 30));});
+			spik.appendPath(spik.loc.x,spik.loc.y,0,true,()->{spikesspawn.play(SoundBank.getVolume(spik, gm, 700, 1.0f, 30));});
 			spik.appendPath(xEnd, y,0,false,()->{spikesend.play(SoundBank.getVolume(spik, gm, 700, 1.0f, 30));});
 			spik.setImage(spikes);
 			spik.setMoveSpeed(4);
 			spik.addEvent(Factory.hitMain(spik, gm, -1));
 			
 			SolidPlatform solp = new SolidPlatform(xStart + spik.width, y, gm);
-			solp.appendPath(solp.currX,solp.currY,0,true,null);
+			solp.appendPath(solp.loc.x,solp.loc.y,0,true,null);
 			solp.appendPath(xEnd + spik.width, y);
 			solp.setMoveSpeed(4);
 			solp.setImage(spikesblock);

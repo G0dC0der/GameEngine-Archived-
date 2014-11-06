@@ -188,8 +188,8 @@ public class PiranhaHell extends StageBuilder
 		PathDrone dull = new PathDrone(2096, 384);
 		dull.setImage(8, dullplant);
 		dull.setMoveSpeed(2);
-		dull.appendPath(dull.currX, dull.currY, 100, false, null);
-		dull.appendPath(dull.currX, dull.currY + dull.height + 10, 100, false, null);
+		dull.appendPath(dull.loc.x, dull.loc.y, 100, false, null);
+		dull.appendPath(dull.loc.x, dull.loc.y + dull.height + 10, 100, false, null);
 		dull.addEvent(Factory.hitMain(dull, gm, -1));
 		dull.setHitbox(Hitbox.EXACT);
 		add(dull);

@@ -102,8 +102,8 @@ public class SquareTown extends StageBuilder
 		 * Spikey
 		 */
 		PathDrone spikey = new PathDrone(240, 1202);
-		spikey.appendPath(spikey.currX, spikey.currY);
-		spikey.appendPath(1020, spikey.currY);
+		spikey.appendPath(spikey.loc.x, spikey.loc.y);
+		spikey.appendPath(1020, spikey.loc.y);
 		spikey.appendPath(1020, 1501);
 		spikey.appendPath(240, 1501);
 		spikey.addEvent(Factory.hitMain(spikey, gm, -1));
@@ -133,8 +133,8 @@ public class SquareTown extends StageBuilder
 		 * Crabs
 		 */
 		PathDrone crab1 = new PathDrone(1181, 1302);
-		crab1.appendPath(crab1.currX, crab1.currY);
-		crab1.appendPath(crab1.currX, 792);
+		crab1.appendPath(crab1.loc.x, crab1.loc.y);
+		crab1.appendPath(crab1.loc.x, 792);
 		crab1.setImage(getCrabAnimationSpeed(), crabImg);
 		crab1.setMoveSpeed(getCrabSpeed());
 		crab1.setHitbox(Hitbox.EXACT);
@@ -142,8 +142,8 @@ public class SquareTown extends StageBuilder
 		crab1.addEvent(Factory.soundFalloff(crabMove1, crab1, gm, 400, 1, 25, 1));
 		
 		PathDrone crab2 = new PathDrone(1181, 182);
-		crab2.appendPath(crab2.currX, crab2.currY);
-		crab2.appendPath(crab2.currX, 432);
+		crab2.appendPath(crab2.loc.x, crab2.loc.y);
+		crab2.appendPath(crab2.loc.x, 432);
 		crab2.setImage(getCrabAnimationSpeed(), crabImg);
 		crab2.setMoveSpeed(getCrabSpeed());
 		crab2.setHitbox(Hitbox.EXACT);

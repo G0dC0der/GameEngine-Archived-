@@ -1,17 +1,24 @@
 package stages.demo;
 
-import game.core.Fundementals;
-import game.core.GameObject;
-import game.core.GameObject.Hitbox;
 import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.StageBuilder;
+import game.essentials.Animation;
+import game.essentials.Controller;
 import game.essentials.Image2D;
+import game.essentials.BigImage.RenderOption;
+import game.mains.GravityMan;
+import game.objects.CheckpointsHandler;
+import game.objects.Particle;
 import ui.accessories.Playable;
 
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
+
+@SuppressWarnings("all")
 @AutoDispose
 @AutoInstall(path=DebuggingMap.PATH, mainPath="res/general")
-@Playable(name="Debugging Map", description="Used for debugging and developing purposes.")
+//@Playable(name="Debugging Map", description="Used for debugging and developing purposes.")
 public class DebuggingMap extends StageBuilder
 {
 	static final String PATH = "res/debugging";
@@ -23,18 +30,19 @@ public class DebuggingMap extends StageBuilder
 	{
 		super.build();
 		
-		gm.flyMode(2);
+		backgroundImg.setRenderOption(RenderOption.PORTION);
 		
-		GameObject go = new GameObject();
-		go.setImage(rec);
-		go.setHitbox(Hitbox.EXACT);
-		go.moveTo(150, 400);
-		go.addEvent(()->{
-//			go.rotation+=1;
-			if(Fundementals.pixelPerfectRotation(go, gm))
-				System.out.println(Math.random());
-		});
-		add(go);
+		/**
+		 * Start testing below:
+		 */
+		
+		gm.flyMode(5);
+		
+		game.zoom = 1.2f;
 	}
-
+	
+	@Override
+	protected void extra() 
+	{
+	}
 }

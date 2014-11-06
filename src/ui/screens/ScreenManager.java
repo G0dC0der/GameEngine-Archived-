@@ -7,6 +7,7 @@ import game.essentials.HighScore;
 import ui.accessories.GameSettings;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 
 public class ScreenManager extends Game
@@ -69,11 +70,13 @@ public class ScreenManager extends Game
 		engine.showFps(settings.showFps);
 		engine.saveReplays = settings.saveReplays;
 		engine.masterVolume = settings.masterVolume;
+		engine.setGlobalScale(settings.masterZoom);
 		engine.setExitEvent(new Event()
 		{
 			@Override
 			public void eventHandling() 
 			{
+				Gdx.graphics.setDisplayMode(800, 600, false);
 				setScreen(menu);
 				System.gc();
 			}

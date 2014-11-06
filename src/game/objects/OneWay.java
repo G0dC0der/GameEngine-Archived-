@@ -32,8 +32,8 @@ public class OneWay extends GameObject implements Event
 			direction == Direction.NW)
 			throw new IllegalArgumentException("The direction must be either N, S, W or E.");
 		
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		this.direction = direction;
 		this.targets = targets;
 		block = new boolean[targets.length];
@@ -51,16 +51,16 @@ public class OneWay extends GameObject implements Event
 			switch(direction)
 			{
 				case S:
-					bool = mo.currY >= currY + height;
+					bool = mo.loc.y >= loc.y + height;
 					break;
 				case N:
-					bool = mo.currY + mo.height <= currY;
+					bool = mo.loc.y + mo.height <= loc.y;
 					break;
 				case E:
-					bool = currX + width <= mo.currX;
+					bool = loc.x + width <= mo.loc.x;
 					break;
 				case W:
-					bool = currX >= mo.currX + mo.width;
+					bool = loc.x >= mo.loc.x + mo.width;
 					break;
 				default: 
 					throw new RuntimeException();

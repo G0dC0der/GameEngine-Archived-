@@ -72,8 +72,8 @@ public class PathDrone extends Enemy
 	 */
 	public PathDrone(float x, float y)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		pathData = new LinkedList<>();
 		dataCounter = stillCounter = 0;
 	}
@@ -146,7 +146,7 @@ public class PathDrone extends Enemy
 	 */
 	public void appendPath()
 	{
-		pathData.add(new PathData(currX, currY, 0, false, null));
+		pathData.add(new PathData(loc.x, loc.y, 0, false, null));
 	}
 	
 	/**
@@ -196,8 +196,8 @@ public class PathDrone extends Enemy
 				
 				resetPrevs();
 				
-				currX = pd.targetX;
-				currY = pd.targetY;
+				loc.x = pd.targetX;
+				loc.y = pd.targetY;
 				
 				if(playEvent && pd.event != null)
 				{
@@ -224,13 +224,13 @@ public class PathDrone extends Enemy
 		if (!canMove)
 			return;
 		
-	    float fX = targetX - currX;
-	    float fY = targetY - currY;
+	    float fX = targetX - loc.x;
+	    float fY = targetY - loc.y;
 	    double dist = Math.sqrt( fX*fX + fY*fY );
 	    double step = steps / dist;
 	    
-	    float tx = (float) (currX + fX * step);
-	    float ty = (float) (currY + fY * step);
+	    float tx = (float) (loc.x + fX * step);
+	    float ty = (float) (loc.y + fY * step);
 	    
 	    if(rock)
 	    {
@@ -259,7 +259,7 @@ public class PathDrone extends Enemy
 	
 	protected boolean reached(PathData pd)
 	{
-		return moveSpeed > Fundementals.distance(pd.targetX, pd.targetY, currX, currY);
+		return moveSpeed > Fundementals.distance(pd.targetX, pd.targetY, loc.x, loc.y);
 	}
 
 	@Override

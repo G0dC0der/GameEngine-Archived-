@@ -57,7 +57,7 @@ public class AbstractTraningStage extends StageBuilder
 				GameObject closest = Fundementals.findClosest(friend, people);
 				if(closest != null)
 				{
-					if(closest.currX + closest.width / 2 > friend.currX + friend.width / 2)
+					if(closest.loc.x + closest.width / 2 > friend.loc.x + friend.width / 2)
 						friend.facing = Direction.NE;
 					else
 						friend.facing = Direction.NW;

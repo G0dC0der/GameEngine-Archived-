@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 public class MainMenu implements Screen
 {
@@ -46,11 +48,11 @@ public class MainMenu implements Screen
 	@Override
 	public void show() 
 	{
-		stage = new Stage();
+		stage = new Stage(new ScalingViewport(Scaling.none, 800, 600));
 		Gdx.input.setInputProcessor(stage);
 		skin = new Skin(Gdx.files.internal("res/data/uiskin.json"));
 		
-		batch = new SpriteBatch(1);
+		batch = new SpriteBatch();
 		background = new Texture(Gdx.files.internal("res/data/background.png"));
 
 		TextButton selectStage = new TextButton("Select Stage", skin);

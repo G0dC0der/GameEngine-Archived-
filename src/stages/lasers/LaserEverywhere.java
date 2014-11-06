@@ -83,8 +83,8 @@ public class LaserEverywhere extends StageBuilder
 		 */
 		final GameObject diamond = new GameObject();
 		diamond.setImage(6, diamondImg);
-		diamond.currX = 64;
-		diamond.currY = 106;
+		diamond.loc.x = 64;
+		diamond.loc.y = 106;
 		diamond.addEvent(new Event()
 		{	
 			@Override
@@ -105,8 +105,8 @@ public class LaserEverywhere extends StageBuilder
 		 */
 		final GameObject f = new GameObject();
 		f.setImage(4, flagImg);
-		f.currX = 125;
-		f.currY = 1261;
+		f.loc.x = 125;
+		f.loc.y = 1261;
 		f.addEvent(()->{if(taken && f.collidesWith(gm)) gm.setState(CharacterState.FINISH);});
 		add(f);
 		

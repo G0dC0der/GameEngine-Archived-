@@ -130,8 +130,8 @@ public class ClimbMe extends Stage
 		
 		GameObject weak1 = new GameObject();
 		weak1.setImage(new Animation<>(1, weakImg));
-		weak1.currX = 270;
-		weak1.currY = 4162;
+		weak1.loc.x = 270;
+		weak1.loc.y = 4162;
 		weak1.addEvent(Factory.weakPlatform(weak1, destroyImage, 70, collapse, gm));
 		
 		GameObject weak2 = weak1.getClone(370, 4263);
@@ -275,8 +275,8 @@ public class ClimbMe extends Stage
 		 */
 		GameObject prop1 = new GameObject();
 		prop1.setImage(new Animation<>(2, propImg));
-		prop1.currX = 54;
-		prop1.currY = 2043;
+		prop1.loc.x = 54;
+		prop1.loc.y = 2043;
 		prop1.setHitbox(Hitbox.EXACT);
 		prop1.addEvent(Factory.hitMain(prop1, gm, -1));
 		
@@ -288,8 +288,8 @@ public class ClimbMe extends Stage
 		
 		GameObject prop2 = new GameObject();
 		prop2.setImage(new Animation<>(2, prop2Img));
-		prop2.currX = 453;
-		prop2.currY = 1180;
+		prop2.loc.x = 453;
+		prop2.loc.y = 1180;
 		prop2.setHitbox(Hitbox.EXACT);
 		prop2.addEvent(Factory.hitMain(prop2, gm, -1));
 		
@@ -301,8 +301,8 @@ public class ClimbMe extends Stage
 		
 		GameObject prop3 = new GameObject();
 		prop3.setImage(new Animation<>(2, prop3Img));
-		prop3.currX = 577;
-		prop3.currY = 1262;
+		prop3.loc.x = 577;
+		prop3.loc.y = 1262;
 		prop3.setHitbox(Hitbox.EXACT);
 		prop3.addEvent(Factory.hitMain(prop3, gm, -1));
 		
@@ -353,8 +353,8 @@ public class ClimbMe extends Stage
 		
 		GameObject flag = new GameObject();
 		flag.setImage(new Animation<>(3, flagImg));
-		flag.currX = 1102;
-		flag.currY = 164;
+		flag.loc.x = 1102;
+		flag.loc.y = 164;
 		
 		add(topb, flag);
 		
@@ -367,7 +367,7 @@ public class ClimbMe extends Stage
 	@Override
 	public void extra()
 	{
-		if(moveSpeed > Fundementals.distance(sol1.currX, sol1.currY, x1, y1) && moveSpeed < Fundementals.distance(sol2.currX, sol2.currY, x3, y3))
+		if(moveSpeed > Fundementals.distance(sol1.loc.x, sol1.loc.y, x1, y1) && moveSpeed < Fundementals.distance(sol2.loc.x, sol2.loc.y, x3, y3))
 			sol1.setMoveSpeed(0);
 		else
 			sol1.setMoveSpeed(moveSpeed);

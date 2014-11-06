@@ -34,8 +34,8 @@ class Blob extends Missile
 
 		MovableObject mo = new MovableObject();
 		mo.setImage(image);
-		mo.currX = currX;
-		mo.currY = currY;
+		mo.loc.x = loc.x;
+		mo.loc.y = loc.y;
 		adjust(spawnOn, mo);
 		
 		Event deform = Factory.tileDeformer(mo, Engine.SOLID, false);
@@ -46,8 +46,8 @@ class Blob extends Missile
 	
 	private static void adjust(MovableObject src, MovableObject target)
 	{
-		float nextX = target.currX + src.currX - src.getPrevX();
-		float nextY = target.currY + src.currY - src.getPrevY();
+		float nextX = target.loc.x + src.loc.x - src.getPrevX();
+		float nextY = target.loc.y + src.loc.y - src.getPrevY();
 		
 		if(target.canGoTo(nextX, nextY))
 			target.moveTo(nextX, nextY);
@@ -55,14 +55,14 @@ class Blob extends Missile
 		for(int i = 0; i < target.height; i++)
 		{
 			if(src.collidesWith(target))
-				target.currY--;
+				target.loc.y--;
 			else
 				break;
 		}
 		for(int i = 0; i < target.height * 2; i++)
 		{
 			if(src.collidesWith(target))
-				target.currY++;
+				target.loc.y++;
 			else
 				break;
 		}
@@ -70,22 +70,22 @@ class Blob extends Missile
 		for(int i = 0; i < target.width; i++)
 		{
 			if(src.collidesWith(target))
-				target.currX--;
+				target.loc.x--;
 			else
 				break;
 		}
 		for(int i = 0; i < target.width * 2; i++)
 		{
 			if(src.collidesWith(target))
-				target.currX++;
+				target.loc.x++;
 			else
 			
 				break;
 		}
 		if(src.collidesWith(target))
-			target.currX -= target.width;
+			target.loc.x -= target.width;
 		
 		if(src.collidesWith(target))
-			target.currY -= target.height;
+			target.loc.y -= target.height;
 	}
 }

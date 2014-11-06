@@ -110,8 +110,8 @@ public class Bouncer extends PathDrone
 		}
 		else
 			offsetX = offsetY = 0;
-		float middleX = currX + width / 2,
-			  middleY = currY + height / 2;
+		float middleX = loc.x + width / 2,
+			  middleY = loc.y + height / 2;
 		
 		for (int i = 0; i < victims.length; i++)
 		{

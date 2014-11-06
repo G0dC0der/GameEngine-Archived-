@@ -33,8 +33,8 @@ public class Boo extends Enemy
 	public Boo(float x, float y, MovableObject victim)
 	{
 		super();
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		this.victim = victim;
 		maxSpeed = 3;
 		acc = 0.03f;
@@ -77,7 +77,7 @@ public class Boo extends Enemy
 	public void moveEnemy() 
 	{
 		if(decline)
-			facing = (victim.currX + victim.width / 2 > currX + width) ? Direction.E : Direction.W;
+			facing = (victim.loc.x + victim.width / 2 > loc.x + width) ? Direction.E : Direction.W;
 		
 		if(canSneak())
 		{
@@ -87,7 +87,7 @@ public class Boo extends Enemy
 			if(resetHideImage && hideImage != null)
 				hideImage.reset();
 			
-			moveToward(victim.currX + victim.width / 2, victim.currY + victim.height / 2, velocity);
+			moveToward(victim.loc.x + victim.width / 2, victim.loc.y + victim.height / 2, velocity);
 			
 			if(!hunting)
 				image = huntImage;
@@ -200,10 +200,10 @@ public class Boo extends Enemy
 	
 	protected boolean canSneak()
 	{
-		if(stone && !hunting && Fundementals.distance(currX + width / 2, currY + height / 2, victim.currX + victim.width / 2, victim.currY + victim.height / 2) < unfreezeRadius)
+		if(stone && !hunting && Fundementals.distance(loc.x + width / 2, loc.y + height / 2, victim.loc.x + victim.width / 2, victim.loc.y + victim.height / 2) < unfreezeRadius)
 			return false;
 		
-		boolean toTheLeft = currX + width / 2 > victim.currX;
+		boolean toTheLeft = loc.x + width / 2 > victim.loc.x;
 		
 		if( toTheLeft && (victim.facing == Direction.NW || victim.facing == Direction.W || victim.facing == Direction.SW))
 			return true;

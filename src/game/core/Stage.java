@@ -259,8 +259,8 @@ public abstract class Stage
 					
 					updateFacing(enemy);
 					
-					enemy.prevX = enemy.currX;
-					enemy.prevY = enemy.currY;
+					enemy.prevX = enemy.loc.x;
+					enemy.prevY = enemy.loc.y;
 				}
 				else
 					enemy.goBack();
@@ -285,8 +285,8 @@ public abstract class Stage
 			if(!main.halted)
 			{
 				updateFacing(main);
-				main.prevX = main.currX;
-				main.prevY = main.currY;
+				main.prevX = main.loc.x;
+				main.prevY = main.loc.y;
 				
 				if(main.isGhost())
 					main.handleInput(main.getNext());
@@ -627,7 +627,7 @@ public abstract class Stage
 	{
 		if(!mo.manualFacings)
 		{
-			Direction dir = Fundementals.getDirection(Fundementals.normalize(mo.prevX, mo.prevY, mo.currX, mo.currY));
+			Direction dir = Fundementals.getDirection(Fundementals.normalize(mo.prevX, mo.prevY, mo.loc.x, mo.loc.y));
 			if(dir != null)
 			{
 				if(mo.doubleFaced)

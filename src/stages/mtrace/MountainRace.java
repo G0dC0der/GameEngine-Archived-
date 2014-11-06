@@ -206,15 +206,15 @@ public class MountainRace extends StageBuilder
 		GameObject cl = new GameObject();
 		cl.setImage(windmaker);
 		cl.addEvent(Factory.wobble(cl, -2, 2, -2, 2, 10));
-		cl.currX = 1432;
-		cl.currY = 129;
+		cl.loc.x = 1432;
+		cl.loc.y = 129;
 		
 		Wind thewind = new Wind(1627, 155, Direction.SE, 7, 7, gm, ghost1, ghost2, ghost3);
 		thewind.setHitbox(Hitbox.EXACT);
 		thewind.setImage(3, wind);
 		thewind.zIndex(200);
 		
-		add(cl, thewind, Factory.soundFalloff(blow, gm, thewind.currX + thewind.width / 2, thewind.currY + thewind.height / 2, 1000, 0, 50,1));
+		add(cl, thewind, Factory.soundFalloff(blow, gm, thewind.loc.x + thewind.width / 2, thewind.loc.y + thewind.height / 2, 1000, 0, 50,1));
 		
 		/*
 		 * Bouncer
@@ -234,8 +234,8 @@ public class MountainRace extends StageBuilder
 		 */
 		GameObject winflag = new GameObject();
 		winflag.setImage(4, flag);
-		winflag.currX = 782;
-		winflag.currY = 499;
+		winflag.loc.x = 782;
+		winflag.loc.y = 499;
 		
 		add(winflag);
 	}

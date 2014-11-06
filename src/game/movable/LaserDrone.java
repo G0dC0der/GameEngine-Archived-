@@ -185,10 +185,10 @@ public class LaserDrone extends PathDrone
 			
 			if(target != null)
 			{
-				int x1 = (int) (currX + width  / 2),
-					y1 = (int) (currY + height / 2),
-					x2 = (int) (target.currX + target.width  / 2),
-					y2 = (int) (target.currY + target.height / 2);
+				int x1 = (int) (loc.x + width  / 2),
+					y1 = (int) (loc.y + height / 2),
+					x2 = (int) (target.loc.x + target.width  / 2),
+					y2 = (int) (target.loc.y + target.height / 2);
 				
 				Vector2 wallp = Fundementals.searchTile(x1,y1, x2,y2, stopTile);
 				if(wallp == null)
@@ -216,12 +216,12 @@ public class LaserDrone extends PathDrone
 			}
 			if(firing)
 			{
-				firingBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
+				firingBeam.fireAt(loc.x + width / 2, loc.y + height / 2, targetX, targetY, 1);
 				sounds.stop(0);
 				sounds.trySound(1, false);
 				
 				for(GameObject go : targets)
-					if(Fundementals.checkLine((int)currX, (int) currY, (int)targetX, (int)targetY, go))
+					if(Fundementals.checkLine((int)loc.x, (int) loc.y, (int)targetX, (int)targetY, go))
 						go.runHitEvent(this);
 				
 				if(++ducounter % laserDuration == 0)
@@ -234,7 +234,7 @@ public class LaserDrone extends PathDrone
 			else
 			{
 				sounds.trySound(0, false);
-				chargeBeam.fireAt(currX + width / 2, currY + height / 2, targetX, targetY, 1);
+				chargeBeam.fireAt(loc.x + width / 2, loc.y + height / 2, targetX, targetY, 1);
 			}
 		}
 	}

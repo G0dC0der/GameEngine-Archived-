@@ -93,7 +93,7 @@ public class TraningStage5 extends StageBuilder
 		GameObject dummy = new GameObject();
 		dummy.setVisible(true);
 		dummy.addEvent(()->{
-			dummy.moveTo(drill.currX, gm.currY);
+			dummy.moveTo(drill.loc.x, gm.loc.y);
 		});
 		
 		add(dummy);
@@ -117,11 +117,11 @@ public class TraningStage5 extends StageBuilder
 				drill.freeze();
 		}
 		
-		game.tx = Math.min(size.width  - game.getScreenWidth(),   Math.max(0, gm.currX - game.getScreenWidth()  / 2)) + game.getScreenWidth()  / 2; 
+		game.tx = Math.min(size.width  - game.getScreenWidth(),   Math.max(0, gm.loc.x - game.getScreenWidth()  / 2)) + game.getScreenWidth()  / 2; 
 		
 		final PathDrone aDrill = allDrills.get(0);
 		
-		if(aDrill.currX + game.getScreenWidth() / 2 > gm.currX)
-			game.tx = aDrill.currX + game.getScreenWidth() / 2;
+		if(aDrill.loc.x + game.getScreenWidth() / 2 > gm.loc.x)
+			game.tx = aDrill.loc.x + game.getScreenWidth() / 2;
 	}
 }

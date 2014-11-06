@@ -81,8 +81,8 @@ public class GhostBridge extends StageBuilder
 		final GameObject lava = new GameObject();
 		lava.setImage(6, lavaImg);
 		lava.setHitbox(Hitbox.EXACT);
-		lava.currX = 25;
-		lava.currY = 762;
+		lava.loc.x = 25;
+		lava.loc.y = 762;
 		lava.zIndex(100);
 		lava.addEvent(()-> { if(lava.collidesWith(gm)) gm.setState(CharacterState.DEAD); });
 		add(lava);
@@ -95,8 +95,8 @@ public class GhostBridge extends StageBuilder
 		for(int i = 0; i < 20; i++, posX += 35)
 		{
 			GameObject weakplatform = new GameObject();
-			weakplatform.currX = posX;
-			weakplatform.currY = posY;
+			weakplatform.loc.x = posX;
+			weakplatform.loc.y = posY;
 			weakplatform.setImage(weakImg);
 			weakplatform.addEvent(Factory.weakPlatform(weakplatform, null, getCollapseTime(), removeBlock, gm));
 			add(weakplatform);
@@ -137,8 +137,8 @@ public class GhostBridge extends StageBuilder
 		 */
 		rightDown = new GameObject();
 		rightDown.setImage(4, diamondImg);
-		rightDown.currX = 877;
-		rightDown.currY = 218;
+		rightDown.loc.x = 877;
+		rightDown.loc.y = 218;
 		
 		leftDown = rightDown.getClone(27, 218);		
 		rightMiddle = rightDown.getClone(877, 188);		
@@ -173,8 +173,8 @@ public class GhostBridge extends StageBuilder
 		 */
 		final GameObject coin = new GameObject();
 		coin.setImage(new Animation<>(7, coinImg));
-		coin.currX = 458;
-		coin.currY = 799;
+		coin.loc.x = 458;
+		coin.loc.y = 799;
 		coin.addEvent(()->{ if(coin.collidesWith(gm)) discard(coin); });
 		add(coin);
 		

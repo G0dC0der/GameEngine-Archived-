@@ -9,7 +9,7 @@ public class GameSettings
 {
 	public boolean vsync, showFps, clearEachFrame, saveReplays;
 	public int fps;
-	public double masterVolume;
+	public double masterVolume, masterZoom;
 
 	public GameSettings()
 	{
@@ -50,7 +50,10 @@ public class GameSettings
 								vsync = Boolean.parseBoolean(value);
 								break;
 							case "volume":
-								masterVolume = Double.parseDouble(value);
+								masterVolume = precentageToDecimal(value);
+								break;
+							case "zoom":
+								masterZoom = precentageToDecimal(value);
 								break;
 							case "cleareachframe":
 								clearEachFrame = Boolean.parseBoolean(value);
@@ -73,5 +76,10 @@ public class GameSettings
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	static double precentageToDecimal(String value)
+	{
+		return Double.parseDouble(value.replace("%", "")) / 100;
 	}
 }

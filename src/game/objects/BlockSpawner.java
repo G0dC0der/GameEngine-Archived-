@@ -35,8 +35,8 @@ public class BlockSpawner extends GameObject implements Event
 	 */
 	public BlockSpawner(float x, float y, MovableObject... users)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		this.users = users;
 		sounds = new SoundBank(2);//0 = Spawn sound, 1 = remove sound
 		sounds.setEmitter(this);
@@ -204,7 +204,7 @@ public class BlockSpawner extends GameObject implements Event
 					cleared = true;
 				
 				if(removePart != null)
-					s.add(removePart.getClone(blocks[index].currX, blocks[index].currY));
+					s.add(removePart.getClone(blocks[index].loc.x, blocks[index].loc.y));
 				
 				s.discard(blocks[index]);
 				index--;

@@ -39,8 +39,8 @@ public class Projectile extends Enemy
 	 */
 	public Projectile(float initialX, float initialY, GameObject... targets)
 	{
-		currX = this.initialX = initialX;
-		currY = this.initialY = initialY;
+		loc.x = this.initialX = initialX;
+		loc.y = this.initialY = initialY;
 		this.targets = targets;
 		targetX = -1;
 		targetY = -1;
@@ -131,7 +131,10 @@ public class Projectile extends Enemy
 		if(subject != null)
 			subject.runHitEvent(this);
 		if(impact != null)
-			stage.add(impact.getClone(currX - impact.width / 2, currY - impact.height / 2));
+		{
+			Vector2 front = getFrontPosition();
+			stage.add(impact.getClone(front.x - impact.halfWidth(), front.y - impact.halfHeight()));
+		}
 
 		sounds.stop(1);
 		
@@ -146,8 +149,8 @@ public class Projectile extends Enemy
 			sounds.allowSound(0);
 			sounds.allowSound(1);
 			
-			currX = initialX;
-			currY = initialY;		
+			loc.x = initialX;
+			loc.y = initialY;		
 		}
 	}
 	
@@ -165,7 +168,7 @@ public class Projectile extends Enemy
 	 */
 	protected void checkCollisions()
 	{
-		if (!canGoTo(currX,currY))
+		if (!canGoTo(loc.x,loc.y))
 			hit(null);
 		else
 		{

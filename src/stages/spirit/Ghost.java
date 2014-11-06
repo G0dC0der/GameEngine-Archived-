@@ -46,7 +46,7 @@ class Ghost extends PathDrone
 			{
 				if(reachedDest)
 				{
-					reward.currX = 512;
+					reward.loc.x = 512;
 					stage.discard(this);
 					stage.add(reward);
 				}

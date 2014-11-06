@@ -80,8 +80,8 @@ public class SimpleWeapon extends PathDrone
 	{
 		if(--reloadCounter < 0)
 		{
-			float startX = currX + offsetX;
-			float startY = currY + offsetY;
+			float startX = loc.x + offsetX;
+			float startY = loc.y + offsetY;
 			
 			Projectile projClone = proj.getClone(startX, startY);
 			projClone.setDisposable(true);

@@ -158,8 +158,8 @@ public class DiamondCave extends StageBuilder
 		ram1.setMoveSpeed(1.6f);
 		ram1.setRock(true, true);
 		ram1.setHitbox(Hitbox.CIRCLE);
-		PathDrone ram2 = ram1.getClone(ram1.currX + ram1.width + 100, ram1.currY);
-		PathDrone ram3 = ram1.getClone(ram1.currX, ram1.currY + ram1.height + 100);
+		PathDrone ram2 = ram1.getClone(ram1.loc.x + ram1.width + 100, ram1.loc.y);
+		PathDrone ram3 = ram1.getClone(ram1.loc.x, ram1.loc.y + ram1.height + 100);
 		final int rotationSpeed = 15;
 		
 		ram1.appendPath(data1);
@@ -386,7 +386,7 @@ public class DiamondCave extends StageBuilder
 		if(++counter % 10 == 0)
 			add(blingbling.getClone(MathUtils.random(game.tx - game.getScreenWidth() / 2, game.tx + game.getScreenWidth() / 2), MathUtils.random(game.ty - game.getScreenHeight() / 2, game.ty + game.getScreenHeight() / 2)));
 		
-		if(Fundementals.rectangleVsRectangle(gm.currX, gm.currY, gm.width(), gm.height(), 0, size.height - 1, size.width, 1))
+		if(Fundementals.rectangleVsRectangle(gm.loc.x, gm.loc.y, gm.width(), gm.height(), 0, size.height - 1, size.width, 1))
 			gm.setState(CharacterState.DEAD);
 	}
 	

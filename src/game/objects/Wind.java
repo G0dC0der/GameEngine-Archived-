@@ -25,8 +25,8 @@ public class Wind extends GameObject
 	 */
 	public Wind (float x, float y, Direction dirr, float blowStrength, float maxStrength, GravityMan... victims)
 	{
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		this.dirr = dirr;
 		this.blowStrength = blowStrength;
 		this.maxStrength = maxStrength;

@@ -87,9 +87,9 @@ public class GravityMan extends MainCharacter
 		/*
 		 * Steep slopes checks
 		 */
-		int x  = (int)  currX, 
-			x2 = (int) (currX + width), 
-			y  = (int) (currY + height);
+		int x  = (int)  loc.x, 
+			x2 = (int) (loc.x + width), 
+			y  = (int) (loc.y + height);
 		
 		boolean canDown  = canGoDown(),
 				canLeft  = canGoLeft(),
@@ -97,13 +97,13 @@ public class GravityMan extends MainCharacter
 		
 		if(!canDown && !canLeft && (!MovableObject.outOfBounds(x + 2, y + 2) && (d[y + 2][x + 1] != SOLID || d[y + 2][x + 2] != SOLID)))
 		{
-			currX++;
+			loc.x++;
 			vy = -60;
 			leftInput = false;
 		}
 		else if (!canDown && !canRight && (!MovableObject.outOfBounds(x - 2, y + 2) && (d[y + 2][x2 - 1] != SOLID || d[y + 2][x2 - 2] != SOLID)))
 		{
-			currX--;
+			loc.x--;
 			vy = -60;
 			rightInput = false;
 		}
@@ -186,7 +186,7 @@ public class GravityMan extends MainCharacter
 				if(-vx < maxX)
 					vx -= accX * DELTA + boostX;
 			}
-			float targetX = currX - vx * DELTA;
+			float targetX = loc.x - vx * DELTA;
 			
 			if(vx > 0)
 				runLeft(targetX);
@@ -200,14 +200,14 @@ public class GravityMan extends MainCharacter
 			if(vx > 0)
 			{
 				vx -= accX * DELTA;
-				targetX = currX - vx * DELTA;
+				targetX = loc.x - vx * DELTA;
 				
 				runLeft(targetX);
 			}
 			if(vx < 0)
 			{
 				vx += accX * DELTA;
-				targetX = currX - vx * DELTA;
+				targetX = loc.x - vx * DELTA;
 				
 				runRight(targetX);
 			}
@@ -269,7 +269,7 @@ public class GravityMan extends MainCharacter
 	    if(vy != 0)
 	    {
 	    	boolean falling = vy < 0; 
-	    	float nextY = currY - vy * DELTA;	    	
+	    	float nextY = loc.y - vy * DELTA;	    	
 	    	
 		    if(!falling)
 		    {
@@ -277,7 +277,7 @@ public class GravityMan extends MainCharacter
 		    	{
 		    		if(!canGoDown())
 		    			sounds.playSound(0);
-		    		moveTo(currX, nextY);
+		    		moveTo(loc.x, nextY);
 		    	}
 		    	else
 		    	{
@@ -286,7 +286,7 @@ public class GravityMan extends MainCharacter
 		    	}
 		    }
 		    else if(falling && canGoDown(nextY))
-		    	moveTo(currX, nextY);
+		    	moveTo(loc.x, nextY);
 		    else
 		    	tryDown(5);
 		    
@@ -388,32 +388,32 @@ public class GravityMan extends MainCharacter
 	
 	protected boolean canSlopeLeft(float targetX)
 	{
-		int y = (int)currY - 1, tar = (int) targetX;
+		int y = (int)loc.y - 1, tar = (int) targetX;
 		
 		for (int i = 0; i < height; i++)
 			if(d[y + i][tar] == SOLID)
 				return false;
 		
-		return !isOverlapping(targetX, currY);
+		return !isOverlapping(targetX, loc.y);
 	}
 	
 	protected boolean canSlopeRight(float targetX)
 	{
-		int y = (int)currY - 1, tar = (int) (targetX + width);
+		int y = (int)loc.y - 1, tar = (int) (targetX + width);
 		
 		for (int i = 0; i < height; i++)
 			if(d[y + i][tar] == SOLID)
 				return false;
 		
-		return !isOverlapping(targetX, currY);
+		return !isOverlapping(targetX, loc.y);
 	}
 	
 	protected boolean leftWall()
 	{
-		int y = (int)currY, 
-			x = (int)currX;
+		int y = (int)loc.y, 
+			x = (int)loc.x;
 		
-		if(isOverlapping(currX - 1, currY))
+		if(isOverlapping(loc.x - 1, loc.y))
 			return true;
 		
 		for (int i = 0; i < height / 2; i++)
@@ -425,10 +425,10 @@ public class GravityMan extends MainCharacter
 	
 	protected boolean rightWall()
 	{
-		int y = (int)currY, 
-			x = (int)(currX + width);
+		int y = (int)loc.y, 
+			x = (int)(loc.x + width);
 		
-		if(isOverlapping(currX + 1, currY))
+		if(isOverlapping(loc.x + 1, loc.y))
 			return true;
 		
 		for (int i = 0; i < height / 2; i++)
@@ -440,23 +440,23 @@ public class GravityMan extends MainCharacter
 	
 	protected void runLeft(float targetX)
 	{
-		if(isOverlapping(targetX, currY))
+		if(isOverlapping(targetX, loc.y))
 		{
 			vx = 0;
 			return;				
 		}
 		
-		for(float next = currX; next >= targetX; next-= 0.1f)
+		for(float next = loc.x; next >= targetX; next-= 0.1f)
 		{
 			if(canGoLeft(next))
 			{
-				currX = next;
-				if(canGoDown(currY + 1) && !canGoDown(currY + 2))
-					currY++;
+				loc.x = next;
+				if(canGoDown(loc.y + 1) && !canGoDown(loc.y + 2))
+					loc.y++;
 			}
 			else if(canSlopeLeft(next))
 			{
-				moveTo(next, currY - 1);
+				moveTo(next, loc.y - 1);
 				tryDown(1);
 			}
 			else
@@ -469,23 +469,23 @@ public class GravityMan extends MainCharacter
 	
 	protected void runRight(float targetX)
 	{
-		if(isOverlapping(targetX, currY))
+		if(isOverlapping(targetX, loc.y))
 		{
 			vx = 0;
 			return;				
 		}
 		
-		for(float next = currX; next <= targetX; next+= 0.1f)
+		for(float next = loc.x; next <= targetX; next+= 0.1f)
 		{
 			if(canGoRight(next))
 			{
-				currX = next;
-				if(canGoDown(currY + 1) && !canGoDown(currY + 2))
-					currY++;
+				loc.x = next;
+				if(canGoDown(loc.y + 1) && !canGoDown(loc.y + 2))
+					loc.y++;
 			}
 			else if(canSlopeRight(next))
 			{
-				moveTo(next, currY - 1);
+				moveTo(next, loc.y - 1);
 				tryDown(1);
 			}
 			else

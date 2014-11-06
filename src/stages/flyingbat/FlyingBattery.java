@@ -102,8 +102,8 @@ public class FlyingBattery extends Stage
 		gm.setController((Controller)Utilities.importObject("res/data/controller1.con"));
 		gm.hit(1);
 		gm.setJumpingSound(jump);
-		gm.currX = startX;
-		gm.currY = startY;
+		gm.loc.x = startX;
+		gm.loc.y = startY;
 		gm.addTileEvent(Factory.slipperWalls(gm));
 		gm.addTileEvent(Factory.pushEvent(gm, Engine.AREA_TRIGGER_2, 0.3f, Direction.E));
 		gm.deathImg = new Particle();
@@ -113,13 +113,13 @@ public class FlyingBattery extends Stage
 		
 		GameObject dummyElectric = new GameObject();
 		dummyElectric.setImage(new Animation<>(4, electricImg));
-		dummyElectric.currX = 430;
-		dummyElectric.currY = 606;
+		dummyElectric.loc.x = 430;
+		dummyElectric.loc.y = 606;
 		
 		final MovableObject door = new MovableObject();
 		door.setImage(new Animation<>(1, doorImg));
-		door.currX = 1498;
-		door.currY = 351;
+		door.loc.x = 1498;
+		door.loc.y = 351;
 		gm.avoidOverlapping(door);
 		
 		final PathDrone button = new PathDrone(46, 455);
@@ -149,8 +149,8 @@ public class FlyingBattery extends Stage
 		{	
 			while(push.collidesWith(gm))
 			{
-				gm.currX-=2;
-				push.moveTo(push.currX + 1, push.currY);
+				gm.loc.x-=2;
+				push.moveTo(push.loc.x + 1, push.loc.y);
 			}
 		});
 		
@@ -254,13 +254,13 @@ public class FlyingBattery extends Stage
 		
 		GameObject coin = new GameObject();
 		coin.setImage(new Animation<>(7, coinImg));
-		coin.currX = 3414;
-		coin.currY = 95;
+		coin.loc.x = 3414;
+		coin.loc.y = 95;
 		
 		GameObject wind = new GameObject();
 		wind.setImage(new Animation<>(2, windImg));
-		wind.currX = 2074;
-		wind.currY = 0;
+		wind.loc.x = 2074;
+		wind.loc.y = 0;
 		
 		final Missile mi = new Missile(0,0, gm);
 		mi.setImage(new Animation<>(1, shellImg));

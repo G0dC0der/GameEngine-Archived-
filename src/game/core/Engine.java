@@ -42,6 +42,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 /**
  * The Engine class is the core of the game. All calculations and controls and the required function calls are being called from here.
@@ -280,6 +282,7 @@ public final class Engine implements Screen
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
 	private boolean showFps, justRestarted, playReplay, showingDialog, replayHelp, crashed, checkpoint, flipY;
+	private double windowScale;
 	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
 	private OrthographicCamera camera, hudCamera;
@@ -316,7 +319,8 @@ public final class Engine implements Screen
 		this.stage = stage;
 		elapsedTime = 0;
 		globalState = GameState.ONGOING;
-		zoom = 1;
+		zoom = 1f;
+		windowScale = 1;
 		currTint = new Color(defaultTint);
 		errorIcon = new Texture(Gdx.files.internal("res/data/error.png"));
 		justRestarted = true;
@@ -324,11 +328,7 @@ public final class Engine implements Screen
 		viewport = new Dimension();
 		
 		if(replays == null)
-		{
 			this.replays = new LinkedList<>();
-			gui = new com.badlogic.gdx.scenes.scene2d.Stage();
-			skin = new Skin(Gdx.files.internal("res/data/uiskin.json"));
-		}
 		else
 		{
 			this.replays = replays;
@@ -444,7 +444,7 @@ public final class Engine implements Screen
 			runExitEvent();
 		else if(globalState == GameState.ENDED)
 		{
-			if((Gdx.input.isKeyPressed(Keys.R) && !playReplay) || (checkpoint && playReplay))	//TODO: Bug fix
+			if((Gdx.input.isKeyPressed(Keys.R) && !playReplay) || (checkpoint && playReplay && !replayFramesEnded()))
 			{
 				restart();
 				stage.build();
@@ -481,8 +481,14 @@ public final class Engine implements Screen
 		GFX.checkpoint = new Image2D("res/data/checkpoint.png");
 		GFX.checkpointReach = TinySound.loadSound(new File("res/data/checkpoint.wav"));
 
-		setViewport(800, 600);
 		batch = new SpriteBatch();
+		setViewport(800, 600);
+		
+		if(!playReplay)
+		{
+			gui = new com.badlogic.gdx.scenes.scene2d.Stage(new ScalingViewport(Scaling.none, (int)(800 * windowScale), (int)(600 * windowScale)), batch);
+			skin = new Skin(Gdx.files.internal("res/data/uiskin.json"));
+		}
 
 		stage.init();
 		stage.build();
@@ -548,6 +554,16 @@ public final class Engine implements Screen
 	}
 	
 	/**
+	 * Allow you to increase the size of the viewport, buy zooming.
+	 * @param windowScale The value to multiple with and height with.
+	 */
+	public void setGlobalScale(double windowScale)
+	{
+		this.windowScale = windowScale;
+		setViewport(viewport.width, viewport.height);
+	}
+	
+	/**
 	 * Sets the size of the viewport.
 	 * @param width The width in pixels.
 	 * @param height The height in pixels.
@@ -563,7 +579,7 @@ public final class Engine implements Screen
 		hudCamera = new OrthographicCamera(viewport.width, viewport.height);
 		hudCamera.setToOrtho(true,viewport.width, viewport.height);
 		
-		Gdx.graphics.setDisplayMode(viewport.width, viewport.height, false);
+		Gdx.graphics.setDisplayMode((int)(viewport.width * windowScale), (int)(viewport.height * windowScale), false);
 	}
 	
 	/**
@@ -660,6 +676,9 @@ public final class Engine implements Screen
 		return playReplay;
 	}
 	
+	/**
+	 * Flips the world vertically.
+	 */
 	public void flipWorldY()
 	{
 		camera.setToOrtho(flipY);
@@ -726,6 +745,15 @@ public final class Engine implements Screen
 		replays.get(index).add(pbs);
 	}
 	
+	private boolean replayFramesEnded()
+	{
+		for(List<PressedButtons> pbs : replays)
+			if(pbs.size() == 0)
+				return true;
+
+		return false;
+	}
+	
 	private void updateCamera()
 	{
 		final int size = focusObjs.size();
@@ -741,8 +769,8 @@ public final class Engine implements Screen
 			final float marginX = viewport.width  / 2;
 			final float marginY = viewport.height / 2;
 			
-			float boxX	= first.currX;
-			float boxY	= first.currY; 
+			float boxX	= first.loc.x;
+			float boxY	= first.loc.y; 
 			float boxWidth	= boxX + first.width();
 			float boxHeight	= boxY + first.height();
 
@@ -750,11 +778,11 @@ public final class Engine implements Screen
 			{
 				GameObject focus = focusObjs.get(i);
 				
-				boxX = Math.min( boxX, focus.currX );
-				boxY = Math.min( boxY, focus.currY );
+				boxX = Math.min( boxX, focus.loc.x );
+				boxY = Math.min( boxY, focus.loc.y );
 				
-				boxWidth  = Math.max( boxWidth,  focus.currX + focus.width () );
-				boxHeight = Math.max( boxHeight, focus.currY + focus.height() );
+				boxWidth  = Math.max( boxWidth,  focus.loc.x + focus.width () );
+				boxHeight = Math.max( boxHeight, focus.loc.y + focus.height() );
 			}
 			boxWidth = boxWidth - boxX;
 			boxHeight = boxHeight - boxY;
@@ -871,7 +899,7 @@ public final class Engine implements Screen
 		if (img != null && go.alpha > 0.0f)
 		{
 			img.setFlip(go.flipX, !go.flipY);
-			img.setPosition(go.currX + go.offsetX, go.currY + go.offsetY);
+			img.setPosition(go.loc.x + go.offsetX, go.loc.y + go.offsetY);
 			img.setRotation(go.rotation);
 			img.setAlpha(go.alpha);
 			img.setSize(go.width, go.height);
@@ -930,8 +958,8 @@ public final class Engine implements Screen
 				if(object.equals("retry"))
 				{
 					saveReplay(name);
-					stage.build();
 					restart();
+					stage.build();
 				}
 				else if(object.equals("menu"))
 				{
@@ -999,8 +1027,11 @@ public final class Engine implements Screen
 			else
 				timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
 		}
-		else if(replayHelp)
+		else if(replayHelp || (playReplay && globalState == GameState.COMPLETED))
+		{
+			replayHelp = true;
 			timeFont.draw(batch, "Press 'B' to return to the main menu.", viewport.width / 2 - 230, viewport.height / 2);
+		}
 	}
 	
 	private final void renderFPS()

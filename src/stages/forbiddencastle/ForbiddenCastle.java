@@ -100,8 +100,8 @@ public class ForbiddenCastle extends StageBuilder
 		GameObject goal = new GameObject();
 		goal.setImage(5, coin);
 		goal.moveTo(79 * 30, 3 * 30);
-		goal.currX += 10;
-		goal.currY += 15;
+		goal.loc.x += 10;
+		goal.loc.y += 15;
 		goal.addEvent(()->{
 			if(goal.collidesWith(gm))
 			{

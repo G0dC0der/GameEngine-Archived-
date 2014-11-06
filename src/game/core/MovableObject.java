@@ -207,8 +207,8 @@ public class MovableObject extends GameObject
 	public MovableObject getClone(float x, float y)
 	{
 		MovableObject mo = new MovableObject();
-		mo.currX = x;
-		mo.currY = y;
+		mo.loc.x = x;
+		mo.loc.y = y;
 		copyData(mo);
 		
 		return mo;
@@ -264,7 +264,7 @@ public class MovableObject extends GameObject
 	 */
 	public boolean canGoUp()
 	{
-		return canGoUp(currY - 1);
+		return canGoUp(loc.y - 1);
 	}
 	
 	/**
@@ -274,7 +274,7 @@ public class MovableObject extends GameObject
 	 */
 	public boolean canGoDown()
 	{
-		return canGoDown(currY + 1);
+		return canGoDown(loc.y + 1);
 	}
 	
 	/**
@@ -284,7 +284,7 @@ public class MovableObject extends GameObject
 	 */
 	public boolean canGoLeft()
 	{
-		return canGoLeft(currX - 1);
+		return canGoLeft(loc.x - 1);
 	}
 	
 	/**
@@ -294,7 +294,7 @@ public class MovableObject extends GameObject
 	 */
 	public boolean canGoRight()
 	{
-		return canGoRight(currX + 1);
+		return canGoRight(loc.x + 1);
 	}
 	
 	/**
@@ -306,7 +306,7 @@ public class MovableObject extends GameObject
 		if (!canMove)
 			return false;
 		
-		int y = (int)currY, tar = (int) targetX;
+		int y = (int)loc.y, tar = (int) targetX;
 		
 		if(outOfBounds(tar,y))
 			return false;
@@ -316,7 +316,7 @@ public class MovableObject extends GameObject
 			if(d[y + i][tar] == SOLID)
 				return false;
 		
-		if(isOverlapping(targetX, currY))
+		if(isOverlapping(targetX, loc.y))
 			return false;
 		return true;
 	}
@@ -330,7 +330,7 @@ public class MovableObject extends GameObject
 		if (!canMove)
 			return false;
 		
-		int y = (int)currY, tar = (int) (targetX + width);
+		int y = (int)loc.y, tar = (int) (targetX + width);
 		
 		if(outOfBounds(tar, y))
 			return false;
@@ -340,7 +340,7 @@ public class MovableObject extends GameObject
 			if(d[y + i][tar] == SOLID)
 				return false;
 
-		if(isOverlapping(targetX, currY))
+		if(isOverlapping(targetX, loc.y))
 			return false;
 		return true;
 	}
@@ -354,7 +354,7 @@ public class MovableObject extends GameObject
 		if (!canMove)
 			return false;
 		
-		int x = (int)currX, tar = (int) targetY;
+		int x = (int)loc.x, tar = (int) targetY;
 		
 		if(outOfBounds(x,tar))
 			return false;
@@ -364,7 +364,7 @@ public class MovableObject extends GameObject
 			if(d[tar][x + i] == SOLID)
 				return false;
 		
-		if(isOverlapping(currX, targetY))
+		if(isOverlapping(loc.x, targetY))
 			return false;
 		return true;
 	}
@@ -378,7 +378,7 @@ public class MovableObject extends GameObject
 		if (!canMove)
 			return false;
 		
-		int x = (int)currX, tar = (int) (targetY + height);
+		int x = (int)loc.x, tar = (int) (targetY + height);
 
 		if(outOfBounds(x,tar))
 			return false;
@@ -388,7 +388,7 @@ public class MovableObject extends GameObject
 			if(d[tar][x + i] == SOLID)
 				return false;
 		
-		if(isOverlapping(currX, targetY))
+		if(isOverlapping(loc.x, targetY))
 			return false;
 		return true;
 	}
@@ -403,7 +403,7 @@ public class MovableObject extends GameObject
 		for (int i = 0; i < steps; i++)
 		{
 			if (canGoUp())
-				currY--;
+				loc.y--;
 			else
 				return false;
 		}
@@ -420,7 +420,7 @@ public class MovableObject extends GameObject
 		for (int i = 0; i < steps; i++)
 		{
 			if (canGoDown())
-				currY++;
+				loc.y++;
 			else
 				return false;
 		}
@@ -437,7 +437,7 @@ public class MovableObject extends GameObject
 		for (int i = 0; i < steps; i++)
 		{
 			if (canGoLeft())
-				currX--;
+				loc.x--;
 			else
 				return false;
 		}
@@ -454,7 +454,7 @@ public class MovableObject extends GameObject
 		for (int i = 0; i < steps; i++)
 		{
 			if (canGoRight())
-				currX++;
+				loc.x++;
 			else
 				return false;
 		}
@@ -466,8 +466,8 @@ public class MovableObject extends GameObject
 	 */
 	public void goBack()
 	{
-		currX = prevX;
-		currY = prevY;
+		loc.x = prevX;
+		loc.y = prevY;
 	}
 	
 	/**
@@ -478,11 +478,11 @@ public class MovableObject extends GameObject
 	 */
 	protected void tempTo(float x, float y)
 	{
-		tempX = currX;
-		tempY = currY;
+		tempX = loc.x;
+		tempY = loc.y;
 		
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 	}
 	
 	/**
@@ -490,8 +490,8 @@ public class MovableObject extends GameObject
 	 */
 	protected void tempBack()
 	{
-		currX = tempX;
-		currY = tempY;
+		loc.x = tempX;
+		loc.y = tempY;
 	}
 	
 	/**
@@ -532,13 +532,13 @@ public class MovableObject extends GameObject
 	{
 		if (canMove)
 		{
-		    float fX = targetX - currX;
-		    float fY = targetY - currY;
+		    float fX = targetX - loc.x;
+		    float fY = targetY - loc.y;
 		    double dist = Math.sqrt( fX*fX + fY*fY );
 		    double step = steps / dist;
 
-		    currX += fX * step;
-		    currY += fY * step;
+		    loc.x += fX * step;
+		    loc.y += fY * step;
 		}
 	}
 	
@@ -548,8 +548,8 @@ public class MovableObject extends GameObject
 	 */
 	public final void resetPrevs()
 	{
-		prevX = currX;
-		prevY = currY;
+		prevX = loc.x;
+		prevY = loc.y;
 	}
 	
 	/**
@@ -559,8 +559,8 @@ public class MovableObject extends GameObject
 	 */
 	public void adjust(MovableObject target, boolean harsh)
 	{
-		float nextX = target.currX + currX - prevX;
-		float nextY = target.currY + currY - prevY;
+		float nextX = target.loc.x + loc.x - prevX;
+		float nextY = target.loc.y + loc.y - prevY;
 		
 		if(target.canGoTo(nextX, nextY))
 			target.moveTo(nextX, nextY);
@@ -578,25 +578,25 @@ public class MovableObject extends GameObject
 		if(collidesWithMultiple(target) == null)
 			return;
 		
-		float centerX = currX + width() / 2;
-		float centerY = currY + height() / 2;
+		float centerX = loc.x + width() / 2;
+		float centerY = loc.y + height() / 2;
 		
-        double overX = ((target.width()  + width() ) /  2.0) - Math.abs((target.currX + target.width()  / 2) - centerX);
-        double overY = ((target.height() + height()) /  2.0) - Math.abs((target.currY + target.height() / 2) - centerY);
+        double overX = ((target.width()  + width() ) /  2.0) - Math.abs((target.loc.x + target.width()  / 2) - centerX);
+        double overY = ((target.height() + height()) /  2.0) - Math.abs((target.loc.y + target.height() / 2) - centerY);
        
         if(overY > overX)
         {
-            if(target.currX > centerX)
-            	target.currX += overX;
+            if(target.loc.x > centerX)
+            	target.loc.x += overX;
             else
-            	target.currX -= overX;
+            	target.loc.x -= overX;
         }
         else
         {
-        	if(target.currY > centerY)
-        		target.currY += overY;
+        	if(target.loc.y > centerY)
+        		target.loc.y += overY;
         	else
-        		target.currY -= overY;
+        		target.loc.y -= overY;
         }
 	}
 	
@@ -673,10 +673,10 @@ public class MovableObject extends GameObject
 	{
 		byte[][] d = Stage.STAGE.stageData;
 		
-		int x  = (int) go.currX + 1,
-			y  = (int) go.currY + 1,
-			x2 = (int) (go.currX + go.width  - 1),
-		    y2 = (int) (go.currY + go.height - 1);
+		int x  = (int) go.loc.x + 1,
+			y  = (int) go.loc.y + 1,
+			x2 = (int) (go.loc.x + go.width  - 1),
+		    y2 = (int) (go.loc.y + go.height - 1);
 		
 		for(int lx = x; lx < x2; lx++)
 		{
@@ -741,10 +741,10 @@ public class MovableObject extends GameObject
 		
 		boolean bool = false;
 		
-		float realX = currX,
-			  realY = currY;
-		currX = targetX;
-		currY = targetY;
+		float realX = loc.x,
+			  realY = loc.y;
+		loc.x = targetX;
+		loc.y = targetY;
 
 		for (GameObject go : solidObjects)
 			if (collidesWithMultiple(go) != null)
@@ -752,8 +752,8 @@ public class MovableObject extends GameObject
 				bool = true;
 				break;
 			}
-		currX = realX;
-		currY = realY;
+		loc.x = realX;
+		loc.y = realY;
 		
 		return bool;
 	}
@@ -819,7 +819,7 @@ public class MovableObject extends GameObject
 	 */
 	public boolean isMoving()
 	{
-		return currX != prevX || currY != prevY;
+		return loc.x != prevX || loc.y != prevY;
 	}
 	
 	/**

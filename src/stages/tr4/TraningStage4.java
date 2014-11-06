@@ -112,7 +112,7 @@ public class TraningStage4 extends AbstractTraningStage
 		hydr.setMoveSpeed(0);
 		
 		GameObject elevatorActivator = new GameObject();
-		elevatorActivator.moveTo(el.currX, el.currY - 50);
+		elevatorActivator.moveTo(el.loc.x, el.loc.y - 50);
 		elevatorActivator.width = el.width;
 		elevatorActivator.height = 50;
 		elevatorActivator.addEvent(()->{

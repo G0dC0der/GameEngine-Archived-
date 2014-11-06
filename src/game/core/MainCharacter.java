@@ -203,7 +203,7 @@ public abstract class MainCharacter extends MovableObject
 			halted = true;
 			
 			if(deathImg != null)
-				Stage.STAGE.add(deathImg.getClone(currX + (width / 2) - (deathImg.width / 2), currY + (height / 2) - (deathImg.height / 2)));
+				Stage.STAGE.add(deathImg.getClone(loc.x + (width / 2) - (deathImg.width / 2), loc.y + (height / 2) - (deathImg.height / 2)));
 		}
 	}
 }

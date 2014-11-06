@@ -218,7 +218,6 @@ public class Sandopolis extends StageBuilder
 		/*
 		 * Falling spike balls
 		 */
-		//TODO
 		SpikeBall bigSpike = new SpikeBall(4, 4);
 		bigSpike.setImage(spikeballImg);
 		bigSpike.addEvent(Factory.hitMain(bigSpike, gm, -1));
@@ -272,8 +271,8 @@ public class Sandopolis extends StageBuilder
 		
 		final GameObject leftCannon = new GameObject();
 		leftCannon.setImage(cannonImg);
-		leftCannon.currX = 4233;
-		leftCannon.currY = 462;
+		leftCannon.loc.x = 4233;
+		leftCannon.loc.y = 462;
 		leftCannon.addEvent(new Event()
 		{	
 			@Override
@@ -291,8 +290,8 @@ public class Sandopolis extends StageBuilder
 		
 		final GameObject rightCannon = new GameObject();
 		rightCannon.setImage(cannonImg);
-		rightCannon.currX = 17;
-		rightCannon.currY = 339;
+		rightCannon.loc.x = 17;
+		rightCannon.loc.y = 339;
 		rightCannon.addEvent(new Event()
 		{	
 			@Override
@@ -308,8 +307,8 @@ public class Sandopolis extends StageBuilder
 		
 		final GameObject middleCannon = new Dummy(2009, 883);
 		middleCannon.setImage(cannonImg);
-		middleCannon.currX = 2009;
-		middleCannon.currY = 883;
+		middleCannon.loc.x = 2009;
+		middleCannon.loc.y = 883;
 		middleCannon.addEvent(new Event()
 		{	
 			@Override
@@ -332,8 +331,8 @@ public class Sandopolis extends StageBuilder
 		wind.setImage(3, windImg);
 		
 		blower = new GameObject();
-		blower.currX = 1353;
-		blower.currY = 760;
+		blower.loc.x = 1353;
+		blower.loc.y = 760;
 		blower.setImage(blowingImg);
 		blower.addEvent(Factory.hitMain(blower, gm, -1));
 		blower.setHitEvent(new HitEvent() 
@@ -393,7 +392,7 @@ public class Sandopolis extends StageBuilder
 						discard(eye2);
 						discard(weapon1);
 						
-						Particle bossExp = new Particle(sun.currX - 100, sun.currY - 100, new GameObject[0]);
+						Particle bossExp = new Particle(sun.loc.x - 100, sun.loc.y - 100, new GameObject[0]);
 						bossExp.setImage(1, bossexpImg);
 						bossExp.setIntroSound(bossdie);
 						add(bossExp);
@@ -428,8 +427,8 @@ public class Sandopolis extends StageBuilder
 		 * Item
 		 */
 		final GameObject item = new GameObject();
-		item.currX = 70;
-		item.currY = 342;
+		item.loc.x = 70;
+		item.loc.y = 342;
 		item.setImage(5, itemImg);
 		item.addEvent(new Event()
 		{	
@@ -459,8 +458,8 @@ public class Sandopolis extends StageBuilder
 		proj.avoidOverlapping(stone);
 		
 		final GameObject powerup = new GameObject();
-		powerup.currX = 2848;
-		powerup.currY = 952;
+		powerup.loc.x = 2848;
+		powerup.loc.y = 952;
 		powerup.setImage(powerupImg);
 		powerup.addEvent(new Event()
 		{	
@@ -489,23 +488,23 @@ public class Sandopolis extends StageBuilder
 			return;
 		}
 		
-		if(10 < Fundementals.distance(sun.currX, 1, gm.currX, 1))
-			sun.moveToward(gm.currX, gm.currY - 300, 3);
+		if(10 < Fundementals.distance(sun.loc.x, 1, gm.loc.x, 1))
+			sun.moveToward(gm.loc.x, gm.loc.y - 300, 3);
 		
 		followEvent.eventHandling();
-		eye1.rotation = Fundementals.rotateTowardsPoint(eye1.currX, eye1.currY, gm.currX, gm.currY, eye1.rotation, 0.11f);
+		eye1.rotation = Fundementals.rotateTowardsPoint(eye1.loc.x, eye1.loc.y, gm.loc.x, gm.loc.y, eye1.rotation, 0.11f);
 		
 		followEvent2.eventHandling();
-		eye2.rotation = Fundementals.rotateTowardsPoint(eye2.currX, eye2.currY, gm.currX, gm.currY, eye2.rotation, 0.11f);
+		eye2.rotation = Fundementals.rotateTowardsPoint(eye2.loc.x, eye2.loc.y, gm.loc.x, gm.loc.y, eye2.rotation, 0.11f);
 	
-		if(!antiBlowDone && 100 > Fundementals.distance(antiBlow.currX, antiBlow.currY, 2844, 108))
+		if(!antiBlowDone && 100 > Fundementals.distance(antiBlow.loc.x, antiBlow.loc.y, 2844, 108))
 		{
 			antiBlow.setTarget(1393, 760);
 			antiBlowDone = true;
 		}
 		
 		if(pissed && sun.canSee(gm, GameObject.Accuracy.MID_CORNERS) && ++projCounter % 50 == 0)
-			add(proj.getClone(sun.currX + sun.width / 2, sun.currY + sun.height / 2));
+			add(proj.getClone(sun.loc.x + sun.width / 2, sun.loc.y + sun.height / 2));
 	}
 	
 	@Override
@@ -535,33 +534,33 @@ public class Sandopolis extends StageBuilder
 		@Override
 		public void moveEnemy() 
 		{
-			if(canGoDown() || (fallingDown && currY < Stage.getCurrentStage().size.height))
+			if(canGoDown() || (fallingDown && loc.y < Stage.getCurrentStage().size.height))
 			{
 				vy *= 1.0 - (damping * DELTA);
 			    float force = mass * gravity;
 			    vy += (force / mass) * DELTA;
 			    
-			    currY -= vy * DELTA;
+			    loc.y -= vy * DELTA;
 			}
 			else
 				vy = 0;
 			
 			if(!fallingDown)
 			{
-				if(currX < 3114)
+				if(loc.x < 3114)
 					fallingDown = true;
 				else
 				{
-					moveToward(0, currY);
+					moveToward(0, loc.y);
 					rotation -= rotationSpeed;
 				}
 				
 			}
-			else if(currY > Stage.getCurrentStage().size.height)
+			else if(loc.y > Stage.getCurrentStage().size.height)
 			{
 				fallingDown = false;
-				currX = Stage.getCurrentStage().size.width;
-				currY = 425;
+				loc.x = Stage.getCurrentStage().size.width;
+				loc.y = 425;
 				tryDown(33);
 			}
 		}

@@ -22,8 +22,8 @@ public class VerticalDrone extends Enemy
 	public VerticalDrone (float x, float y)
 	{
 		super();
-		currX = x;
-		currY = y;
+		loc.x = x;
+		loc.y = y;
 		moveUp = true;
 		sounds = new SoundBank(1);
 		sounds.setEmitter(this);

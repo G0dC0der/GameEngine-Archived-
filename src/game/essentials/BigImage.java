@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 /**
- * Can be used for large images such as backgrounds and foregrounds. The must commonly used ability with this class is portion render.
+ * Can be used for large images such as backgrounds and foregrounds. The must commonly used ability in this class is easy portion render.
  * @author Pojahn Moradi
  *
  */
@@ -95,12 +95,14 @@ public class BigImage extends Image2D
 				float v 		= startY / getHeight();
 				float u2		= (startX + width ) / getWidth();
 				float v2		= (startY + height) / getHeight();
+				batch.draw(getTexture(), startX, startY, width, height, u, v, u2, v2);
 
-				setRegion(u, v, u2, v2);
-				setSize(width, height);
-				setPosition(startX, startY);
-				setFlip(false, true);
-				super.draw(batch);
+				//These caused a bug when restarting a stage.
+//				setRegion(u, v, u2, v2);
+//				setSize(width, height);
+//				setPosition(startX, startY);
+//				setFlip(false, true);
+//				super.draw(batch);
 				
 				break;
 			case REPEAT:
