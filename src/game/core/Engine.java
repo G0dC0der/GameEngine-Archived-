@@ -2,9 +2,9 @@ package game.core;
 
 import game.core.GameObject.Event;
 import game.core.MainCharacter.CharacterState;
+import game.essentials.CameraEffect;
 import game.essentials.Controller;
 import game.essentials.Controller.PressedButtons;
-import game.essentials.CameraEffect;
 import game.essentials.GFX;
 import game.essentials.HighScore;
 import game.essentials.Image2D;
@@ -37,6 +37,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -282,6 +283,7 @@ public final class Engine implements Screen
 	private List<List<PressedButtons>> replays;
 	private GameState globalState;
 	private boolean showFps, justRestarted, playReplay, showingDialog, replayHelp, crashed, checkpoint, flipY;
+	private float prevTX, prevTY;
 	private double windowScale;
 	private int fpsWriterCounter, fps;
 	private SpriteBatch batch;
@@ -436,6 +438,8 @@ public final class Engine implements Screen
 	{
 		updateClock();
 		stage.moveEnemies();
+		prevTX = tx;
+		prevTY = ty;
 		updateCamera();
 		stage.extra();
 		SoundBank.FRAME_COUNTER++;
@@ -601,6 +605,17 @@ public final class Engine implements Screen
 	}
 	
 	/**
+	 * Checks whether or not the specified unit is in the field of view.
+	 * @param obj The unit to test.
+	 * @return False if the given unit can be culled.
+	 */
+	public boolean visible(GameObject obj)
+	{
+		Rectangle bbox = Fundementals.getBoundingBox(obj);
+		return camera.frustum.boundsInFrustum(bbox.x, bbox.y, 0, bbox.width / 2, bbox.height / 2 , 0);
+	}
+	
+	/**
 	 * This function allow you to determine which {@code GameObjects} the game should focus on. <br>
 	 * The screen will follow the specified {@code GameObjects} whenever they moves. <br>
 	 * This is usual set to the main character(s).<br><br>
@@ -645,6 +660,24 @@ public final class Engine implements Screen
 	public void gameCamera()
 	{
 		batch.setProjectionMatrix(camera.combined);
+	}
+	
+	/**
+	 * Returns the translate X value from the previous frame.
+	 * @return The value.
+	 */
+	public float getPrevTx()
+	{
+		return prevTX;
+	}
+	
+	/**
+	 * Returns the translate Y value from the previous frame.
+	 * @return The value.
+	 */
+	public float getPrevTy()
+	{
+		return prevTY;
 	}
 	
 	/**

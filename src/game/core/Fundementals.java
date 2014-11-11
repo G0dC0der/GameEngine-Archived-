@@ -755,6 +755,14 @@ public class Fundementals
 		
 		return Math.atan2(deltaY, deltaX) * 180 / Math.PI;
 	}
+	
+	/**
+	 * Returns the angle between the two points in degrees.
+	 */
+	public static double getAngle(Vector2 pt1, Vector2 pt2)
+	{
+		return getAngle(pt1.x, pt1.y, pt2.x, pt2.y);
+	}
 
 	/**
 	 * Return the distance between the two {@code GameObjects} middle point. The higher value returned, the further away.
@@ -763,6 +771,11 @@ public class Fundementals
 	public static double distance(GameObject go1, GameObject go2)
 	{
 		return Fundementals.distance(go1.loc.x, go1.loc.y, go2.loc.x, go2.loc.y);
+	}
+	
+	public static double distance(Vector2 v1, Vector2 v2)
+	{
+		return Fundementals.distance(v1.x, v1.y, v2.x, v2.y);
 	}
 	
 	/**
