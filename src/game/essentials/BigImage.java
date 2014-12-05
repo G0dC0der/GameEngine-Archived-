@@ -2,6 +2,8 @@ package game.essentials;
 
 import game.core.Engine;
 import game.core.Stage;
+
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
@@ -33,10 +35,17 @@ public class BigImage extends Image2D
 		/**
 		 * Repeats the texture vertically and horizontally.
 		 */
-		REPEAT
+		REPEAT,
+		
+		/**
+		 * Parallax rendering.
+		 */
+		PARALLAX
 	};
 	
 	private RenderOption type;
+	private float ratioX, ratioY;
+	private OrthographicCamera parallaxCamera;
 	
 	/**
 	 * Creates an image from the given path with {@code RenderOption.DEFAULT} option.
@@ -45,6 +54,7 @@ public class BigImage extends Image2D
 	public BigImage(String path)
 	{
 		this(path, RenderOption.DEFAULT);
+		ratioX = ratioY = 1;
 	}
 	
 	/**
@@ -55,7 +65,7 @@ public class BigImage extends Image2D
 	public BigImage(String path, RenderOption type)
 	{
 		super(path,false);
-		this.type = type;
+		setRenderOption(type);
 	}
 	
 	/**
@@ -65,6 +75,32 @@ public class BigImage extends Image2D
 	public void setRenderOption(RenderOption type)
 	{
 		this.type = type;
+		
+		if(this.type == RenderOption.PARALLAX)
+		{
+			parallaxCamera = new OrthographicCamera(getWidth(), getHeight());
+			parallaxCamera.setToOrtho(true);
+			parallaxCamera.position.set(0, 0, 0);
+		}
+	}
+	
+	/**
+	 * The ratio to use if the PARALLAX option is used. 0.5 means move half the speed of the screen movement.
+	 * @param ration The ratio.
+	 */
+	public void setScrollRatio(float ratio)
+	{
+		ratioX = ratioY = ratio;
+	}
+	
+	public void setScrollRationX(float ratioX)
+	{
+		this.ratioX = ratioX;
+	}
+
+	public void setScrollRationY(float ratioY)
+	{
+		this.ratioY = ratioY;
 	}
 	
 	@Override
@@ -123,6 +159,16 @@ public class BigImage extends Image2D
 						setPosition(x * img.getWidth(), y * img.getHeight());
 						super.draw(batch);
 					}
+				
+				break;
+			case PARALLAX:
+				parallaxCamera.position.x = Math.max(e.getScreenWidth() / 2, parallaxCamera.position.x + (e.tx - e.getPrevTx()) * ratioX);
+				parallaxCamera.position.y = Math.max(e.getScreenHeight() / 2, parallaxCamera.position.y + (e.ty - e.getPrevTy()) * ratioY);
+				parallaxCamera.update();
+
+				batch.setProjectionMatrix(parallaxCamera.combined);
+				super.draw(batch);
+				e.gameCamera();
 				
 				break;
 		}

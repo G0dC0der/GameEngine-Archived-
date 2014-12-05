@@ -167,6 +167,22 @@ public class Utilities
 		return obj;
 	}
 	
+	public static boolean inRange(double minBound, double maxBound, double value)
+	{
+		return minBound <= value && value <= maxBound;
+	}
+	
+	public static boolean nearlyEqual(float value1, float value2, float tolerance)
+	{
+	    final float absA = Math.abs(value1);
+	    final float absB = Math.abs(value2);
+	    final float diff = Math.abs(value1 - value2);
+
+	    return (value1 * value2 == 0) ? 
+	    		diff < (tolerance * tolerance) : 
+	    		diff / (absA + absB) < tolerance;
+	}
+	
 	/**
 	 * Updates {@code source} to look more like {@code target}.
 	 * @param source The color to update.
@@ -180,6 +196,7 @@ public class Utilities
 				source.a += speed;
 			else if(source.a > target.a)
 				source.a -= speed;
+			source.a = Math.max(0, Math.min(source.a, 1.0f));
 		}
 		
 		if(Math.abs(source.r - target.r) > speed)
@@ -188,6 +205,7 @@ public class Utilities
 				source.r += speed;
 			else if(source.r > target.r)
 				source.r -= speed;
+			source.r = Math.max(0, Math.min(source.r, 1.0f));
 		}
 		
 		if(Math.abs(source.g - target.g) > speed)
@@ -196,6 +214,7 @@ public class Utilities
 				source.g += speed;
 			else if(source.g > target.g)
 				source.g -= speed;
+			source.g = Math.max(0, Math.min(source.g, 1.0f));
 		}
 		
 		if(Math.abs(source.b - target.b) > speed)
@@ -204,6 +223,7 @@ public class Utilities
 				source.b += speed;
 			else if(source.b > target.b)
 				source.b -= speed;
+			source.b = Math.max(0, Math.min(source.b, 1.0f));
 		}
 	}
 	

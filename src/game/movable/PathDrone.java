@@ -2,8 +2,11 @@ package game.movable;
 
 import game.core.Enemy;
 import game.core.Fundementals;
+
 import java.util.LinkedList;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Most enemies inherit this class rather than {@code Enemy} as it offer a common used functionality: waypoint pathing.<br>
@@ -25,7 +28,7 @@ public class PathDrone extends Enemy
 		/**
 		 * The coordinate to move to.
 		 */
-		public final float targetX, targetY;
+		public float targetX, targetY;
 		/**
 		 * The amount of frames to stay at the target when reached.
 		 */
@@ -111,6 +114,12 @@ public class PathDrone extends Enemy
 		pathData.add(new PathData(x, y, frames, jump, event));
 	}
 	
+
+	public void appendPath(Vector2 loc, int frames, boolean jump, Event event) 
+	{
+		pathData.add(new PathData(loc.x, loc.y, frames, jump, event));
+	}
+	
 	/**
 	 * Appends a path to the waypoint list.
 	 * @param pd The waypoint.
@@ -147,6 +156,16 @@ public class PathDrone extends Enemy
 	public void appendPath()
 	{
 		pathData.add(new PathData(loc.x, loc.y, 0, false, null));
+	}
+	
+	/**
+	 * Returns the current target.
+	 * @return The coordinate.
+	 */
+	public Vector2 getCurrentTarget()
+	{
+		PathData pd = pathData.get(dataCounter >= pathData.size() ? 0 : dataCounter);
+		return new Vector2(pd.targetX, pd.targetY);
 	}
 	
 	/**

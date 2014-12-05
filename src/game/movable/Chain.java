@@ -110,7 +110,6 @@ public class Chain extends Enemy
 	{
 		Vector2 endPoint1 = src1 == null ? pt1 : (centerize1 ? new Vector2(src1.centerX() - halfWidth(), src1.centerY() - halfHeight()) : src1.loc);
 		Vector2 endPoint2 = src1 == null ? pt2 : (centerize2 ? new Vector2(src2.centerX() - halfWidth(), src2.centerY() - halfHeight()) : src2.loc);
-		float rotation = (rotate) ? (float)Fundementals.getAngle(endPoint1, endPoint2) : 0f;
 		int start = (linkOnEndpoint) ? 0 : 1;
 		int end   = (linkOnEndpoint) ? links : links + 2;
 		int cond  = (linkOnEndpoint) ? links : end - 1;
@@ -118,7 +117,12 @@ public class Chain extends Enemy
 		for(int i = start; i < cond; i++)
 		{
 			Vector2 linkPos = new Vector2(endPoint1).lerp(endPoint2, (float)i/(float)(end - 1));
-			batch.draw(super.getFrame(), linkPos.x, linkPos.y, centerX(), centerY(), width(), height(), 1, 1, rotation);
+			
+			Image2D img = super.getFrame();
+			img.setPosition(linkPos.x, linkPos.y);
+			img.setRotation((rotate) ? (float)Fundementals.getAngle(endPoint1, endPoint2) : this.rotation);
+			img.draw(batch);
+			//batch.draw(super.getFrame(), linkPos.x, linkPos.y, centerX(), centerY(), width(), height(), 1, 1, rotation);
 		}
 	}
 	

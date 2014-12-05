@@ -1,12 +1,16 @@
 package game.movable;
 
 import game.core.Engine;
+import game.core.Fundementals;
 import game.core.GameObject;
 import game.core.MovableObject;
 import game.core.Stage;
 import game.essentials.Animation;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
+
+import java.util.HashSet;
+
 import kuusisto.tinysound.Sound;
 
 /**
@@ -23,6 +27,7 @@ public class SolidPlatform extends PathDrone
 	private int destroyFrames;
 	private byte transformTo;
 	private Animation<Image2D> destroyImage;
+	private HashSet<GameObject> onMe;
 	private GameObject target;
 	private float targetOffsetX, targetOffsetY;
 	private int counter = 0;
@@ -41,6 +46,7 @@ public class SolidPlatform extends PathDrone
 		destroyFrames = 100;
 		transformTo = Engine.SOLID;
 		harsh = true;
+		onMe = new HashSet<>();
 		sounds = new SoundBank(1);
 		sounds.setEmitter(this);
 		
@@ -85,6 +91,8 @@ public class SolidPlatform extends PathDrone
 	@Override
 	public void moveEnemy()
 	{
+		onMe.clear();
+		
 		if(tileDeformer && transformBack)
 			deformBack();
 		
@@ -118,9 +126,19 @@ public class SolidPlatform extends PathDrone
 						image = destroyImage;
 				}
 				
+				onMe.add(mo);
 				adjust(mo, harsh);
 			}
 		}
+	}
+	
+	/**
+	 * Checks whether or not the given {@code GameObject} is currently standing or sliding on this platform.
+	 * @return True if its standing or sliding on it.
+	 */
+	public boolean onTop(GameObject go)
+	{
+		return onMe.contains(go);
 	}
 	
 	@Override
@@ -269,13 +287,18 @@ public class SolidPlatform extends PathDrone
 	protected boolean collides(MovableObject mo)
 	{
 		boolean bool = strict && (collidingWhen(this, loc.x, loc.y - 1, mo)             || collidingWhen(mo, mo.loc.x, mo.loc.y + moveSpeed + 2, this) ||
-				   				  collidingWhen(this, loc.x - moveSpeed - 4, loc.y, mo) || collidingWhen(this, loc.x + moveSpeed + 4, loc.y, mo));
+				   				  collidingWhen(this, loc.x - moveSpeed - 4, loc.y, mo) || collidingWhen(this, loc.x + moveSpeed + 4, loc.y, mo) ||
+				   				  collidingWhen(this, loc.x, loc.y + moveSpeed + 4, mo));
 		
 		if(!bool)
-			bool = !strict && (collidingWhen(this, loc.x, loc.y - 1, mo) || collidingWhen(this, loc.x - 1, loc.y, mo) || 
-					           collidingWhen(this, loc.x + 1, loc.y, mo));
+			bool = !strict && expandAndCheck(this, mo);
 		
 		return bool;
+	}
+	
+	protected static boolean expandAndCheck(GameObject expandable, GameObject go)
+	{
+		return Fundementals.rectangleVsRectangle(expandable.loc.x - 1, expandable.loc.y - 1, expandable.width() + 2, expandable.height() + 2, go.loc.x, go.loc.y, go.width(), go.height());
 	}
 	
 	/**

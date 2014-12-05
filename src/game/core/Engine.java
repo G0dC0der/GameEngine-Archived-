@@ -931,13 +931,19 @@ public final class Engine implements Screen
 		Image2D img = go.getFrame();
 		if (img != null && go.alpha > 0.0f)
 		{
+			float width  = img.getWidth();
+			float height = img.getHeight();
+			
 			img.setFlip(go.flipX, !go.flipY);
 			img.setPosition(go.loc.x + go.offsetX, go.loc.y + go.offsetY);
-			img.setRotation(go.rotation);
 			img.setAlpha(go.alpha);
 			img.setSize(go.width, go.height);
 			img.setScale(go.scale);
+			img.setOriginCenter();
+			img.setRotation(go.rotation);
 			img.draw(batch);
+			
+			img.setSize(width, height);
 		}
 	}
 	

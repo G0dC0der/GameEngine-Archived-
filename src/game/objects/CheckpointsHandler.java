@@ -159,7 +159,9 @@ public class CheckpointsHandler implements Event
 					if(Fundementals.rectangleVsRectangle(user.loc.x, user.loc.y, user.width, user.height, cp.x, cp.y, cp.width, cp.height))
 					{
 						cp.taken = true;
-						reachEvent.eventHandling();
+						if(reachEvent != null)
+							reachEvent.eventHandling();
+						
 						continue Outer;
 					}
 				}

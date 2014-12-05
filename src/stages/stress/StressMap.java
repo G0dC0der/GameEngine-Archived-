@@ -1,4 +1,4 @@
-package stages.tr5;
+package stages.stress;
 
 import game.core.Engine;
 import game.core.GameObject;
@@ -18,11 +18,11 @@ import ui.accessories.Playable;
 import com.badlogic.gdx.graphics.Color;
 
 @AutoDispose
-@Playable(description="Practise perfectionism.", name="Traning Stage 5")
-@AutoInstall(mainPath="res/general", path="res/traning5")
-public class TraningStage5 extends StageBuilder
+@Playable(description="Author: Pojahn Moradi\nDifficulty: Hard\nAverage time: 44 sec\nProfessional time: 43 sec\nObjective: Enter goal.", name="Stress Map")
+@AutoInstall(mainPath="res/general", path="res/stress")
+public class StressMap extends StageBuilder
 {
-	@AutoLoad(path="res/traning5",type=VisualType.IMAGE)
+	@AutoLoad(path="res/stress",type=VisualType.IMAGE)
 	private Image2D drills[];
 	
 	@AutoLoad(path="res/mtrace",type=VisualType.IMAGE)
@@ -39,12 +39,12 @@ public class TraningStage5 extends StageBuilder
 		
 		try
 		{
-			sawLoop = TinySound.loadMusic(new File("res/traning5/sawLoop.wav"));
+			sawLoop = TinySound.loadMusic(new File("res/stress/sawLoop.wav"));
 			sawLoop.setVolume(0);
 			sawLoop.play(true);
 			
 			game.timeColor = Color.WHITE;
-			setStageMusic("res/traning5/song.ogg", 3.58f, 1.0f);
+			setStageMusic("res/stress/song.ogg", 3.58f, 1.0f);
 		}
 		catch(Exception e)
 		{

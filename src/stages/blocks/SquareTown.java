@@ -29,7 +29,7 @@ import com.badlogic.gdx.graphics.Color;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path="res/blocks")
-@Playable(name="Square Town", description="Stage: Square Town\nAuthor: Pojahn Moradi\nAverage time: 150 sec\nProfessional time: 100 sec\nObjective: Enter the goal.")
+@Playable(name="Square Town", description="Author: Pojahn Moradi\nAverage time: 150 sec\nProfessional time: 100 sec\nObjective: Enter the goal.")
 public class SquareTown extends StageBuilder
 {
 	{
@@ -96,7 +96,6 @@ public class SquareTown extends StageBuilder
 			if(tileType == Engine.LETHAL)
 				gm.setState(CharacterState.DEAD);
 		});
-		gm.flyMode(5);
 		
 		/*
 		 * Spikey

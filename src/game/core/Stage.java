@@ -433,6 +433,7 @@ public abstract class Stage
 		events.clear();
 		appendList.clear();
 		discardList.clear();
+		delayedObject.clear();
 	}
 	
 	/**

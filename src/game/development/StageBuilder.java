@@ -32,11 +32,12 @@ public abstract class StageBuilder extends Stage
 {
 	public enum VisualType {IMAGE, SOUND, MUSIC, REPLAY, WAYPOINT};
 	
-	protected Pixmap stageImage;
+	protected Pixmap map;
 	protected Image2D deathImg[], mainImage[], extraHp[];
 	protected BigImage backgroundImg, foregroundImg;
 	protected Sound jump;
 	protected GravityMan gm;
+	protected boolean skipSceenImages;
 	private boolean autoInstall;
 	
 	@Override
@@ -140,7 +141,7 @@ public abstract class StageBuilder extends Stage
 					
 					try{backgroundImg = new BigImage(stagePath + "background.png", RenderOption.PORTION);} catch(Exception e){System.err.println("Background image not found");}
 					try{foregroundImg = new BigImage(stagePath + "foreground.png", RenderOption.PORTION);} catch(Exception e){System.err.println("Foreground image not found");}
-					    stageImage    = new Pixmap(new FileHandle(stagePath + "map.png"));
+					    map    = new Pixmap(new FileHandle(stagePath + "map.png"));
 				}
 			}
 		}
@@ -159,13 +160,16 @@ public abstract class StageBuilder extends Stage
 		
 		if(autoInstall)
 		{
-			stageData = Utilities.createStageData(stageImage);
+			stageData = Utilities.createStageData(map);
 			basicInits();
 			
-			if(backgroundImg != null)
-				background(backgroundImg);
-			if(foregroundImg != null)
-				foreground(foregroundImg);
+			if(!skipSceenImages)
+			{
+				if(backgroundImg != null)
+					background(backgroundImg);
+				if(foregroundImg != null)
+					foreground(foregroundImg);
+			}
 			
 			/*
 			 * Main Character
@@ -208,7 +212,7 @@ public abstract class StageBuilder extends Stage
 		}
 		else
 		{
-			disposeBatch(backgroundImg, foregroundImg, deathImg, mainImage, extraHp, jump, stageImage, music);
+			disposeBatch(backgroundImg, foregroundImg, deathImg, mainImage, extraHp, jump, map, music);
 			
 			for(Field field : fields)
 			{

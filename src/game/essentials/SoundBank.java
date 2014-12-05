@@ -45,7 +45,7 @@ public class SoundBank
 	public SoundBank(int size)
 	{
 		units = new Unit[size];
-		maxDistance = 800;
+		maxDistance = 700;
 		maxVolume = 1.0f;
 		power = 40;
 	}

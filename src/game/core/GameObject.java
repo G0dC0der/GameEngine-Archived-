@@ -76,7 +76,7 @@ public class GameObject
 	/**
 	 * A {@code Comparator} for sorting the list after {@code zIndex}.
 	 */
-	public static final Comparator<GameObject> Z_INDEX_SORT = (o1, o2) -> {return o1.zIndex - o2.zIndex;};
+	public static final Comparator<GameObject> Z_INDEX_SORT = (o1, o2) ->  o1.zIndex - o2.zIndex;
 	
 	/**
 	 * These constants define accuracy of certain "watch" methods.

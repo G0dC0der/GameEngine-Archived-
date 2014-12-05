@@ -25,9 +25,9 @@ import kuusisto.tinysound.Sound;
 public class GravityMan extends MainCharacter
 {
 	public float maxX, maxY, accX, vx, vy, boostX, upSpeed, mass, gravity, damping, wallGravity, wallDamping, maxWallSlideSpeed, breakSpeed;
-	private boolean jumpAllowed, wallSliding, jumpStarted, oldInput, allowWallJump, allowWallSlide, blockInput, moving;
-	private int counter, flySpeed;
-	private float prevVX;
+	boolean jumpAllowed, wallSliding, jumpStarted, oldInput, allowWallJump, allowWallSlide, blockInput, moving, leftInput, rightInput, upInput, checkAllowed, canLeft, canDown, canRight;
+	int counter, flySpeed;
+	float prevVX;
 	private byte[][] d;
 	
 	public GravityMan()
@@ -80,20 +80,127 @@ public class GravityMan extends MainCharacter
 		/*
 		 * Global variables
 		 */
-		boolean leftInput  = !blockInput && pb.left, rightInput = !blockInput && pb.right, upInput = !blockInput && pb.up;
-		boolean checkAllowed = true;
+		leftInput  = !blockInput && pb.left;
+		rightInput = !blockInput && pb.right;
+		upInput = !blockInput && pb.up;
+		
+		checkAllowed = true;
 		d = Stage.getCurrentStage().stageData;
 
 		/*
 		 * Steep slopes checks
 		 */
-		int x  = (int)  loc.x, 
-			x2 = (int) (loc.x + width), 
-			y  = (int) (loc.y + height);
+		steepSlopes();
 		
-		boolean canDown  = canGoDown(),
-				canLeft  = canGoLeft(),
-				canRight = canGoRight();
+		/* 
+		 * The following code is related to wall jumping and contains some global variables used everywhere in this method.
+		 */
+		wallHandling();
+		
+		/*
+		 * The following code is related to running and ground sliding.
+		 */
+		run();
+
+		/*
+		 * The following code is related to jumps and gravity
+		 */
+		jumpHandling();
+	}
+	
+	@Override
+	public Image2D getFrame() 
+	{
+		boolean stopped = image.isStopped();
+		if(!moving)
+			image.stop(true);
+			
+		Image2D img =  super.getFrame();
+		image.stop(stopped);
+		
+		return img;
+	}
+	
+	public void setWalkingSound(Sound sound)
+	{
+		//TODO:
+	}
+	
+	/**
+	 * The sound to play when jumping.
+	 * @param sound The sound.
+	 */
+	public void setJumpingSound(Sound sound)
+	{
+		sounds.setSound(0, sound);
+		sounds.setDelay(0, 20);
+	}
+	
+	/**
+	 * Whether or not to enable wall sliding.
+	 * @param slide True to enable wall sliding(default).
+	 */
+	public void enableWallSlide(boolean slide)
+	{
+		allowWallSlide = slide;
+	}
+	
+	/**
+	 * Whether or not to be able to jump when wall sliding.
+	 * @param walljump True to allow wall jumping.
+	 */
+	public void enableWallJump(boolean walljump)
+	{
+		allowWallJump = walljump;
+	}
+	
+	/**
+	 * The {@code GravityMan} do not use a single variable to control the speed.<br>
+	 * To alter the move speed, check {@code maxX, accX} and {@code boostX}.
+	 */
+	@Override
+	@Deprecated
+	public void setMoveSpeed(float speed)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Disables the control of the character.
+	 */
+	@Override
+	public void freeze()
+	{
+		blockInput = true;
+	}
+	
+	/**
+	 * Reenables the control of the character.
+	 */
+	@Override
+	public void unfreeze()
+	{
+		blockInput = false;
+	}
+	
+	/**
+	 * Allow the character to fly, for debugging purposes.
+	 * @param flySpeed The fly speed. 0 to disable.
+	 */
+	public void flyMode(int flySpeed)
+	{
+		this.flySpeed = flySpeed;
+	}
+	
+	protected void steepSlopes()
+	{
+		int x  = (int)  loc.x, 
+			x2 = (int) (loc.x + width()), 
+			y  = (int) (loc.y + height());
+			
+		canDown  = canGoDown();
+		canLeft  = canGoLeft();
+		canRight = canGoRight();
 		
 		if(!canDown && !canLeft && (!MovableObject.outOfBounds(x + 2, y + 2) && (d[y + 2][x + 1] != SOLID || d[y + 2][x + 2] != SOLID)))
 		{
@@ -107,10 +214,10 @@ public class GravityMan extends MainCharacter
 			vy = -60;
 			rightInput = false;
 		}
-		
-		/* 
-		 * The following code is related to wall jumping and contains some global variables used everywhere in this method.
-		 */
+	}
+
+	protected void wallHandling()
+	{
 		canLeft  = canGoLeft ();
 		canRight = canGoRight();
 		boolean leftWall  = leftWall (),
@@ -157,10 +264,10 @@ public class GravityMan extends MainCharacter
 			}
 		}
 		oldInput = upInput;
-		
-		/*
-		 * The following code is related to running and ground sliding.
-		 */		
+	}
+	
+	protected void run()
+	{
 		moving = false;
 		prevVX = vx;
 		
@@ -214,10 +321,10 @@ public class GravityMan extends MainCharacter
 			if(vx == prevVX)
 				vx = 0;
 		}
-
-		/*
-		 * The following code is related to jumps and gravity
-		 */
+	}
+	
+	protected void jumpHandling()
+	{
 		if(wallSliding)
 			counter = 0;
 		
@@ -305,85 +412,6 @@ public class GravityMan extends MainCharacter
 	    	else if(facing == Direction.NW)
 	    		facing = Direction.W;
 	    }
-	}
-	
-	@Override
-	public Image2D getFrame() 
-	{
-		boolean stopped = image.isStopped();
-		if(!moving)
-			image.stop(true);
-			
-		Image2D img =  super.getFrame();
-		image.stop(stopped);
-		
-		return img;
-	}
-	
-	/**
-	 * The sound to play when jumping.
-	 * @param sound The sound.
-	 */
-	public void setJumpingSound(Sound sound)
-	{
-		sounds.setSound(0, sound);
-		sounds.setDelay(0, 20);
-	}
-	
-	/**
-	 * Whether or not to enable wall sliding.
-	 * @param slide True to enable wall sliding(default).
-	 */
-	public void enableWallSlide(boolean slide)
-	{
-		allowWallSlide = slide;
-	}
-	
-	/**
-	 * Whether or not to be able to jump when wall sliding.
-	 * @param walljump True to allow wall jumping.
-	 */
-	public void enableWallJump(boolean walljump)
-	{
-		allowWallJump = walljump;
-	}
-	
-	/**
-	 * The {@code GravityMan} do not use a single variable to control the speed.<br>
-	 * To alter the move speed, check {@code maxX, accX} and {@code boostX}.
-	 */
-	@Override
-	@Deprecated
-	public void setMoveSpeed(float speed)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Disables the control of the character.
-	 */
-	@Override
-	public void freeze()
-	{
-		blockInput = true;
-	}
-	
-	/**
-	 * Reenables the control of the character.
-	 */
-	@Override
-	public void unfreeze()
-	{
-		blockInput = false;
-	}
-	
-	/**
-	 * Allow the character to fly, for debugging purposes.
-	 * @param flySpeed The fly speed. 0 to disable.
-	 */
-	public void flyMode(int flySpeed)
-	{
-		this.flySpeed = flySpeed;
 	}
 	
 	protected boolean canSlopeLeft(float targetX)
@@ -496,7 +524,7 @@ public class GravityMan extends MainCharacter
 		}
 	}
 	
-	private void reset()
+	void reset()
 	{
     	vy = counter = 0;
     	jumpStarted = false;

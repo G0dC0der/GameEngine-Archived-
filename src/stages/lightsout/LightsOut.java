@@ -16,6 +16,7 @@ import game.movable.Missile;
 import game.movable.PathDrone;
 import game.movable.SimpleWeapon;
 import game.movable.SolidPlatform;
+import game.objects.CheckpointsHandler;
 import game.objects.Particle;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
@@ -24,6 +25,7 @@ import ui.accessories.Playable;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=LightsOut.PATH)
@@ -39,6 +41,8 @@ public class LightsOut extends StageBuilder
 	private Sound spikesend, spikesspawn, collect, missilefire, missileexp;
 	
 	private Music electric;
+	
+	private CheckpointsHandler cph;
 	
 	@Override
 	public void init() 
@@ -260,12 +264,36 @@ public class LightsOut extends StageBuilder
 		}
 		
 		/*
+		 * Checkpoint
+		 */
+		Vector2 cp1 = new Vector2(1772, 355);
+		
+		if(cph == null)
+		{
+			cph = new CheckpointsHandler();
+			cph.appendCheckpoint(cp1, 1602, 395, 103, 47);
+			cph.setReachEvent(()-> GFX.renderCheckpoint());
+		}
+		
+		Vector2 latestCp = cph.getLastestCheckpoint();
+		if(latestCp != null)
+			gm.loc.set(latestCp);
+		
+		cph.setUsers(gm);
+		add(cph);
+		
+		/*
 		 * Finalizing
 		 */
 		gm.setHitEvent((hitter)->{
 			if(hitter.sameAs(proj))
 				gm.hit(-1);
 		});
+	}
+	
+	protected boolean isSafe() 
+	{
+		return cph.getLastestCheckpoint() != null;
 	}
 	
 	PathDrone getSaw(int x, int y)

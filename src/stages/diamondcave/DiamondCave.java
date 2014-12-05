@@ -12,8 +12,8 @@ import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.development.StageBuilder;
-import game.essentials.Factory;
 import game.essentials.Animation;
+import game.essentials.Factory;
 import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.movable.Circle;
@@ -22,22 +22,27 @@ import game.movable.PathDrone.PathData;
 import game.movable.Projectile;
 import game.movable.SimpleWeapon;
 import game.movable.SolidPlatform;
+import game.objects.CheckpointsHandler;
 import game.objects.OneWay;
 import game.objects.Particle;
+
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=DiamondCave.PATH)
@@ -55,6 +60,7 @@ public class DiamondCave extends StageBuilder
 	private Image2D weakDie[];
 	private Particle blingbling;
 	private PathData[] data1, data2, data3;
+	private CheckpointsHandler cph;
 	private int counter = 0;
 	
 	@Override
@@ -358,6 +364,29 @@ public class DiamondCave extends StageBuilder
 		add(goal);
 		
 		/*
+		 * Checkpoint
+		 */
+		Vector2 cp1 = new Vector2(1455, 551);
+		Vector2 cp2 = new Vector2(3084, 458);
+		Vector2 cp3 = new Vector2(4775, 787);
+		
+		if(cph == null)
+		{
+			cph = new CheckpointsHandler();
+			cph.appendCheckpoint(cp1, 1342, 551, 210, gm.height());
+			cph.appendCheckpoint(cp2, 3072, 408, 47, 380);
+			cph.appendCheckpoint(cp3, 4621, 717, 332, 455);
+			cph.setReachEvent(()-> GFX.renderCheckpoint());
+		}
+		
+		Vector2 latestCp = cph.getLastestCheckpoint();
+		if(latestCp != null)
+			gm.loc.set(latestCp);
+		
+		cph.setUsers(gm);
+		add(cph);	
+		
+		/*
 		 * Finalizing
 		 */
 		gm.setHitEvent((hitter)->
@@ -375,6 +404,12 @@ public class DiamondCave extends StageBuilder
 		blingbling = new Particle();
 		blingbling.setImage(9, bling);
 		blingbling.zIndex(500);
+	}
+	
+	@Override
+	protected boolean isSafe() 
+	{
+		return cph.getLastestCheckpoint() != null;
 	}
 	
 	@Override

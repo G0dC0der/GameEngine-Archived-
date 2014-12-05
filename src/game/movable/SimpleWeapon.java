@@ -37,6 +37,27 @@ public class SimpleWeapon extends PathDrone
 		sounds.setEmitter(this);
 	}
 	
+	@Override
+	public SimpleWeapon getClone(float x, float y)
+	{
+		SimpleWeapon sw = new SimpleWeapon(x, y, proj, projDir, reloadTime);
+		copyData(sw);
+		
+		if(cloneEvent != null)
+			cloneEvent.cloned(sw);
+		
+		return sw;
+	}
+	
+	protected void copyData(SimpleWeapon dest)
+	{
+		super.copyData(dest);
+		
+		dest.fireAnim = fireAnim;
+		dest.offsetX = offsetX;
+		dest.offsetY = offsetY;
+	}
+	
 	/**
 	 * Allow you to customize the offset of which the projectiles are spawned at.
 	 * @param offsetX The relative x coordinate.
@@ -64,6 +85,15 @@ public class SimpleWeapon extends PathDrone
 	public boolean reloading()
 	{
 		return reloadCounter > 0;
+	}
+	
+	/**
+	 * Allow you to customize the firing direction.
+	 * @param projDir The direction to use.
+	 */
+	public void setFiringDirection(Direction projDir)
+	{
+		this.projDir = projDir;
 	}
 	
 	/**

@@ -7,11 +7,13 @@ import game.core.MainCharacter.CharacterState;
 import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
-import game.essentials.Factory;
 import game.essentials.Animation;
+import game.essentials.Factory;
+import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.movable.PathDrone;
 import game.movable.SolidPlatform;
+import game.objects.CheckpointsHandler;
 import game.objects.Flash;
 import game.objects.Particle;
 import game.objects.Wind;
@@ -27,6 +29,7 @@ import ui.accessories.Playable;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=TraningStage4.RES)
@@ -41,6 +44,7 @@ public class TraningStage4 extends AbstractTraningStage
 	private Music propeller;
 	private BitmapFont talkingFont;
 	private Flash flash;
+	private CheckpointsHandler cph;
 	private boolean chaserHunting;
 	private int diamonds, collectedDiamonds;
 	
@@ -374,6 +378,32 @@ public class TraningStage4 extends AbstractTraningStage
 		add(getFriend(1212, 1881, -20, -20, "Get on the moving platform and continue upwards."),
 			getFriend(1613, 1033, 40, 0, "Collect all the five gems to open the port found at far east."),
 			getFriend(3498, 217, -50, -20, "Jump while running at high speed or you may get dragged down."));
+		
+		/*
+		 * Checkpoints
+		 */
+		if(cph == null)
+		{
+			cph = new CheckpointsHandler();
+			cph.appendCheckpoint(3299, 2156, 3262, 2018, 125, 166);
+			cph.appendCheckpoint(2256, 2092, 2256, 2092, 32, 20);
+			cph.appendCheckpoint(1479, 1052, 1479, 1022, 75, 82);
+			cph.appendCheckpoint(4164, 236, 4164, 66, 185, 228);
+			cph.setReachEvent(()-> GFX.renderCheckpoint());
+		}
+		
+		Vector2 latestCp = cph.getLastestCheckpoint();
+		if(latestCp != null)
+			gm.loc.set(latestCp);
+		
+		cph.setUsers(gm);
+		add(cph);
+	}
+	
+	@Override
+	protected boolean isSafe() 
+	{
+		return cph.getLastestCheckpoint() != null;
 	}
 	
 	void addWeak(int x, int y)
