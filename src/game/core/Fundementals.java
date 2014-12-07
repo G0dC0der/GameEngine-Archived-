@@ -339,44 +339,43 @@ public class Fundementals
 	public static boolean pixelPerfectRotation(GameObject obj1, GameObject obj2)	//TODO:
 	{
 		throw new RuntimeException("Method not implemented yet.");
-		/*
-		Image2D image1 = getEntityImage(obj1);
-		Image2D image2 = getEntityImage(obj2);
-		
-		if(image1 == null ||image2 == null)
-			return false;
-		
-		Matrix4 m1 = new Matrix4().setToRotation(obj1.centerX(), obj2.centerY(), 0, obj1.rotation);
-		Matrix4 m2 = new Matrix4().setToRotation(obj2.centerX(), obj2.centerY(), 0, obj2.rotation);
-		
-		Matrix4 transformAToB = new Matrix4(m1).mul(new Matrix4(m2).inv());
-		
-		Vector3 stepX = new Vector3(Vector3.X).mul(transformAToB).nor();
-		Vector3 stepY = new Vector3(Vector3.Y).mul(transformAToB).nor();
-
-		Vector3 yPosInB = new Vector3(Vector3.Zero).rot(transformAToB);
-		
-		for (int yA = 0; yA < obj1.height; yA++)
-		{
-			Vector3 posInB = new Vector3(yPosInB);
-			
-			for (int xA = 0; xA < obj1.width; xA++)
-			{
-				int xB = Math.round(posInB.x);
-				int yB = Math.round(posInB.y);
-              
-				if(	0 <= xB && xB < obj2.width  && 0 <= yB && yB < obj2.height && image1.getColor(xA,yA) != 0 && image2.getColor(xB,yB) != 0 )
-					return true;
-              
-              	posInB.x += stepX.x;
-              	posInB.y += stepX.y;
-			}
-			
-			yPosInB.x += stepY.x;
-			yPosInB.y += stepY.y;
-		}
-		
-		return false;*/
+//		Image2D image1 = getEntityImage(obj1);
+//		Image2D image2 = getEntityImage(obj2);
+//		
+//		if(image1 == null ||image2 == null)
+//			return false;
+//		
+//		Matrix4 m1 = new Matrix4().setToRotation(obj1.centerX(), obj2.centerY(), 0, obj1.rotation);
+//		Matrix4 m2 = new Matrix4().setToRotation(obj2.centerX(), obj2.centerY(), 0, obj2.rotation).inv();
+//		
+//		Matrix4 transformAToB = m1.mul(m2);
+//		
+//		Vector3 stepX = new Vector3(Vector3.X).mul(transformAToB).nor();
+//		Vector3 stepY = new Vector3(Vector3.Y).mul(transformAToB).nor();
+//
+//		Vector3 yPosInB = new Vector3(Vector3.Zero).mul(transformAToB);
+//		
+//		for (int yA = 0; yA < obj1.height; yA++)
+//		{
+//			Vector3 posInB = new Vector3(yPosInB);
+//			
+//			for (int xA = 0; xA < obj1.width; xA++)
+//			{
+//				int xB = Math.round(posInB.x);
+//				int yB = Math.round(posInB.y);
+//              
+//				if(	0 <= xB && xB < obj2.width  && 0 <= yB && yB < obj2.height && image1.getColor(xA,yA) != 0 && image2.getColor(xB,yB) != 0 )
+//					return true;
+//              
+//              	posInB.x += stepX.x;
+//              	posInB.y += stepX.y;
+//			}
+//			
+//			yPosInB.x += stepY.x;
+//			yPosInB.y += stepY.y;
+//		}
+//		
+//		return false;
 	}
 	
 	/**

@@ -2,8 +2,11 @@ package stages.demo;
 
 import java.io.File;
 
+import org.lwjgl.opengl.Display;
+
 import kuusisto.tinysound.TinySound;
 import game.core.GameObject;
+import game.core.GameObject.Hitbox;
 import game.development.AutoDispose;
 import game.development.StageBuilder;
 import game.essentials.Animation;
@@ -32,10 +35,11 @@ public class DebuggingMap extends StageBuilder
 {
 	static final String PATH = "res/debugging";
 	
-	private Image2D rec = new Image2D("res/data/rec.png", true);
+	private Image2D rec = new Image2D("res/data/rec2.png", true);
 	private Image2D aLink = new Image2D("C:/link.png");
 	private Image2D bg = new Image2D("C:/background.png");
 	private Flipper main;
+	GameObject arec;
 	
 	@Override
 	public void init() 
@@ -73,7 +77,7 @@ public class DebuggingMap extends StageBuilder
 		main.deathImg.zIndex(101);
 		game.addFocusObject(main);
 		add(main);
-		
+		main.flyMode(3);
 		
 		GameObject fakeMain = new GameObject();
 		fakeMain.setImage(mainImage[0]);
@@ -88,38 +92,23 @@ public class DebuggingMap extends StageBuilder
 //		chain.linkOnEndpoint(false);
 		add(chain);
 		
-		OrthographicCamera cam = new OrthographicCamera(bg.getWidth(), bg.getHeight());
-		cam.setToOrtho(true);
-		cam.position.set(0, 0, 0);
-		cam.update();
-		
-		add(new GameObject()
-		{
-			{
-				zIndex(-101);
-			}
+		arec = new GameObject();
+		arec.moveTo(150, 150);
+		arec.setHitbox(Hitbox.EXACT);
+		arec.setImage(rec);
+		arec.addEvent(()->{
+//			arec.rotation++;
 			
-			@Override
-			public void drawSpecial(SpriteBatch batch) 
-			{
-				cam.position.x += (game.tx - game.getPrevTx()) * 1.5f;
-				
-				cam.position.x = Math.max(game.getScreenWidth() / 2, cam.position.x);
-				
-				cam.position.y += game.ty - game.getPrevTy();
-				cam.update();
-				
-				batch.setProjectionMatrix(cam.combined);
-				batch.draw(bg, 0, 0);
-				game.gameCamera();
-			}
+//			if(arec.collidesWith(main))
+//				System.out.println(Math.random());
 		});
+		add(arec);
 	}
 	
 	@Override
 	protected void extra() 
 	{
-		if(Gdx.input.isKeyJustPressed(Keys.F))
-			main.flip();
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_3))
+			System.out.println(Display.getX() + " " + Display.getY());
 	}
 }

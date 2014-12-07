@@ -60,7 +60,7 @@ public class ScreenManager extends Game
 	public void startGame(Stage stage, HighScore replay)
 	{
 		GameSettings settings = new GameSettings();
-		settings.loadSettings("res/data/game.ini");
+		settings.loadSettings("game.ini");
 		
 		if(replay != null)
 			stage.setMeta(replay.meta);

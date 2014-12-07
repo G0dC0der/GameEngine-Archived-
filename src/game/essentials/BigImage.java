@@ -93,12 +93,12 @@ public class BigImage extends Image2D
 		ratioX = ratioY = ratio;
 	}
 	
-	public void setScrollRationX(float ratioX)
+	public void setScrollRatioX(float ratioX)
 	{
 		this.ratioX = ratioX;
 	}
 
-	public void setScrollRationY(float ratioY)
+	public void setScrollRatioY(float ratioY)
 	{
 		this.ratioY = ratioY;
 	}

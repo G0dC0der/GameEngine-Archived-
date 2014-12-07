@@ -21,14 +21,14 @@ public class AbstractTraningStage extends StageBuilder
 	private GameObject[] people;
 	private Sound talking;
 	private Music[] dialog;
-	private int[] indexes;
+	private int indexes[], friendImageSpeed;
 	private BitmapFont friendFont;
 	private Color friendTextColor;
 	
 	public GameObject getFriend(final float x, final float y, final float textOffsetX, final float textOffsetY, final String text)
 	{
 		final MovableObject friend = new MovableObject();
-		friend.setImage(1,friendImage);
+		friend.setImage(friendImageSpeed,friendImage);
 		friend.moveTo(x, y);
 		friend.setDoubleFaced(true, true);
 		friend.facing = Direction.N;
@@ -50,6 +50,7 @@ public class AbstractTraningStage extends StageBuilder
 					
 					recoveryFrames = 230;
 					currEvent = Factory.printText(text, friendTextColor, friendFont, 220, friend, textOffsetX, textOffsetY, ()->Stage.getCurrentStage().discard(currEvent));
+					currEvent.zIndex(friend.getZIndex());
 					add(currEvent);
 				}
 				
@@ -71,6 +72,11 @@ public class AbstractTraningStage extends StageBuilder
 	public void setFriendImage(Image2D... friendImage) 
 	{
 		this.friendImage = friendImage;
+	}
+	
+	public void friendImageSpeed(int speed)
+	{
+		friendImageSpeed = speed;
 	}
 
 	public void setPeople(GameObject... people) 

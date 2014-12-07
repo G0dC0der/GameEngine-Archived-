@@ -26,7 +26,7 @@ public class TheMainClass
 //		}
 		
 		GameSettings settings = new GameSettings();
-		settings.loadSettings("res/data/game.ini");
+		settings.loadSettings("game.ini");
 		
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Pojahns Game Engine";
