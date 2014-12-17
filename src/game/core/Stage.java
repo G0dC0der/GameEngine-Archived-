@@ -345,7 +345,66 @@ public abstract class Stage
 					event.eventHandling();
 			}
 	}
-
+	
+	public void add(Event event)
+	{
+		pending = true;
+		appendList.add(event);
+	}
+	
+	public void add(Event event, int delay)
+	{
+		AbstractMap.SimpleEntry<Object, Integer> pair = new AbstractMap.SimpleEntry<>(event, delay);
+		delayedObject.add(pair);
+	}
+	
+	public void onceEvent(Event event)
+	{
+		Event wrapper = new Event()
+		{
+			@Override
+			public void eventHandling() 
+			{
+				event.eventHandling();
+				discard(this);
+			}
+		};
+		add(wrapper);
+	}
+	
+	public void onceEvent(Event event, int delay)
+	{
+		Event wrapper = new Event()
+		{
+			@Override
+			public void eventHandling() 
+			{
+				event.eventHandling();
+				discard(this);
+			}
+		};
+		AbstractMap.SimpleEntry<Object, Integer> pair = new AbstractMap.SimpleEntry<>(wrapper, delay);
+		delayedObject.add(pair);
+	}
+	
+	public void livingEvent(Event event, int life)
+	{
+		Event wrapper = new Event()
+		{
+			int counter;
+			
+			@Override
+			public void eventHandling() 
+			{
+				if(++counter > life)
+					discard(this);
+				else
+					event.eventHandling();
+			}
+		};
+		add(wrapper);
+	}
+	
 	/**
 	 * Adds the given objects to the game.<br>
 	 * The object can be an instance of either {@code GameObject} or {@code Event}.
@@ -451,13 +510,18 @@ public abstract class Stage
 	 * Called by the engine when all playable {@code MainCharacters} are dead and returns whether or not a checkpoint was reached during the play.<br>
 	 * By default, this function always return false so it should be overridden by the subclasses if checkpoints are supported.<br>
 	 * In case a checkpoint was gotten, the player receive a different death message. Furthermore, the time is not reseted and the replay is not saved.<br>
-	 * Other than that, the stage is cleared as usual and {@code build} is called again.
 	 * @return True if one or more of the main characters got a checkpoint during the play.
 	 */
 	protected boolean isSafe()
 	{
 		return false;
 	}
+	
+	/**
+	 * Called by the engine as soon as a stage has been completed. By default, this method does nothing.
+	 */
+	protected void onComplete()
+	{}
 	
 	/**
 	 * This function sends data to the replay file(default=empty string) that needs to be saved.<br>

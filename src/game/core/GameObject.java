@@ -151,6 +151,8 @@ public class GameObject
 	protected HitEvent hitEvent;
 	private int id, zIndex;
 	boolean drawSpecialBehind;
+	float offsetX2, offsetY2;
+	Animation<Image2D> secondImage;
 	LinkedList<Event> removeQueue, events;
 	Polygon poly;
 	
@@ -258,12 +260,23 @@ public class GameObject
 	 * This method also set {@code width} and {@code height}.
 	 * @param imgs The image/animation to use.
 	 */
-	public void setImage(Animation<Image2D> obj)
+	public void setImage(Animation<Image2D> img)
 	{
-		image = obj;
-		Image2D[] imgs = obj.getArray();
+		image = img;
+		Image2D[] imgs = img.getArray();
 		width  = imgs[0].getWidth();
 		height = imgs[0].getHeight();
+	}
+	
+	public void setSecondImage(Animation<Image2D> img)
+	{
+		secondImage = img;
+	}
+	
+	public void setSecondImageOffset(float offsteX, float offsetY)
+	{
+		offsetX2 = offsetX;
+		offsetY2 = offsetY;
 	}
 	
 	/**
@@ -432,6 +445,14 @@ public class GameObject
 		dest.alpha = alpha;
 		dest.flipX = flipX;
 		dest.flipY = flipY;
+		dest.offsetX2 = offsetX2;
+		dest.offsetY2 = offsetY2;
+
+		if(secondImage != null)
+			dest.secondImage = secondImage.getClone();
+		
+		if(poly != null)
+			dest.poly = new Polygon(poly.getTransformedVertices());
 	}
 	
 	/**
@@ -504,7 +525,7 @@ public class GameObject
 	 * Whether or not to call drawSpecial after rendering this unit or not.
 	 * @param behind True if drawSpecial should be called after this unit have been rendered.
 	 */
-	public void setDrawSpecialBehind(boolean behind)
+	public void drawSpecialBehind(boolean behind)
 	{
 		drawSpecialBehind = behind;
 	}

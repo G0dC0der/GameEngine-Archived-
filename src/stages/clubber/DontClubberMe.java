@@ -201,6 +201,7 @@ public class DontClubberMe extends Stage
 		m.setTrailerDelay(7);
 		m.setFiringSound(firesound);
 		m.setImpact(impact);
+		m.adjustTrailer(true);
 		
 		Weapon weap = new Weapon(1195, 510, 1, 1, 120, gm);
 		weap.setImage(new Animation<>(1, weaponimg));

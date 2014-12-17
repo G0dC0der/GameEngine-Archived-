@@ -86,6 +86,17 @@ public class Shuttle extends Enemy
 		appendPath(x,y,null);
 	}
 	
+	public void appendPath(Vector2 path)
+	{
+		appendPath(path.x, path.y);
+	}
+	
+	public void appendPath(Vector2[] paths)
+	{
+		for(Vector2 path : paths)
+			appendPath(path.x, path.y);
+	}
+	
 	/**
 	 * Appends a waypoint with an {@code Event} to execute once this waypoint is reached.
 	 * @param x The x coordinate of the waypoint.

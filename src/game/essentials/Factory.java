@@ -829,9 +829,13 @@ public class Factory
 				if(Fundementals.rectangleVsRectangle(listener.loc.x, listener.loc.y, listener.width(), listener.height(), room.x, room.y, room.width, room.height))
 				{
 					roomMusic.setVolume(Math.min(roomMusic.getVolume() + fadeSpeed, maxVolume));
+					pauseCheck(roomMusic);
 					
 					if(outsideMusic != null)
+					{
 						outsideMusic.setVolume(Math.max(outsideMusic.getVolume() - fadeSpeed, 0));
+						pauseCheck(outsideMusic);
+					}
 						
 					oneColliding = true;
 					break;
@@ -841,10 +845,23 @@ public class Factory
 			if(!oneColliding)
 			{
 				roomMusic.setVolume(Math.max(roomMusic.getVolume() - fadeSpeed, 0));
+				pauseCheck(roomMusic);
+				
 				if(outsideMusic != null)
+				{
 					outsideMusic.setVolume(Math.min(outsideMusic.getVolume() + fadeSpeed, maxVolume));
+					pauseCheck(outsideMusic);
+				}
 			}
 		};
+	}
+	
+	private static void pauseCheck(Music music)
+	{
+		if(music.getVolume() == 0.0f && music.playing())
+			music.pause();
+		else if(music.getVolume() > 0.0f && !music.playing())
+			music.resume();
 	}
 	
 	/**

@@ -406,6 +406,12 @@ public class TraningStage4 extends AbstractTraningStage
 		return cph.getLastestCheckpoint() != null;
 	}
 	
+	@Override
+	protected void onComplete() 
+	{
+		cph.reset();
+	}
+	
 	void addWeak(int x, int y)
 	{
 		Animation<Image2D> destroyAnim = new Animation<>(6, weak);

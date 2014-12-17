@@ -413,6 +413,12 @@ public class DiamondCave extends StageBuilder
 	}
 	
 	@Override
+	protected void onComplete() 
+	{
+		cph.reset();
+	}
+	
+	@Override
 	public void extra() 
 	{
 		if(Gdx.input.isKeyPressed(Keys.A))

@@ -769,7 +769,7 @@ public class Fundementals
 	 */
 	public static double distance(GameObject go1, GameObject go2)
 	{
-		return Fundementals.distance(go1.loc.x, go1.loc.y, go2.loc.x, go2.loc.y);
+		return Fundementals.distance(go1.centerX(), go1.centerY(), go2.centerX(), go2.centerY());
 	}
 	
 	public static double distance(Vector2 v1, Vector2 v2)

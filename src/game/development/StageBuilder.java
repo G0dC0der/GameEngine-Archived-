@@ -20,6 +20,7 @@ import kuusisto.tinysound.TinySound;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Polygon;
 
 /**
  * Extending this class rather than {@code Stage} is an alternative way of creating a stage.<br>
@@ -182,6 +183,7 @@ public abstract class StageBuilder extends Stage
 			gm.hit(1);
 			gm.setJumpingSound(jump);
 			gm.moveTo(startX, startY);
+			gm.setPolygon(new Polygon(new float[]{0,0, gm.width(), 0, gm.width(), gm.height(), 0, gm.height()}));
 			gm.deathImg = new Particle();
 			gm.deathImg.setImage(4,deathImg);
 			gm.deathImg.zIndex(101);

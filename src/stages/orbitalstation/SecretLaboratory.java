@@ -32,12 +32,15 @@ import game.objects.CheckpointsHandler;
 import game.objects.OneWay;
 import game.objects.Particle;
 import game.objects.Wind;
+
 import java.io.File;
 import java.util.LinkedList;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -785,6 +788,12 @@ public class SecretLaboratory extends StageBuilder
 	}
 	
 	@Override
+	protected void onComplete() 
+	{
+		cph.reset();
+	}
+	
+	@Override
 	public void extra() 
 	{
 		/*
@@ -936,7 +945,7 @@ public class SecretLaboratory extends StageBuilder
 		laser.setImage(laserbeam);
 		laser.useSpecialEffect(true);
 		laser.setLaserTint(Color.GREEN);
-		laser.setDrawSpecialBehind(true);
+		laser.drawSpecialBehind(true);
 		laser.setBeam(getLaser());
 		laser.useFastCollisionCheck(true);
 		laser.addEvent(()->{

@@ -812,6 +812,12 @@ public class DeathEgg extends StageBuilder
 		return cph != null && cph.getLastestCheckpoint() != null;
 	}
 	
+	@Override
+	protected void onComplete() 
+	{
+		cph.reset();
+	}
+	
 	protected void extra() 
 	{
 		if(!stopSpark && ++sparkCounter % 20 == 0)

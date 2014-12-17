@@ -183,6 +183,12 @@ public class GravityMan extends MainCharacter
 		blockInput = false;
 	}
 	
+	@Override
+	public boolean isFrozen() 
+	{
+		return blockInput;
+	}
+	
 	/**
 	 * Allow the character to fly, for debugging purposes.
 	 * @param flySpeed The fly speed. 0 to disable.

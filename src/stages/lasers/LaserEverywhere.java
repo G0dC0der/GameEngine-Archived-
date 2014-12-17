@@ -7,16 +7,22 @@ import game.core.GameObject.HitEvent;
 import game.core.MainCharacter.CharacterState;
 import game.development.AutoInstall;
 import game.development.StageBuilder;
+import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.movable.Circle;
 import game.movable.TargetLaser;
+import game.objects.CheckpointsHandler;
 import game.objects.Particle;
+
 import java.io.File;
-import com.badlogic.gdx.graphics.Color;
+
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import ui.accessories.Playable;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 
 @AutoInstall(mainPath="res/general", path="res/lasereverywhere")
 @Playable(name="Laser Everywhere!", description="Stage: Laser Everywhere!\nAuthor: Pojahn Moradi\nAverage time: 80 sec\nProfessional time: 70 sec\nObjective:Collect the diamond and enter goal(flag).")
@@ -30,6 +36,7 @@ public class LaserEverywhere extends StageBuilder
 	private Sound boom1,boom2,boom3,boom4,boom5,boom6,boom7,boom8;
 	private Music laserLoop;
 	private TargetLaser tl1, tl2, tl3, tl4, tl5, tl6, tl7, tl8;
+	private CheckpointsHandler cph;
 	private boolean taken, added;
 
 	public void init() 
@@ -246,6 +253,26 @@ public class LaserEverywhere extends StageBuilder
 				}	
 			}
 		});
+		
+		/*
+		 * Checkpoint
+		 */
+		if(getDifficulty() != Difficulty.HARD)
+		{
+			if(cph == null)
+			{
+				cph = new CheckpointsHandler();
+				cph.setReachEvent(()-> GFX.renderCheckpoint());
+				cph.appendCheckpoint(168, 111, 143, 45, 50, 86);
+			}
+			
+			Vector2 latestCp = cph.getLastestCheckpoint();
+			if(latestCp != null)
+				gm.loc.set(latestCp);
+			
+			cph.setUsers(gm);
+			add(cph);
+		}
 	}
 	
 	float getSpeed()
@@ -260,6 +287,19 @@ public class LaserEverywhere extends StageBuilder
 			default:
 				return 0.0032f;	
 		}	
+	}
+	
+	@Override
+	protected boolean isSafe() 
+	{
+		return cph != null && cph.getLastestCheckpoint() != null;
+	}
+	
+	@Override
+	protected void onComplete() 
+	{
+		if(cph != null)
+		cph.reset();
 	}
 	
 	@Override

@@ -33,7 +33,7 @@ public class Missile extends Projectile
 	public float thrust, drag, delta;
 	private float vx, vy;
 	private int trailerDelay, delayCounter, reloadCounter;
-	private boolean faceTarget, adjustTrailer;
+	private boolean faceTarget, adjustTrailer, rotationAllowed;
 	private Particle trailer;
 	GameObject currTarget;
 	
@@ -48,7 +48,7 @@ public class Missile extends Projectile
 		super(initialX, initialY, targets);
 		vx = 1;
 		trailerDelay = 3;
-		faceTarget = true;
+		faceTarget = rotationAllowed = true;
 		setProperties(MissileProperties.MEDIUM_FLOATY);
 	}
 	
@@ -75,6 +75,7 @@ public class Missile extends Projectile
 		dest.trailer = trailer;
 		dest.currTarget = currTarget;
 		dest.adjustTrailer = adjustTrailer;
+		dest.rotationAllowed = rotationAllowed;
 	}
 	
 	@Override
@@ -124,9 +125,9 @@ public class Missile extends Projectile
 			checkCollisions();
 		}
 		
-		if(faceTarget)
+		if(faceTarget && rotationAllowed)
 			rotation = (float) Fundementals.getAngle(centerX(), centerY(), targetX, targetY);
-		else
+		else if(rotationAllowed)
 			rotation = (float) Math.toDegrees(Math.atan2(vy, vx));
 		
 		if(visible && haveTarget() && trailer != null && ++delayCounter % trailerDelay == 0)
@@ -175,6 +176,15 @@ public class Missile extends Projectile
 			delta = (float)1f/60f;			
 			break;
 		}
+	}
+	
+	/**
+	 * Whether or not to allow the missile to be rotated.
+	 * @param rotationAllowed False to disable rotation.
+	 */
+	public void rotationAllowed(boolean rotationAllowed)
+	{
+		this.rotationAllowed = rotationAllowed;
 	}
 	
 	/**

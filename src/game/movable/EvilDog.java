@@ -19,8 +19,9 @@ import kuusisto.tinysound.Sound;
  */
 public class EvilDog extends Enemy
 {
-	public float thrust, drag, delta;
-	private float vx, vy, maxDistance;
+	public float thrust, drag, delta, vx, vy;
+	private float maxDistance, targetX, targetY;
+	private boolean hunting;
 	private GameObject[] targets;
 	private Particle impact;
 	private Animation<Image2D> idleImg, huntImg;
@@ -41,6 +42,7 @@ public class EvilDog extends Enemy
 		thrust = 500f;
 		drag = .5f;
 		delta = Engine.DELTA;
+		targetX = targetY = -1;
 		
 		sounds = new SoundBank(1); //Collision
 		sounds.setEmitter(this);
@@ -75,12 +77,29 @@ public class EvilDog extends Enemy
 	}
 	
 	/**
+	 * Returns true if the dog is currently hunting a target.
+	 */
+	public boolean hunting()
+	{
+		return hunting;
+	}
+	
+	/**
 	 * The image to use when all targets are out of range.
 	 * @param idleImg The image.
 	 */
 	public void idleImage(Animation<Image2D> idleImg)
 	{
 		this.idleImg = idleImg;
+	}
+	
+	/**
+	 * Uses a custom target instead of the units given in the constructor. Use -1 to disable.
+	 */
+	public void setTarget(float x, float y)
+	{
+		targetX = x;
+		targetY = y;
 	}
 	
 	@Override
@@ -96,13 +115,15 @@ public class EvilDog extends Enemy
 		if(isFrozen())
 			return;
 		
-		GameObject closest = Fundementals.findClosest(this, targets);
+		boolean customTarget = targetX != -1;
+		GameObject closest = customTarget ? null : Fundementals.findClosest(this, targets);
 
-		if(closest != null && maxDistance > Fundementals.distance(this, closest))
+		if(customTarget || (closest != null && (maxDistance == -1 || maxDistance > Fundementals.distance(this, closest))))
 		{
 			image = huntImg;
+			hunting = true;
 			
-			Vector2 norP = Fundementals.normalize(closest, this);
+			Vector2 norP = customTarget ? Fundementals.normalize(targetX, targetY, loc.x, loc.y) : Fundementals.normalize(closest, this);
 				 
 			float accelx = thrust * norP.x - drag * vx;
 			float accely = thrust * norP.y - drag * vy;
@@ -113,16 +134,20 @@ public class EvilDog extends Enemy
 			loc.x = loc.x + delta * vx;
 			loc.y = loc.y + delta * vy;
 			
-			if(collidesWith(closest))
+			if((customTarget && Fundementals.rectangleVsRectangle(loc.x, loc.y, width(), height(), targetX, targetY, 1, 1)) || (!customTarget && collidesWith(closest)))
 			{
 				if(impact != null)
 					Stage.getCurrentStage().add(impact.getClone(loc.x, loc.y));
 				
-				closest.runHitEvent(this);
+				if(!customTarget)
+					closest.runHitEvent(this);
 				sounds.trySound(0, true);
 			}
 		}
 		else if(idleImg != null)
+		{
+			hunting = false;
 			image = idleImg;
+		}
 	}
 }

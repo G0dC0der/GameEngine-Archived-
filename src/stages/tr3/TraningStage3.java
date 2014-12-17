@@ -3,6 +3,7 @@ package stages.tr3;
 import game.core.Engine.Direction;
 import game.core.GameObject;
 import game.core.MainCharacter.CharacterState;
+import game.development.AutoDispose;
 import game.development.AutoInstall;
 import game.development.AutoLoad;
 import game.essentials.Animation;
@@ -13,8 +14,10 @@ import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import stages.traning.AbstractTraningStage;
 import ui.accessories.Playable;
+
 import com.badlogic.gdx.graphics.Color;
 
+@AutoDispose
 @AutoInstall(mainPath="res/general", path=TraningStage3.PATH)
 @Playable(name="Traning Stage 3", description="A traning stage where the difficulty is slightly increasing.")
 public class TraningStage3 extends AbstractTraningStage

@@ -554,6 +554,8 @@ public final class Engine implements Screen
 				if(!checkpoint)
 					saveReplay("Loser");
 			}
+			else
+				stage.onComplete();
 		}
 	}
 	
@@ -928,22 +930,32 @@ public final class Engine implements Screen
 	
 	void drawObject(GameObject go)
 	{
-		Image2D img = go.getFrame();
-		if (img != null && go.alpha > 0.0f)
+		for(int i = 0; i < 2; i++)
 		{
-			float width  = img.getWidth();
-			float height = img.getHeight();
+			Image2D img = null;
 			
-			img.setFlip(go.flipX, !go.flipY);
-			img.setPosition(go.loc.x + go.offsetX, go.loc.y + go.offsetY);
-			img.setAlpha(go.alpha);
-			img.setSize(go.width, go.height);
-			img.setScale(go.scale);
-			img.setOriginCenter();
-			img.setRotation(go.rotation);
-			img.draw(batch);
-			
-			img.setSize(width, height);
+			if(i == 0)
+				img = go.getFrame();
+			else if(go.secondImage != null)
+				img = go.secondImage.getObject();
+				
+			if (img != null && go.alpha > 0.0f)
+			{
+				float width  = img.getWidth();
+				float height = img.getHeight();
+				
+				img.setFlip(go.flipX, !go.flipY);
+				img.setPosition(go.loc.x + (i == 0 ? go.offsetX : go.offsetX2), go.loc.y + (i == 0 ? go.offsetY : go.offsetY2));
+				img.setAlpha(go.alpha);
+				img.setSize(i == 0 ? go.width : img.getWidth(), i == 0 ? go.height : img.getHeight());
+				img.setScale(go.scale);
+				img.setOriginCenter();
+				img.setRotation(go.rotation);
+				img.draw(batch);
+				
+				if(i == 0)
+					img.setSize(width, height);
+			}
 		}
 	}
 	

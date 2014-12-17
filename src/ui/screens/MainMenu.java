@@ -2,7 +2,6 @@ package ui.screens;
 
 import game.essentials.Utilities;
 import ui.screens.ScreenManager.Task;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;

@@ -296,6 +296,12 @@ public class LightsOut extends StageBuilder
 		return cph.getLastestCheckpoint() != null;
 	}
 	
+	@Override
+	protected void onComplete() 
+	{
+		cph.reset();
+	}
+	
 	PathDrone getSaw(int x, int y)
 	{
 		PathDrone saw = new PathDrone(x * 30, y * 30);
