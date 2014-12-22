@@ -18,11 +18,11 @@ import game.essentials.Factory;
 import game.essentials.GFX;
 import game.essentials.Image2D;
 import game.essentials.SoundBank;
-import game.essentials.Utilities;
 import game.movable.EvilDog;
 import game.movable.LaserDrone;
 import game.movable.Missile;
 import game.movable.PathDrone;
+import game.movable.PathDrone.PathData;
 import game.movable.Shuttle;
 import game.movable.SolidPlatform;
 import game.movable.TimedEnemy;
@@ -32,6 +32,8 @@ import game.objects.OneWay;
 import game.objects.Particle;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
@@ -46,7 +48,7 @@ import com.badlogic.gdx.math.Vector2;
 
 @AutoDispose
 @AutoInstall(mainPath="res/general", path=MutantLabb.PATH)
-@Playable(name="Mutant Labb", description="")
+@Playable(name="Mutant Labb", description="Author: Pojahn Moradi\nAverage time: 110 sec\nProfessional time: 80 sec\nObjective: Enter the exit door.")
 public class MutantLabb extends StageBuilder
 {
 	static final String PATH = "res/mutantlabb";
@@ -72,18 +74,6 @@ public class MutantLabb extends StageBuilder
 	@Override
 	public void init() 
 	{
-//		for(int i = 0; i < 3; i++)
-//		{
-//			int padding = 100;
-//			PathData[] pd = Factory.randomWallPoints(4704 + padding, 5597 - padding, 768 + padding, 1152 - padding);
-//			Vector2[] wps = new  Vector2[pd.length];
-//			for(int j = 0; j < wps.length; j++)
-//				wps[j] = new Vector2(pd[j].targetX, pd[j].targetY);
-//			
-//			Utilities.exportObject(wps, PATH + "/waypoints" + i + ".dat");
-//		}
-//		System.exit(0);
-		
 		super.init();
 		
 		health = Image2D.loadImages(new File("res/general/health"));
@@ -101,12 +91,8 @@ public class MutantLabb extends StageBuilder
 		stress.setLoopPositionBySeconds(7.62);
 		
 		foregroundImg.setRenderOption(RenderOption.PORTION);
-		backgroundImg.setRenderOption(RenderOption.PARALLAX);
+		backgroundImg.setRenderOption(RenderOption.PARALLAX_REPEAT);
 		backgroundImg.setScrollRatio(.5f);
-		
-		wp1 = (Vector2[]) Utilities.importObject(PATH + "/waypoints0.dat");
-		wp2 = (Vector2[]) Utilities.importObject(PATH + "/waypoints1.dat");
-		wp3 = (Vector2[]) Utilities.importObject(PATH + "/waypoints2.dat");
 	}
 	
 	@Override
@@ -442,6 +428,13 @@ public class MutantLabb extends StageBuilder
 		turr.setFiringParticle(gunfire);
 		add(turr);
 		
+		if(!game.playingReplay())
+		{
+			wp1 = getLaserMonsterWP();
+			wp2 = getLaserMonsterWP();
+			wp3 = getLaserMonsterWP();
+		}
+		
 		/*
 		 * Laser Monsters
 		 */
@@ -460,11 +453,11 @@ public class MutantLabb extends StageBuilder
 			
 			LaserDrone ld = new LaserDrone(4687, 772, 50, 10, 60, gm);
 			ld.addEvent(Factory.follow(sh, ld, sh.halfWidth(), sh.halfHeight()));
-			ld.setLaserTint(Color.valueOf("335037FF"));
+			ld.setLaserTint(Color.valueOf("00f428FF"));
 			ld.setFiringSound(laserfire);
 			ld.getSoundBank().useFallOff(true);
-			ld.getSoundBank().power = 20;
-			ld.getSoundBank().maxDistance = 1000;
+			ld.getSoundBank().power = 40;
+			ld.getSoundBank().maxDistance = 1600;
 			ld.addEvent(new Event()
 			{
 				int counter, delay = MathUtils.random(120, 200);
@@ -473,7 +466,10 @@ public class MutantLabb extends StageBuilder
 				public void eventHandling() 
 				{
 					if(++counter % delay == 0)
-						getRandomAlienLaser().play(SoundBank.getVolume(ld, gm, 1000, 1, 40));;
+						getRandomAlienLaser().play(SoundBank.getVolume(ld, gm, 1000, 1, 40));
+					
+					if(buttonDown)
+						discard(ld);
 				}
 			});
 			proj.merge(ld);
@@ -530,7 +526,12 @@ public class MutantLabb extends StageBuilder
 	
 	EvilDog getMetroid(float x, float y)
 	{
-		EvilDog m = new EvilDog(x, y, -1, gm)
+		GameObject dummy = new GameObject();
+		dummy.width = gm.width;
+		dummy.height = gm.height;
+		dummy.loc.set(gm.loc);
+		
+		EvilDog m = new EvilDog(x, y, -1, dummy)
 		{
 			boolean attacking, recover;
 			int attackingCounter, recoveryCounter;
@@ -563,7 +564,7 @@ public class MutantLabb extends StageBuilder
 						vx = vy = 0;
 					}
 					else
-						moveToward2(targetX, targetY, 10);
+						moveTo(targetX, targetY);
 				}
 
 				if(recover && ++recoveryCounter % 120 == 0)
@@ -571,24 +572,8 @@ public class MutantLabb extends StageBuilder
 				
 				if(!attacking)
 				{
-					setTarget(targetX, targetY);
+					dummy.moveTo(targetX, targetY);
 					super.moveEnemy();
-				}
-			}
-			
-			public void moveToward2(float targetX, float targetY, float steps)
-			{
-				if(steps >= Fundementals.distance(targetX, targetY, loc.x, loc.y))
-					moveTo(targetX, targetY);
-				else
-				{
-				    float fX = targetX - loc.x;
-				    float fY = targetY - loc.y;
-				    double dist = Math.sqrt( fX*fX + fY*fY );
-				    double step = steps / dist;
-	
-				    loc.x += fX * step;
-				    loc.y += fY * step;
 				}
 			}
 			
@@ -751,5 +736,37 @@ public class MutantLabb extends StageBuilder
 		}
 		
 		return null;
+	}
+	
+	@Override
+	protected Serializable getMeta() 
+	{
+		ArrayList<Vector2[]> list = new ArrayList<>(3);
+		list.add(wp1);
+		list.add(wp2);
+		list.add(wp3);
+		
+		return list;
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setMeta(Serializable meta) 
+	{
+		ArrayList<Vector2[]> list = (ArrayList<Vector2[]>) meta;
+		wp1 = list.get(0);
+		wp2 = list.get(1);
+		wp3 = list.get(2);
+	}
+	
+	Vector2[] getLaserMonsterWP()
+	{
+		int padding = 100;
+		PathData[] pd = Factory.randomWallPoints(4704 + padding, 5597 - padding, 768 + padding, 1152 - padding);
+		Vector2[] wps = new  Vector2[pd.length];
+		for(int j = 0; j < wps.length; j++)
+			wps[j] = new Vector2(pd[j].targetX, pd[j].targetY);
+		
+		return wps;
 	}
 }

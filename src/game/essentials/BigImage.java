@@ -40,7 +40,12 @@ public class BigImage extends Image2D
 		/**
 		 * Parallax rendering.
 		 */
-		PARALLAX
+		PARALLAX,
+		
+		/**
+		 * Parallax rendering, repeating the image.
+		 */
+		PARALLAX_REPEAT
 	};
 	
 	private RenderOption type;
@@ -79,6 +84,12 @@ public class BigImage extends Image2D
 		if(this.type == RenderOption.PARALLAX)
 		{
 			parallaxCamera = new OrthographicCamera(getWidth(), getHeight());
+			parallaxCamera.setToOrtho(true);
+			parallaxCamera.position.set(0, 0, 0);
+		}
+		else if(this.type == RenderOption.PARALLAX_REPEAT)
+		{
+			parallaxCamera = new OrthographicCamera(Stage.getCurrentStage().size.width, Stage.getCurrentStage().size.height);
 			parallaxCamera.setToOrtho(true);
 			parallaxCamera.position.set(0, 0, 0);
 		}
@@ -142,35 +153,53 @@ public class BigImage extends Image2D
 				
 				break;
 			case REPEAT:
-				Texture img = getTexture();
-				int stageWidth  = Stage.getCurrentStage().size.width;
-				int stageHeight = Stage.getCurrentStage().size.height;
-				int repeatX = (int) (stageWidth /  img.getWidth());
-				int repeatY = (int) (stageHeight / img.getHeight());
-				
-				if(stageWidth  > repeatX * img.getWidth())
-					repeatX++;
-				if(stageHeight > repeatY * img.getHeight())
-					repeatY++;
-					
-				for(int x = 0; x < repeatX; x++)
-					for(int y = 0; y < repeatY; y++)
-					{
-						setPosition(x * img.getWidth(), y * img.getHeight());
-						super.draw(batch);
-					}
+				repeat(batch);
 				
 				break;
 			case PARALLAX:
-				parallaxCamera.position.x = Math.max(e.getScreenWidth() / 2, parallaxCamera.position.x + (e.tx - e.getPrevTx()) * ratioX);
-				parallaxCamera.position.y = Math.max(e.getScreenHeight() / 2, parallaxCamera.position.y + (e.ty - e.getPrevTy()) * ratioY);
-				parallaxCamera.update();
-
+				updateParallaxCamera();
 				batch.setProjectionMatrix(parallaxCamera.combined);
 				super.draw(batch);
 				e.gameCamera();
 				
 				break;
+			case PARALLAX_REPEAT:
+				updateParallaxCamera();
+				batch.setProjectionMatrix(parallaxCamera.combined);
+				repeat(batch);
+				e.gameCamera();
+				
+				break;
 		}
+	}
+	
+	private void updateParallaxCamera()
+	{
+		final Engine e = Stage.getCurrentStage().game;
+		
+		parallaxCamera.position.x = Math.max(e.getScreenWidth()  / 2, parallaxCamera.position.x + (e.tx - e.getPrevTx()) * ratioX);
+		parallaxCamera.position.y = Math.max(e.getScreenHeight() / 2, parallaxCamera.position.y + (e.ty - e.getPrevTy()) * ratioY);
+		parallaxCamera.update();
+	}
+	
+	private void repeat(Batch batch)
+	{
+		Texture img = getTexture();
+		int stageWidth  = Stage.getCurrentStage().size.width;
+		int stageHeight = Stage.getCurrentStage().size.height;
+		int repeatX = (int) (stageWidth /  img.getWidth());
+		int repeatY = (int) (stageHeight / img.getHeight());
+		
+		if(stageWidth  > repeatX * img.getWidth())
+			repeatX++;
+		if(stageHeight > repeatY * img.getHeight())
+			repeatY++;
+			
+		for(int x = 0; x < repeatX; x++)
+			for(int y = 0; y < repeatY; y++)
+			{
+				setPosition(x * img.getWidth(), y * img.getHeight());
+				super.draw(batch);
+			}
 	}
 }

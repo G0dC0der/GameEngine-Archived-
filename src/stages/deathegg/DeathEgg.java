@@ -99,7 +99,7 @@ public class DeathEgg extends StageBuilder
 		stageData = Utilities.createStageData(map);
 		
 		foregroundImg = new BigImage(PATH + "/foreground.png", RenderOption.PORTION);
-		backgroundImg = new BigImage(PATH + "/background.png", RenderOption.PARALLAX);
+		backgroundImg = new BigImage(PATH + "/background.png", RenderOption.PARALLAX_REPEAT);
 		backgroundImg.setScrollRatio(.5f);
 		
 		jump	= TinySound.loadSound(new File("res/general/jump.wav"));

@@ -876,7 +876,7 @@ public class Fundementals
 	}
 	
 	/**
-	 * Normalizes the two points. Returns point (NaN:NaN) if x1 == x2 && y1 == y2.
+	 * Normalizes the two points.
 	 * @return The normalized point.
 	 */
 	public static Vector2 normalize(float x1, float y1, float x2, float y2)
@@ -887,7 +887,7 @@ public class Fundementals
 		dx /= length;
 		dy /= length;
 		
-		return new Vector2(dx,dy);
+		return new Vector2(Float.isNaN(dx) ? 0 : dx, Float.isNaN(dy) ? 0 : dy);
 	}
 
 	/**
