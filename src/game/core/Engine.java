@@ -559,6 +559,11 @@ public final class Engine implements Screen
 		}
 	}
 	
+	public double getGlobalScale()
+	{
+		return windowScale;
+	}
+	
 	/**
 	 * Allow you to increase the size of the viewport, buy zooming.
 	 * @param windowScale The value to multiple with and height with.

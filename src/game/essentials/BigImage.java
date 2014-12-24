@@ -177,6 +177,7 @@ public class BigImage extends Image2D
 	{
 		final Engine e = Stage.getCurrentStage().game;
 		
+		parallaxCamera.zoom = getScale();
 		parallaxCamera.position.x = Math.max(e.getScreenWidth()  / 2, parallaxCamera.position.x + (e.tx - e.getPrevTx()) * ratioX);
 		parallaxCamera.position.y = Math.max(e.getScreenHeight() / 2, parallaxCamera.position.y + (e.ty - e.getPrevTy()) * ratioY);
 		parallaxCamera.update();
@@ -201,5 +202,17 @@ public class BigImage extends Image2D
 				setPosition(x * img.getWidth(), y * img.getHeight());
 				super.draw(batch);
 			}
+	}
+	
+	private float getScale()
+	{
+		float scale = (float)Stage.getCurrentStage().game.getGlobalScale();
+		
+		if(scale == 1f)
+			return scale;
+		else if(scale > 1f)
+			return scale - 1f;
+		else
+			return scale + 1f;
 	}
 }

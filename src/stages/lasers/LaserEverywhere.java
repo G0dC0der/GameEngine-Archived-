@@ -299,7 +299,7 @@ public class LaserEverywhere extends StageBuilder
 	protected void onComplete() 
 	{
 		if(cph != null)
-		cph.reset();
+			cph.reset();
 	}
 	
 	@Override

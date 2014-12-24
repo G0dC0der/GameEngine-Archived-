@@ -60,7 +60,7 @@ public class SelectStage implements Screen
 		Collections.sort(highscores, HighScore.TIME_SORT);
 		Collections.reverse(highscores);
 		
-		java.util.List<Class<game.core.Stage>> stgs = StageReader.loadAll();
+		java.util.List<Class<? extends game.core.Stage>> stgs = StageReader.loadAll();
 		stages = new ArrayList<>(stgs.size());
 		for(Class<?> clazz : stgs)
 		{

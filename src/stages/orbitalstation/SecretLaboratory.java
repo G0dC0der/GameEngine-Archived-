@@ -112,7 +112,7 @@ public class SecretLaboratory extends StageBuilder
 		spaceMusic.setLoopPositionBySeconds(4.48f);
 		spaceMusic.setLoop(true);
 		
-		sawLoop = TinySound.loadMusic(new File("res/traning5/sawLoop.wav"), true);
+		sawLoop = TinySound.loadMusic(new File("res/stress/sawLoop.wav"), true);
 	}
 	
 	@Override
@@ -790,7 +790,8 @@ public class SecretLaboratory extends StageBuilder
 	@Override
 	protected void onComplete() 
 	{
-		cph.reset();
+		if(cph != null)
+			cph.reset();
 	}
 	
 	@Override

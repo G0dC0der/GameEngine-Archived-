@@ -595,6 +595,7 @@ public class SteelFactory extends StageBuilder
 		missile.setMoveSpeed(8);
 		missile.setImpact(shra);
 		missile.setTrailer(trailer);
+		missile.adjustTrailer(true);
 		missile.setProperties(MissileProperties.FAST_VERY_FLOATY);
 		
 		Particle firingParticle = new Particle();

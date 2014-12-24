@@ -815,7 +815,8 @@ public class DeathEgg extends StageBuilder
 	@Override
 	protected void onComplete() 
 	{
-		cph.reset();
+		if(cph != null)
+			cph.reset();
 	}
 	
 	protected void extra() 
