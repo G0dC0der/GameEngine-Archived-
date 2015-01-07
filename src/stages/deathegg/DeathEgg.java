@@ -159,7 +159,7 @@ public class DeathEgg extends StageBuilder
 		 */
 		addSwitch(495, 3632, false);
 		addSwitch(1967, 4096, true);
-		addSwitch(180, 448, true);
+		addSwitch(100, 448, true);
 		addSwitch(2201, 1025, false);
 		
 		/*
@@ -264,11 +264,11 @@ public class DeathEgg extends StageBuilder
 		plat1.appendPath(plat1.loc.x, plat1.loc.y, 0, true, null);
 		plat1.appendPath(3904, 3522 + 30);
 		plat1.setStrictGlueMode(true);
-		plat1.setMoveSpeed(2);
+		plat1.setMoveSpeed(1.3f);
 		
 		add(plat1);
-		add(plat1.getClone(plat1.loc.x, plat1.loc.y), 75);
-		add(plat1.getClone(plat1.loc.x, plat1.loc.y), 145);
+		add(plat1.getClone(plat1.loc.x, plat1.loc.y), 115);
+		add(plat1.getClone(plat1.loc.x, plat1.loc.y), 225);
 		
 		for(int i = 0, y = 2560; i < 5; i++, y += 80)
 		{
@@ -282,9 +282,9 @@ public class DeathEgg extends StageBuilder
 		
 		SolidPlatform plat2 = plat1.getClone(3752, 3194);
 		plat2.clearData();
-		plat2.appendPath(plat2.loc, 20, false, null);
-		plat2.appendPath(3922, 3060, 20, false, null);
-		plat2.setMoveSpeed(2.4f);
+		plat2.appendPath(plat2.loc, 50, false, null);
+		plat2.appendPath(3922, 3060, 50, false, null);
+		plat2.setMoveSpeed(1.5f);
 		add(plat2);
 		
 		/*
